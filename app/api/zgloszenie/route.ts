@@ -1,0 +1,95 @@
+import { put } from "@vercel/blob";
+
+// Zapis zgloszenia kandydatki. Kontrakt: plan/02 sekcja D. Jeden plik JSON per
+// zgloszenie, zero panelu admina (odczyt przez dashboard Vercel Blob).
+//
+// Store `jwp-zgloszenia` jest PRYWATNY (DECISIONS #6) - zgloszenia niosa adresy
+// e-mail, wiec `access: "private"`. Domyslne przyklady z dokumentacji uzywaja
+// "public" i na tym store po prostu nie przechodza.
+
+export const runtime = "nodejs";
+
+// Ten plik nie moze eksportowac NIC poza handlerami i konfiguracja segmentu -
+// `tsc --noEmit` tego nie lapie, wywala dopiero `pnpm build`.
+
+const LIMIT_BAJTOW = 2 * 1024;
+
+function liczbaWZakresie(wartosc: unknown, min: number, max: number): number | null {
+  const n = typeof wartosc === "number" ? wartosc : Number(wartosc);
+  if (!Number.isFinite(n) || n < min || n > max) return null;
+  return n;
+}
+
+function losowe6(): string {
+  return Math.random().toString(36).slice(2, 8).padEnd(6, "0");
+}
+
+export async function POST(request: Request) {
+  const surowy = await request.text();
+  if (new TextEncoder().encode(surowy).length > LIMIT_BAJTOW) {
+    return Response.json(
+      { blad: "Zgłoszenie przekracza dopuszczalną objętość akt. Komisja czyta, ale nie tomami." },
+      { status: 413 },
+    );
+  }
+
+  let cialo: Record<string, unknown>;
+  try {
+    cialo = JSON.parse(surowy) as Record<string, unknown>;
+  } catch {
+    return Response.json({ blad: "Druk nieczytelny dla Komisji." }, { status: 400 });
+  }
+
+  // Granica zaufania: te same trzy reguly co u klienta, tylko tu obowiazuja naprawde.
+  const email = typeof cialo.email === "string" ? cialo.email.trim() : "";
+  if (!/.+@.+\..+/.test(email) || email.length > 254) {
+    return Response.json(
+      { blad: "WYPEŁNIONO NIEGODNIE: ADRES NIE PRZYPOMINA ADRESU. Komisja odsyła druk." },
+      { status: 400 },
+    );
+  }
+  const rozmiarButa = liczbaWZakresie(cialo.rozmiarButa, 10, 70);
+  if (rozmiarButa === null) {
+    return Response.json(
+      { blad: "WYPEŁNIONO NIEGODNIE: ROZMIAR BUTA POZA SKALĄ KOMISJI (10-70)." },
+      { status: 400 },
+    );
+  }
+  const srednicaUchaMm = liczbaWZakresie(cialo.srednicaUchaMm, 5, 500);
+  if (srednicaUchaMm === null) {
+    return Response.json(
+      { blad: "WYPEŁNIONO NIEGODNIE: ŚREDNICA UCHA POZA SKALĄ KOMISJI (5-500)." },
+      { status: 400 },
+    );
+  }
+
+  const zgloszenie = {
+    email,
+    rozmiarButa,
+    srednicaUchaMm,
+    punktyEgzamin: liczbaWZakresie(cialo.punktyEgzamin, 0, 10) ?? 0,
+    punktyQuiz: liczbaWZakresie(cialo.punktyQuiz, 0, 15) ?? 0,
+    ts: new Date().toISOString(),
+  };
+  const sciezka = `zgloszenia/${zgloszenie.ts}-${losowe6()}.json`;
+
+  // Bez tokena (lokalny dev) formularz ma DZIALAC, nie wywalac sie na infrastrukturze.
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    console.log(`[zgloszenie dev-log] ${sciezka} ${JSON.stringify(zgloszenie)}`);
+    return Response.json({ tryb: "dev-log", sciezka });
+  }
+
+  try {
+    const blob = await put(sciezka, JSON.stringify(zgloszenie), {
+      access: "private",
+      contentType: "application/json",
+      addRandomSuffix: false,
+    });
+    return Response.json({ tryb: "blob", sciezka: blob.pathname });
+  } catch {
+    // Teatr w kliencie nie moze zalezec od Bloba - klient dostaje 502 i pokazuje
+    // stempel o pamieci ulotnej, a zgloszenie zostaje w logu (plan/07 B).
+    console.log(`[zgloszenie awaria-bloba] ${sciezka} ${JSON.stringify(zgloszenie)}`);
+    return Response.json({ blad: "Komisja zapisała w pamięci ulotnej." }, { status: 502 });
+  }
+}

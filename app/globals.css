@@ -1700,3 +1700,4 @@ a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
   .ognisko__strzal { animation: none; opacity: 0; }
   .ogien__pole[data-zle="tak"] { animation: none; }   /* zostaje sam stempel (plan/07 C) */
 }
+.ogien__ulotna { display: block; margin-top: 6px; font-size: var(--rozmiar-drobny); color: var(--urzad); }

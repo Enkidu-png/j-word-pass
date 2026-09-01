@@ -42,6 +42,7 @@ export default function Kwestionariusz() {
   const [proba, ustawProbe] = useState(0);   // numer podejscia: remontuje trzesienie
   const [iskra, ustawIskre] = useState(0);   // fokus pola strzela iskra z ogniska
   const [przyjete, ustawPrzyjete] = useState(false);
+  const [ulotna, ustawUlotna] = useState(false);   // Blob padl: zgloszenie zyje tylko w logu
   // natywny submit przed hydracja wypchnalby e-mail kandydata do adresu URL
   const [gotowy, ustawGotowy] = useState(false);
 
@@ -63,7 +64,33 @@ export default function Kwestionariusz() {
     ustawEmail(pola.current.email?.value || zapis?.email || "");
     ustawBut(pola.current.but?.value || (zapis?.rozmiarButa != null ? String(zapis.rozmiarButa) : ""));
     ustawUcho(pola.current.ucho?.value || (zapis?.srednicaUchaMm != null ? String(zapis.srednicaUchaMm) : ""));
+    // powrot na URL po wysylce: druk jest juz przyjety i NIE leci drugi POST (07 C)
+    if (zapis?.wyslano) ustawPrzyjete(true);
   }, []);
+
+  // POST leci OBOK teatru (plan/07 B): niczego nie blokuje, a przy awarii ponawia
+  // sie raz w tle. Druga proba ma sens tylko dla awarii serwera - 4xx znaczy, ze
+  // druk jest wadliwy i powtorka nic nie zmieni.
+  async function wyslij(dane: Record<string, unknown>) {
+    for (const podejscie of [0, 1]) {
+      try {
+        const res = await fetch("/api/zgloszenie", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(dane),
+        });
+        if (res.ok) {
+          zapiszTeraz({ ogien: { wyslano: true } });
+          return;
+        }
+        if (res.status < 500) break;
+      } catch {
+        // siec padla - drugie podejscie albo stempel o pamieci ulotnej
+      }
+      if (podejscie === 0) await new Promise((g) => setTimeout(g, 400));
+    }
+    ustawUlotna(true);
+  }
 
   const zapisz = (patch: { email?: string; rozmiarButa?: number | null; srednicaUchaMm?: number | null }) =>
     zapiszStan({ ogien: patch });
@@ -99,8 +126,19 @@ export default function Kwestionariusz() {
           ustawProbe((n) => n + 1);
           if (nowe.length > 0) return;   // fokus ustawia efekt po remoncie pol
           // werdykt etapu nie moze zginac w debounce (znalezisko F7-08)
+          const stan = czytajStan();
           zapiszTeraz({ ogien: { email, rozmiarButa: liczba(but), srednicaUchaMm: liczba(ucho) } });
           ustawPrzyjete(true);
+          // idempotencja (anty-spec 07 D2): raz wyslane zgloszenie nie leci drugi raz
+          if (!stan?.ogien?.wyslano) {
+            void wyslij({
+              email,
+              rozmiarButa: liczba(but),
+              srednicaUchaMm: liczba(ucho),
+              punktyEgzamin: stan?.egzamin?.punkty ?? 0,
+              punktyQuiz: stan?.quiz?.punkty ?? 0,
+            });
+          }
           // ponytail: ceremonia spalenia i list w butelce dochodza w F5-03,
           // tu konczy sie na przyjeciu druku - zero toasta (anty-spec 07 D1).
         }}
@@ -209,6 +247,9 @@ export default function Kwestionariusz() {
         {przyjete ? (
           <p className="formularz-F7 ogien__przyjeto" data-przyjeto="" role="status">
             DRUK OGN-3/TAJ PRZYJĘTY. KOMISJA SZYKUJE OGIEŃ.
+            {ulotna && (
+              <span className="ogien__ulotna" data-ulotna="">KOMISJA ZAPISAŁA W PAMIĘCI ULOTNEJ</span>
+            )}
           </p>
         ) : (
           <button className="ogien__cta" type="submit" data-cta disabled={!gotowy || !pokora}>
