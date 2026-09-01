@@ -44,5 +44,50 @@ export function etapUkonczony(stan: StanJWP | null, etap: Etap): boolean {
   return stan.ogien?.wyslano === true;
 }
 
-// ponytail: strona czytajaca. `zapiszStan(patch)` z debounce 400 ms i
-// `wyczyscStan()` dochodza w F2-04 - shell ich jeszcze nie potrzebuje.
+type Patch = {
+  [K in Etap]?: Partial<NonNullable<StanJWP[K]>>;
+};
+
+let oczekujacy: Patch | null = null;
+let timer: ReturnType<typeof setTimeout> | null = null;
+
+function scal(stan: StanJWP | null, patch: Patch): StanJWP {
+  const bazowy: StanJWP = stan ?? { v: 1, egzamin: null, quiz: null, ogien: null };
+  const wynik: StanJWP = { ...bazowy, v: 1 };
+  for (const etap of Object.keys(patch) as Etap[]) {
+    // merge plytki per etap (kontrakt plan/02 G)
+    wynik[etap] = { ...(bazowy[etap] ?? {}), ...patch[etap] } as never;
+  }
+  return wynik;
+}
+
+// Zapis z debounce 400 ms: kolejne wywolania sklejaja sie w jeden patch,
+// zeby pisanie w textarea nie waliło w sessionStorage na kazdy znak.
+export function zapiszStan(patch: Patch): void {
+  if (typeof window === "undefined") return;
+  oczekujacy = { ...oczekujacy, ...patch };
+  if (timer) clearTimeout(timer);
+  timer = setTimeout(() => {
+    const doZapisu = oczekujacy;
+    oczekujacy = null;
+    timer = null;
+    if (!doZapisu) return;
+    try {
+      window.sessionStorage.setItem(KLUCZ_STANU, JSON.stringify(scal(czytajStan(), doZapisu)));
+    } catch {
+      // brak miejsca / tryb prywatny - kandydat traci zapis, nie strone
+    }
+  }, 400);
+}
+
+export function wyczyscStan(): void {
+  if (typeof window === "undefined") return;
+  if (timer) clearTimeout(timer);
+  timer = null;
+  oczekujacy = null;
+  try {
+    window.sessionStorage.removeItem(KLUCZ_STANU);
+  } catch {
+    // jw.
+  }
+}

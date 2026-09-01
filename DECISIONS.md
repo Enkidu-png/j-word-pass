@@ -103,3 +103,25 @@ wyłącznie przez dashboard Vercel (decyzja D3 w plan/README - zero panelu admin
 Konsekwencja dla F5-02: wywołanie `put()` z `@vercel/blob` musi mieć
 `access: "private"`. Domyślne przykłady w dokumentacji używają `access: "public"` -
 to by nie zadziałało na tym store.
+
+## #7 Pierwszy deploy Vercela wylądował na PRODUKCJI mimo braku `--prod` (F2-04, worker)
+
+Dyspozycja dla F2-04 brzmiała: deploy PREVIEW dozwolony, produkcyjny zakazany
+(bramka F8). Wykonana komenda była zgodna: `vercel deploy --yes`, bez `--prod`.
+Vercel mimo to ustawił `"target": "production"` i sam to zakomunikował:
+„This is the project's first deployment, so it was assigned to production.
+Future deployments will be preview deployments unless you use --prod."
+
+Skutek: `dpl_2WWx6DiArnRbyrytPpRrtokJkdvV` ma aliasy `j-word-pass.vercel.app`
+i `j-word-pass-enkidu-pngs-projects.vercel.app`. Bramka F8 formalnie została
+przekroczona przez domyślne zachowanie platformy, nie przez decyzję workera.
+
+Łagodzące: projekt ma włączoną Deployment Protection (Vercel Authentication),
+więc anonimowy ruch dostaje 302 na SSO - nikt postronny tej wersji nie zobaczy.
+Aplikacja nie ma jeszcze żadnego endpointu API ani zapisu do Blob, więc deploy
+nie wystawił niczego kosztownego.
+
+Decyzja: NIE cofam tego (usunięcie deployu / pauza projektu to działanie na
+zasobach użytkownika poza zakresem issue). Kolejne deploye workerów będą już
+preview automatycznie. Bramka F8-01 zostaje otwarta i przy jej wykonaniu trzeba
+świadomie rozstrzygnąć Deployment Protection - opisane jako znalezisko F7-04.
