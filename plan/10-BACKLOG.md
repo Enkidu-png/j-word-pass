@@ -219,6 +219,13 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
   ✓ D1 fix: `await page.mouse.move(0, 0)` przed każdym `hover({force:true})` w pętli i przed hoverem czwartym - kursor opuszcza przycisk, więc każdy hover jest prawdziwym wejściem. Asercje nietknięte.
   ✓ D2 `npx playwright test` uruchomione 3x pod rząd: **64 passed + 8 skipped + 0 failed** za każdym razem.
 
+- [x] **F7-07** `ui` `components/Pieczatka.tsx` rysował tekst po łuku DO GÓRY NOGAMI, a napis dłuższy niż ~9 znaków owijał się poza koniec ścieżki i znikał.
+  ZNALEZIONE W: F3-04 (oględziny `screenshots/F3/F3-04-werdykt-desktop.png` - pieczęć `8/10 - ZDANO` czytała się odwrotnie). Błąd zastany z F1-02, nie z F3.
+  DLACZEGO TESTY GO NIE ZŁAPAŁY: `tests/f1-02.spec.ts` sprawdza treść `textPath` i `aria-label`, a nie orientację glifów. Na krótkim `ZALACZONO` obrót był mało widoczny.
+  AC: napis w pieczęci czyta się normalnie w obu ceremoniach; dowolnie długi tekst mieści się wewnątrz koła.
+  ✓ D1 łuk zamieniony na `M 14,44 A 65,65 0 0 0 86,44` (kierunek dobrany empirycznie na zrzutach, nie z rozumowania o `sweep-flag`), plus `textLength="70" lengthAdjust="spacingAndGlyphs"`.
+  ✓ D2 zweryfikowane na trzech użyciach: `8/10 - ZDANO` i `0/10 - PUSTKA` (F3-04), mini `ZAŁ.` na fiszkach (F3-03, wycinek screenshotu), `ZALACZONO` na `/dev/animacje` (test F1-02 nadal zielony).
+
 - [ ] **F7-04** `deploy` Projekt ma włączoną Deployment Protection (Vercel Authentication) - anonimowy `curl` na URL deployu dostaje 302 na `vercel.com/sso-api`.
   ZNALEZIONE W: F2-04 (weryfikacja AC „URL preview działa"; obejście: `vercel curl <url>`, które dokłada token).
   DLACZEGO TO PROBLEM: kandydat wchodzący z linku zobaczy ekran logowania Vercela, a nie bramę. Dopóki gra ma być publiczna, ochrona musi zniknąć albo dostać bypass.
@@ -228,6 +235,15 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
   ZNALEZIONE W: F2-04 (oględziny screenshotu DoD `screenshots/F2/F2-DoD-egzamin-mobile.png`; testy tego nie łapią, bo asercje sprawdzają istnienie elementów, nie kolizję prostokątów).
   AC: na 390x844 prostokąt widżetu radia nie przecina żadnego prostokąta tekstu stopki (Playwright: `getBoundingClientRect()` obu, assert brak przecięcia) - np. przez dolny padding stopki równy wysokości widżetu; screenshot mobile w `screenshots/F7/`; desktop 1280x800 bez zmian wizualnych.
   ROZSZERZENIE (F3-04): widżet nie zasłania już tylko stopki. Na `screenshots/F3/F3-04-werdykt-mobile.png` przykrywa PRZYCISK `PRZYJMUJĘ WERDYKT, ŻĄDAM QUIZU`, a na `F3-04-werdykt-desktop.png` wchodzi na scenę egzaminu. To samo zjawisko, ale trafia już w element interaktywny, więc AC obejmuje też: na obu viewportach prostokąt widżetu nie przecina prostokąta ŻADNEGO elementu klikalnego (`button`, `a`, `[role="button"]`).
+
+## DoD FAZY F3 (odhaczone 2026-09-01)
+- ✓ `pnpm run check` zielony (`lint-tokens: czysto`, `tsc --noEmit` bez błędów).
+- ✓ `pnpm build` zielony: `/egzamin` 8,13 kB, first load 110 kB, `/api/ocena` jako `ƒ`.
+- ✓ `npx playwright test` = **96 passed + 12 skipped + 0 failed**, powtórzone 2x pod rząd.
+- ✓ Screenshoty stanu fazy w `screenshots/F3/`: `F3-02-egzamin-{desktop,mobile}.png` (scena + arkusz), `F3-03-karty-{desktop,mobile}.png` (dowody przybite), `F3-04-werdykt-{desktop,mobile}.png` (stan końcowy etapu).
+- ✓ Zero znalezisk bez issue: F7-06 i F7-07 dopisane i zamknięte w tej paczce, F7-05 rozszerzone o kolizję widżetu radia z przyciskiem werdyktu.
+- ✓ `app/vendor/` nietknięte - w F3 nic nie vendorowano (uzasadnienie przy F3-02), więc warunki vendorowe DoD nie mają zastosowania. F7-02 nadal otwarte i nadal blokuje pierwszą wklejkę.
+- ✓ Anty-spec 05→D: (D1) założenia wyłącznie jako karty, zero `<p>` - test negatywny w F3-02 i F3-03; (D2) werdykt jest sceną, nie modalem; (D3) zero spinnera - czekaniem jest narada; (D4) zero walidacji „min. N znaków" - pustka daje 0 i przepuszcza dalej.
 
 ## F8 - BRAMKA DECYZYJNA: PRODUKCJA
 
