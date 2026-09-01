@@ -1526,3 +1526,177 @@ a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) {
   .maszyna__teczka, .podanie__samolocik, .podanie-do-ognia[data-przejscie="ogien"] { animation: none !important; }
 }
+
+/* == ETAP 3: PROBA OGNIA (plan/07 A, C) == */
+/* Kafel ognia w pelnej mocy zjada tekst, wiec sekcja dostaje overlay --kosmos 60%
+   (plan/07 naglowek). Tresc jedzie warstwe wyzej. */
+.ogien { position: relative; padding: 16px; }
+.ogien::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--kosmos);
+  opacity: 0.6;
+  pointer-events: none;
+}
+.ogien > * { position: relative; }
+.ogien > h1 {
+  font-family: var(--font-krzyk);
+  font-size: var(--rozmiar-krzyk);
+  line-height: 1;
+  text-align: center;
+  color: var(--chrom-b);          /* na przygaszonym kaflu atrament byłby niewidoczny */
+  text-shadow: var(--cien-x) var(--cien-y) 0 var(--cien);
+  /* PassOMetr wisi `fixed` w prawym gornym rogu - bez tego marginesu ostatnia
+     litera krzyku chowa sie pod jego ramka (ta sama klasa bledu co F7-05) */
+  padding-right: 210px;
+}
+
+.ogien__scena { position: relative; max-width: 640px; margin: 0 auto 220px; }
+
+/* ognisko siedzi POD drukiem i wystaje zza jego dolnej krawedzi: same czubki
+   plomieni chowaja sie za drukiem, reszta stosu jest widoczna (plan/07 A) */
+.ognisko { position: absolute; left: 50%; bottom: -200px; width: 300px; margin-left: -150px; z-index: 0; }
+.ognisko__svg { display: block; overflow: visible; }
+.ognisko__polana rect { fill: var(--atrament); stroke: var(--cien); stroke-width: 3; }
+
+.ognisko__wychyl { transform-box: view-box; transform-origin: 100px 150px; }
+.ognisko__wychyl[data-kierunek="0"] { transform: rotate(-8deg); }
+.ognisko__wychyl[data-kierunek="2"] { transform: rotate(8deg); }
+
+.ognisko__plomien {
+  stroke: var(--cien);
+  stroke-width: 3;
+  transform-box: view-box;
+  transform-origin: 100px 142px;
+  --klatki: 4;
+  animation-name: jwp-plomien;
+  animation-duration: 900ms;
+}
+.ognisko__plomien--zewnetrzny { fill: var(--urzad); }
+.ognisko__plomien--srodkowy { fill: var(--alarm); animation-delay: 220ms; }
+.ognisko__plomien--rdzen { fill: var(--chrom-b); animation-delay: 440ms; }
+@keyframes jwp-plomien {
+  0% { transform: scaleY(1) scaleX(1); }
+  25% { transform: scaleY(0.86) scaleX(1.06); }
+  50% { transform: scaleY(1.08) scaleX(0.94); }
+  75% { transform: scaleY(0.94) scaleX(1.03); }
+  100% { transform: scaleY(1) scaleX(1); }
+}
+
+.ognisko__iskra {
+  fill: var(--chrom-b);
+  transform-box: view-box;
+  --klatki: 6;
+  animation-name: jwp-iskra;
+  animation-duration: 1200ms;
+}
+.ognisko__iskra[data-iskra="1"] { animation-delay: 200ms; }
+.ognisko__iskra[data-iskra="2"] { animation-delay: 400ms; }
+.ognisko__iskra[data-iskra="3"] { animation-delay: 600ms; }
+.ognisko__iskra[data-iskra="4"] { animation-delay: 800ms; }
+.ognisko__iskra[data-iskra="5"] { animation-delay: 1000ms; }
+@keyframes jwp-iskra {
+  0% { transform: translate(0, 0); opacity: 1; }
+  100% { transform: translate(0, -78px); opacity: 0; }
+}
+
+/* strzal iskra po fokusie pola - jednorazowy, klasa ceremonia (Z8) */
+.ognisko__strzal {
+  fill: var(--chrom-a);
+  transform-box: view-box;
+  animation: jwp-strzal 500ms steps(5) 1 both;
+}
+@keyframes jwp-strzal {
+  0% { transform: translate(0, 0); opacity: 1; }
+  100% { transform: translate(18px, -96px); opacity: 0; }
+}
+
+.ogien__druk { position: relative; z-index: 1; }
+.ogien__numer { font-family: var(--font-urzad); font-size: var(--rozmiar-drobny); margin: 0 0 4px; }
+.ogien__naglowek { font-family: var(--font-krzyk); font-size: var(--rozmiar-tekst); margin: 0 0 20px; }
+
+/* Trzy pola na luku (plan/07 A). Obrot liczony od LEWEJ krawedzi i wezsze pole:
+   przy 100% szerokosci i srodkowym punkcie obrotu podkreslenia wyjezdzaly poza
+   druk i wchodzily na etykiete sasiada (widoczne dopiero na zrzucie). */
+.ogien__pole { width: 76%; margin: 0 0 40px; transform-origin: left center; }
+.ogien__pole[data-luk="1"] { margin-left: auto; }
+.ogien__pole[data-luk="0"] { transform: rotate(-6deg); }
+.ogien__pole[data-luk="2"] { transform: rotate(6deg); }
+.ogien__pole[data-zle="tak"] { animation: jwp-trzesienie 240ms steps(2) 2 both; }
+@keyframes jwp-trzesienie {
+  0% { translate: -6px 0; }
+  50% { translate: 6px 0; }
+  100% { translate: 0 0; }
+}
+
+.ogien__etykieta { display: block; font-family: var(--font-urzad); font-size: var(--rozmiar-drobny); }
+.ogien__wiersz { display: flex; align-items: center; gap: 12px; }
+.ogien__wpis {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px dotted var(--atrament);   /* fokus zamienia kropki na ciagla */
+  padding: 4px 2px;
+}
+.ogien__wpis:focus { border-bottom-style: solid; }
+.ogien__wpis--liczba { width: 7ch; flex: 0 0 auto; }
+.ogien__dopisek { display: block; margin-top: 8px; font-size: var(--rozmiar-drobny); }
+
+.ogien__stopka { width: 120px; height: 60px; flex: 0 0 auto; }
+.ogien__stopka-ksztalt, .ogien__stopka-palec { fill: var(--atrament); stroke: var(--cien); stroke-width: 2; }
+.ogien__miarka { stroke: var(--urzad); stroke-width: 2; fill: none; }
+
+.ogien__ucho { width: 120px; height: 70px; flex: 0 0 auto; }
+.ogien__ucho-ksztalt { fill: var(--papier); stroke: var(--atrament); stroke-width: 3; }
+.ogien__suwmiarka-belka, .ogien__suwmiarka-szczeka { stroke: var(--urzad); stroke-width: 3; fill: none; }
+.ogien__podziw { font-family: var(--font-krzyk); font-size: var(--rozmiar-drobny); margin: 6px 0 0; color: var(--urzad); }
+
+/* Z14: komunikat o bledzie to stempel na druku, nigdy czerwona obwodka pola */
+.ogien__stempel {
+  margin: 18px 0 0;   /* mniej i obrocony stempel wchodzil na dopisek pod polem */
+  padding: 6px 8px;
+  border: 4px double var(--alarm);
+  color: var(--alarm);
+  font-family: var(--font-krzyk);
+  font-size: var(--rozmiar-drobny);
+  transform: rotate(-2deg);
+}
+
+.ogien__klauzula { font-family: var(--font-glos); margin: 24px 0 8px; }
+.ogien__smierc { color: var(--alarm); font-family: var(--font-krzyk); }
+.ogien__pokora { display: flex; align-items: center; gap: 8px; font-family: var(--font-urzad); margin: 0 0 16px; }
+.ogien__cta {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  font-family: var(--font-krzyk);
+  background: var(--chrom-b);
+  border: 4px outset var(--atrament);
+  box-shadow: var(--cien-x) var(--cien-y) 0 var(--cien);
+}
+.ogien__cta:disabled { background: var(--krata); }
+.ogien__przyjeto {
+  margin: 0;
+  border-color: var(--jad);
+  font-family: var(--font-krzyk);
+  transform: rotate(-1deg);
+}
+
+@media (max-width: 767px) {
+  /* mobile: formularz NAD ogniskiem, kolumna (plan/07 C). Kolejnosc DOM zostaje
+     (ognisko jest tlem sceny, wiec idzie pierwsze), przestawia ja `order`. */
+  .ogien__scena { display: flex; flex-direction: column; margin-bottom: 16px; }
+  .ogien__druk { order: 1; }
+  .ognisko { position: static; order: 2; width: 200px; margin: 16px auto 0; }
+  .ogien > h1 { padding-right: 0; }
+  .ogien__pole { width: 100%; margin-bottom: 28px; }
+  .ogien__pole[data-luk="0"], .ogien__pole[data-luk="2"] { transform: none; }
+  .ogien__pole[data-luk="1"] { margin-left: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ognisko__strzal { animation: none; opacity: 0; }
+  .ogien__pole[data-zle="tak"] { animation: none; }   /* zostaje sam stempel (plan/07 C) */
+}
