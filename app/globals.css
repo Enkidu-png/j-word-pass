@@ -150,11 +150,12 @@ a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
 .straz-etapu__druk { font-family: var(--font-krzyk); margin: 0 0 8px; }
 
 /* == RADIO KOMISJI == */
+/* F7-05: bylo `position: fixed` w lewym dolnym rogu (plan/04 A). Fixed lezy NAD
+   trescia, wiec widzet zaslanial stopke, przycisk werdyktu i przyciski bramy.
+   Widzet wraca do normalnego przeplywu tuz nad stopka - dalej w lewym dolnym
+   rogu STRONY, ale juz niczego nie przykrywa. */
 .radio-komisji {
-  position: fixed;
-  left: 12px;
-  bottom: 12px;
-  z-index: 40;
+  margin: 24px 0 0 12px;
   border: var(--ramka);
   background: var(--papier);
   box-shadow: var(--cien-x) var(--cien-y) 0 var(--cien);

@@ -231,10 +231,15 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
   DLACZEGO TO PROBLEM: kandydat wchodzący z linku zobaczy ekran logowania Vercela, a nie bramę. Dopóki gra ma być publiczna, ochrona musi zniknąć albo dostać bypass.
   AC: decyzja użytkownika na bramce F8-01 - albo `vercel project` / dashboard wyłącza Vercel Authentication dla produkcji, albo zostaje świadomie (gra prywatna). Weryfikacja: `curl -sI <url produkcyjny>` zwraca 200, nie 302.
 
-- [ ] **F7-05** `ui` Na 390 px widżet RadioKomisji (lewy dolny róg) NAKŁADA SIĘ na treść `WebringStopki` - zasłania wiersz „ostatnia aktualizacja / projekt" i etykietę licznika odwiedzin.
+- [x] **F7-05** `ui` Na 390 px widżet RadioKomisji (lewy dolny róg) NAKŁADA SIĘ na treść `WebringStopki` - zasłania wiersz „ostatnia aktualizacja / projekt" i etykietę licznika odwiedzin.
   ZNALEZIONE W: F2-04 (oględziny screenshotu DoD `screenshots/F2/F2-DoD-egzamin-mobile.png`; testy tego nie łapią, bo asercje sprawdzają istnienie elementów, nie kolizję prostokątów).
   AC: na 390x844 prostokąt widżetu radia nie przecina żadnego prostokąta tekstu stopki (Playwright: `getBoundingClientRect()` obu, assert brak przecięcia) - np. przez dolny padding stopki równy wysokości widżetu; screenshot mobile w `screenshots/F7/`; desktop 1280x800 bez zmian wizualnych.
   ROZSZERZENIE (F3-04): widżet nie zasłania już tylko stopki. Na `screenshots/F3/F3-04-werdykt-mobile.png` przykrywa PRZYCISK `PRZYJMUJĘ WERDYKT, ŻĄDAM QUIZU`, a na `F3-04-werdykt-desktop.png` wchodzi na scenę egzaminu. To samo zjawisko, ale trafia już w element interaktywny, więc AC obejmuje też: na obu viewportach prostokąt widżetu nie przecina prostokąta ŻADNEGO elementu klikalnego (`button`, `a`, `[role="button"]`).
+  DOWÓD: ✓ przyczyna: `.radio-komisji` miało `position: fixed; left/bottom; z-index: 40` - nakładka nad treścią. Fix: widżet wraca do normalnego przepływu tuż nad stopką (`margin: 24px 0 0 12px`), zero pozycjonowania, więc nie może niczego przykryć na żadnym viewporcie ani przy żadnym scrollu.
+  ✓ `tests/f7-05.spec.ts` (10 przypadków, 2 viewporty): dla 4 route'ów oraz dla stanu PO WERDYKCIE mierzy (a) przecięcie prostokątów radia z wierszami tekstu stopki = 0, (b) `elementFromPoint` na środku KAŻDEGO `button, a, [role="button"]` nigdy nie trafia w radio = nic nie jest zasłonięte. Mocniejsze niż samo przecięcie prostokątów, bo `StrazEtapu` to celowa nakładka nad treścią (Z15) i leży NAD radiem.
+  ✓ test odtwarza błąd: z przywróconym `position: fixed` = 3 fail na mobile (`/`, `/quiz`, `/proba-ognia`), po fixie 10/10 pass.
+  ✓ screenshots/F7/F7-05-brama-{desktop,mobile}.png i F7-05-werdykt-{desktop,mobile}.png (390x844 i 1280x800): radio stoi nad PassOMetrem i stopką, przycisk `SKŁADAM WNIOSEK I WCHODZĘ` oraz `PRZYJMUJĘ WERDYKT, ŻĄDAM QUIZU` w całości odsłonięte. Porównanie z zastanym `screenshots/F2/F2-DoD-brama-mobile.png` pokazuje wcześniejsze zasłonięcie przycisku wejścia.
+  ✓ `npx playwright test` = 106 passed + 12 skipped + 0 failed; `pnpm run check` zielony; `pnpm build` zielony.
 
 ## DoD FAZY F3 (odhaczone 2026-09-01)
 - ✓ `pnpm run check` zielony (`lint-tokens: czysto`, `tsc --noEmit` bez błędów).

@@ -125,3 +125,23 @@ Decyzja: NIE cofam tego (usunięcie deployu / pauza projektu to działanie na
 zasobach użytkownika poza zakresem issue). Kolejne deploye workerów będą już
 preview automatycznie. Bramka F8-01 zostaje otwarta i przy jej wykonaniu trzeba
 świadomie rozstrzygnąć Deployment Protection - opisane jako znalezisko F7-04.
+
+## #8 - RadioKomisji przestaje być `position: fixed` (odstępstwo od plan/04 A pkt 4)
+
+plan/04 sekcja A opisuje `RadioKomisji` jako widżet "lewy dolny róg, fixed".
+Znalezisko F7-05 pokazało, że to nie jest kosmetyka: element `fixed` leży NAD
+treścią, więc na 390 px przykrywał przycisk `SKŁADAM WNIOSEK I WCHODZĘ` na
+bramie i `PRZYJMUJĘ WERDYKT, ŻĄDAM QUIZU` po ocenie, a na desktopie wchodził na
+stopkę i scenę egzaminu. To blokuje realną ścieżkę użytkownika.
+
+Rozważone i odrzucone: (a) dolny padding stopki równy wysokości widżetu - leczy
+tylko stopkę, każdy inny przycisk w lewym dolnym rogu nadal ginie przy scrollu;
+(b) lewa rynna na całej stronie (`body { padding-left }`) - przesuwa cały layout
+o 200 px i psuje kompozycję desktopu.
+
+Decyzja: widżet wraca do normalnego przepływu tuż nad stopką (jedna zmiana w
+`.radio-komisji`: `position/left/bottom/z-index` -> `margin`). Nadal jest w
+lewym dolnym rogu STRONY, tylko nie nakłada się na nic. Ten sam wzorzec ma już
+`PassOMetr` na mobile (`position: static` + `margin-top: auto`), więc shell
+zostaje spójny. AC F7-05 (zero kolizji z elementami klikalnymi) ma pierwszeństwo
+nad literalnym "fixed" z plan/04.
