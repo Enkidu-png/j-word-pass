@@ -136,7 +136,7 @@ kończy się stanem, w którym fokus klawiatury jest ustawiony na sensownym elem
 
 **Z10. `prefers-reduced-motion: reduce` wyłącza WSZYSTKIE ruchy klasy `dekoracja`
 i skraca każdą `ceremonię` do jednego kroku ≤ 400 ms.** Treść i punktacja muszą
-pozostać w pełni dostępne. Weryfikacja: emulacja w DevTools plus screenshot.
+pozostać w pełni dostępne. Weryfikacja: Playwright `page.emulateMedia({reducedMotion:"reduce"})` plus screenshot.
 
 **Z11. Zero utraty danych kandydata przy przeładowaniu.** Odpowiedzi egzaminu i quizu
 zapisują się w `sessionStorage` pod kluczem `jwp.v1` przy każdej zmianie pola
