@@ -69,3 +69,37 @@ Uwaga do AC F0-05: warunek `grep -r "sk-or-" . = 0` jest niespełnialny dosłown
 ciąg `sk-or-` występuje w treści AC w `plan/10-BACKLOG.md`, `plan/01-ANALIZA-I-ZASADY.md`
 i `plan/08-AI-KOMISJA.md`. Trafienia sprawdzone jedno po drugim: wszystkie to tekst
 zasady, zero kluczy. `git log -p | grep -c "sk-or-"` = 4, te same trzy pliki.
+
+---
+
+## #4 - Marquee paska krawędzi łamie zakres Z7 (`steps(24)`, 3800 ms)
+
+Data: 2026-09-01. Status: wykonana w F2-01.
+
+Konflikt między dwoma dokumentami pakietu, nie swoboda workera:
+- Z7 (`plan/01` sekcja B) dopuszcza dla dekoracji wyłącznie `steps(N)` z N od 2 do 8
+  i czas trwania 300-1400 ms.
+- `plan/04` sekcja A punkt 2 żąda dla marquee dosłownie `steps(24)` i 3800 ms,
+  z uzasadnieniem „duża liczba kroków celowo: rwany przesuw".
+
+Decyzja: idzie zapis z `plan/04`, bo jest bardziej szczegółowy i opisuje ten
+konkretny element, a intencja Z7 (ruch ma być skokowy, nigdy płynny) zostaje
+zachowana - `steps(24)` to nadal ruch krokowy, tylko drobniejszy. Napis przewija
+się przez całą szerokość ekranu, więc przy N ≤ 8 skoki byłyby wielkości ćwierci
+ekranu i napis stałby się nieczytelny.
+
+Zakres odstępstwa: WYŁĄCZNIE klasa `.pasek-krawedzi__marquee`. Wszystkie dekoracje
+`.gif-less--*` trzymają się Z7 (N 2-8, 300-1400 ms) - zweryfikowane testem
+`tests/f1-01.spec.ts`. Marquee nie jest wariantem `gif-less` i nie używa jego bazy.
+`prefers-reduced-motion` zatrzymuje go tak samo jak resztę (Z10).
+
+## #6 Blob store `jwp-zgloszenia` jest PRYWATNY (F0-05, orkiestrator)
+
+`plan/02` sekcja D nie precyzuje trybu dostępu Blob store. Wybrany `--access private`,
+bo zgłoszenia zawierają adresy e-mail kandydatów, a publiczny blob jest czytelny dla
+każdego, kto zna URL (nieodgadywalny, ale nie chroniony). Odczyt i tak odbywa się
+wyłącznie przez dashboard Vercel (decyzja D3 w plan/README - zero panelu admina).
+
+Konsekwencja dla F5-02: wywołanie `put()` z `@vercel/blob` musi mieć
+`access: "private"`. Domyślne przykłady w dokumentacji używają `access: "public"` -
+to by nie zadziałało na tym store.
