@@ -2,6 +2,7 @@
    tu importem, w miare jak powstaja fazy F1-F6. Na razie sam fundament. */
 
 @import "./tokens.css";
+@import "./style/scena.css";
 
 /* Caveat self-hostowany (F0-04). Dwa podzbiory dokladnie takie, jakie serwuje
    Google: `latin` niesie ó, `latin-ext` reszte polskich znakow (aceilnszz).

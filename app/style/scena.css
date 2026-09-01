@@ -1,0 +1,96 @@
+/* Style silnika sceny (plan/04). Ekran ladowania ma WLASNY plik
+   app/style/ladowanie.css, bo tylko tam wolno obracac (Z6b) i walidator
+   z F0-02 trzyma allowliste rotacji wlasnie na tamtej sciezce. */
+
+.ozdoba {
+  display: block;
+  image-rendering: pixelated;
+}
+
+/* Wzorzec ROGI (plan/04 B) */
+.stwor-rogowy {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+}
+.stwor-rogowy--lewy-dol {
+  left: 0;
+  bottom: 0;
+}
+.stwor-rogowy--prawy-dol {
+  right: 0;
+  bottom: 0;
+}
+.stwor-rogowy--lewy-gora {
+  left: 0;
+  top: 0;
+}
+.stwor-rogowy--prawy-gora {
+  right: 0;
+  top: 0;
+}
+.stwor-rogowy--lustro {
+  transform: scaleX(-1);
+}
+
+/* Ponizej 390 px dolne stwory nie moga zjadac tresci (plan/04 B) */
+@media (max-width: 390px) {
+  .stwor-rogowy--lewy-dol .ozdoba,
+  .stwor-rogowy--prawy-dol .ozdoba {
+    max-width: 22vw;
+    height: auto;
+  }
+}
+
+/* Pas (plan/04 C) */
+.pas {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  background-repeat: repeat-x;
+  background-position: center;
+  z-index: 3;
+}
+.pas--gora {
+  top: 0;
+}
+.pas--dol {
+  bottom: 0;
+}
+
+/* Playground /dev/scena. Zyje tylko w developmencie, wiec styl jest roboczy:
+   ma pokazac kazda pozycje, nie zachwycic. */
+.playground {
+  padding: 12px;
+}
+.playground-siatka,
+.playground-pasy {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.playground-kafelek {
+  width: 180px;
+  min-height: 180px;
+  background: var(--druk-tlo);
+  border: 2px outset var(--chrom-a);
+  text-align: center;
+  overflow: hidden;
+}
+.playground-pasy {
+  display: block;
+}
+.playground-pasek {
+  position: relative;
+  height: 70px;
+  margin-bottom: 6px;
+  border: 2px outset var(--chrom-a);
+}
+.playground-rogi {
+  position: relative;
+  height: 320px;
+  border: 3px ridge var(--chrom-b);
+  background: var(--papier);
+}
