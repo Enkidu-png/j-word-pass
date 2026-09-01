@@ -151,9 +151,16 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
 
 ## F4 - QUIZ
 
-- [ ] **F4-01** `ui` ⚠ HARD Segregator: stos 15 teczek, zakładki, nawigacja (klik/strzałki), wybór wariantów, pyt. 14 otwarte, stemple WYPEŁNIONO, zapis stanu.
+- [x] **F4-01** `ui` ⚠ HARD Segregator: stos 15 teczek, zakładki, nawigacja (klik/strzałki), wybór wariantów, pyt. 14 otwarte, stemple WYPEŁNIONO, zapis stanu.
   CZYTAJ: 06→A,E; 02→C2; 02→F (kopiowanie).
   AC: wszystkie 15 pytań przechodne klawiaturą; F5 w połowie przywraca zaznaczenia (Playwright: zaznacz 3, reload, assert); pyt. 14 akceptuje `mohsa`/`Mohsa`/`skala Mohsa` (normalize test); negatywne: zero emoji w DOM (grep renderowanego HTML po zakresach emoji = 0), zero natychmiastowego feedbacku poprawności.
+  DOWÓD: ✓ `npx playwright test tests/f4-01.spec.ts` = 8 passed (2 viewporty). Klawiatura: fokus na zakładce 01, 14x `ArrowDown` przechodzi teczki 02-15, po każdym kroku `data-teczka` rośnie, `[data-naglowek-teczki]` jest sfokusowany (Z9) i pokazuje `AKTA NR NN/15`; `ArrowUp` cofa; klik zakładki i przyciski `POPRZEDNIA`/`NASTĘPNA TECZKA` dają ten sam efekt; wariant zaznaczalny samą klawiaturą (fokus na radiu A + strzałka -> B `toBeChecked`).
+  ✓ F5 w połowie: zaznaczone 2:C, 5:A, 9:D + wpis w lukę pyt. 14, `reload()`, po powrocie wszystkie 3 radia nadal `checked`, luka ma `skala Mohsa`, zakładki mają `data-wypelniono="tak"`.
+  ✓ pyt. 14 normalize: `mohsa`, `Mohsa`, `skala Mohsa`, `  SKALA   MOHSA  ` -> `data-otwarte-trafione="tak"`; `""`, `moss`, `richtera`, `skala` -> `nie` (`lib/quiz.ts`: NFD + zdjęcie diakrytyków + lowercase + zbicie spacji).
+  ✓ negatywne: przejście po WSZYSTKICH 14 pytaniach abcd z zaznaczeniem złego wariantu - zero atrybutów `data-poprawna`/`data-bledna` w teczce, `page.content()` bez `POPRAWN|BŁĄD|ŹLE|DOBRZE|PUNKT`; regex po zakresach emoji (`1F300-1FAFF`, `2600-27BF`, `2190-21FF`, `2B00-2BFF`, `FE0F`) na wyrenderowanym HTML = 0 trafień (`emojiZrodlowe` zostaje w JSON-ie, nie w DOM).
+  ✓ screenshots/F4/F4-01-segregator-{desktop,mobile}.png - oględziny: stos 15 zakładek po prawej (mobile: pozioma rolka u góry), otwarta teczka `formularz-F7`, mini-stemple `WYPEŁNIONO` przekrzywione o 6 stopni, krzyżyk wbity tylko na wybranym wariancie, zero karuzeli i zero kropek postępu (anty-spec 06 F1).
+  ✓ dodatkowo zmierzone: żaden element klikalny segregatora nie jest zasłonięty (`elementFromPoint` na środku każdej zakładki, przycisków nawigacji i luki = 0 kolizji, oba viewporty).
+  ✓ `pnpm run check` zielony; `pnpm build` zielony (`/quiz` 5,54 kB, first load 107 kB); pełny `npx playwright test` = 114 passed + 12 skipped + 0 failed.
 - [ ] **F4-02a** `ui` Signature pytań 1-5 z tabeli 06→D.
   CZYTAJ: 06→D (wiersze 1-5); 03→B.
   AC: pytania 1-5 mają unikalne elementy (screenshot-kolaż do screenshots/F4/); signature 1 reaguje na hover wariantu B (Playwright: `animation-play-state` jednego serca = paused); budżet: `node -e` liczy linie każdego pliku signature, max <= 30 (wynik w dowodzie odhaczenia); negatywne: zero emoji w DOM.

@@ -905,3 +905,141 @@ a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
 @media (min-width: 768px) {
   .narada__podpisy { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* == ETAP 2: SEGREGATOR AKT (plan/06 A) == */
+.quiz { padding: 16px; }
+
+.segregator {
+  display: grid;
+  gap: 12px;
+  align-items: start;
+}
+
+/* Stos zakladek. Kazda kolejna wsuwa sie o kawalek w prawo - z boku wyglada
+   jak brzegi 15 teczek wciśniętych w segregator. */
+.segregator__zakladki {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.zakladka {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  font-size: var(--rozmiar-drobny);
+  padding: 4px 8px;
+  border: 2px outset var(--atrament);
+  background: var(--papier);
+  box-shadow: var(--cien-x) 0 0 var(--cien);
+}
+.zakladka[data-otwarta="tak"] {
+  border-style: inset;
+  background-color: var(--chrom-b);
+  font-weight: bold;
+}
+.zakladka__numer { font-family: var(--font-krzyk); letter-spacing: 1px; }
+.zakladka__kategoria { flex: 1; }
+/* mini-stempel WYPELNIONO: przekrzywiony nadruk, nie plakietka statusu */
+.zakladka__stempel {
+  border: 2px solid var(--urzad);
+  color: var(--urzad);
+  padding: 0 4px;
+  transform: rotate(-6deg);
+  white-space: nowrap;
+}
+
+/* Rozlozenie teczki: 2 klatki, 250 ms - dekoracja nawigacji, nie ceremonia. */
+.teczka {
+  padding: 16px;
+  animation-name: jwp-rozklada;
+  animation-duration: 250ms;
+  animation-timing-function: steps(2, end);
+  animation-iteration-count: 1;
+  transform-origin: top center;
+}
+@keyframes jwp-rozklada {
+  0% { transform: scaleY(0.9) translateX(12px); }
+  100% { transform: scaleY(1) translateX(0); }
+}
+.teczka__naglowek { font-family: var(--font-krzyk); letter-spacing: 1px; margin-bottom: 8px; }
+.teczka__pytanie { font-family: var(--font-glos); }
+
+.teczka__warianty { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 8px; }
+.wariant {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 4px;
+  border: 2px double transparent;
+}
+/* skok o 3 px w prawo, bez transition (plan/06 E) */
+.wariant:hover { transform: translateX(3px); border-color: var(--atrament); }
+.wariant__pudlo {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--atrament);
+  background: var(--papier);
+}
+.wariant__pudlo svg { display: block; width: 100%; height: 100%; visibility: hidden; }
+.wariant__krzyzyk { stroke: var(--urzad); stroke-width: 2.5; fill: none; stroke-linecap: round; }
+/* krzyzyk wbija sie w 2 klatkach - to wybor kandydata, nie ocena Komisji */
+.wariant input:checked ~ .wariant__pudlo svg {
+  visibility: visible;
+  animation-name: jwp-wbicie-x;
+  animation-duration: 200ms;
+  animation-timing-function: steps(2, end);
+  animation-iteration-count: 1;
+}
+@keyframes jwp-wbicie-x {
+  0% { transform: scale(2.2) rotate(-12deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+/* radio siedzi w .tylko-dla-czytnika, wiec fokus musi byc widac na pudelku */
+.wariant input:focus-visible ~ .wariant__pudlo { outline: 3px dashed var(--alarm); outline-offset: 2px; }
+
+.teczka__luka-wiersz { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.teczka__luka {
+  flex: 1;
+  min-width: 200px;
+  border: 0;
+  border-bottom: 2px dotted var(--atrament);
+  background: transparent;
+  font-family: var(--font-urzad);
+}
+.teczka__signature { min-height: 40px; }
+.teczka__nawigacja { display: flex; gap: 8px; margin: 0; }
+.teczka__nawigacja button {
+  border: 2px outset var(--atrament);
+  background: var(--papier);
+  padding: 4px 8px;
+}
+.teczka__nawigacja button:disabled { color: var(--krata); border-style: solid; }
+
+@media (prefers-reduced-motion: reduce) {
+  /* Z10: teczki przelaczaja sie bez animacji */
+  .teczka, .wariant input:checked ~ .wariant__pudlo svg { animation: none !important; }
+}
+
+@media (min-width: 768px) {
+  /* teczka po lewej, brzegi stosu po prawej (plan/06 A) */
+  .segregator { grid-template-columns: 1fr 260px; }
+  .teczka { grid-column: 1; grid-row: 1; }
+  .segregator__zakladki { grid-column: 2; grid-row: 1; }
+}
+
+@media (max-width: 767px) {
+  /* mobile: zakladki jako pozioma rolka u gory, teczka pelnej szerokosci */
+  .segregator__zakladki {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .zakladka { width: auto; white-space: nowrap; }
+  .zakladka__kategoria { flex: none; }
+}
