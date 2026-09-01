@@ -657,7 +657,8 @@ a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
   padding: 6px 8px;
 }
 .scena__etykieta { font-size: var(--rozmiar-drobny); }
-.scena__przerwa { color: var(--alarm); font-size: var(--rozmiar-drobny); }
+/* na kaflu --kosmos ciemna magenta ma 3,49:1 - tekst dostaje rozowy chrom (F6-01) */
+.scena__przerwa { color: var(--chrom-c); font-size: var(--rozmiar-drobny); }
 
 /* -- SLON -- */
 .scena__slon {

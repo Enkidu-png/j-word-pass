@@ -2,7 +2,10 @@
   /* kolory */
   --papier: #f4e9c8;        /* tlo drukow, pozolkly papier */
   --atrament: #1a1447;      /* tekst podstawowy, granat dlugopisu */
-  --alarm: #ff2079;         /* magenta: bledy, kara smierci, blink */
+  --alarm: #cc0060;         /* magenta: bledy, kara smierci, blink. Ciemniejsza
+                               niz pierwotna neonowa: jako TEKST na --papier dawala
+                               3,02:1, a jako TLO pod --papier tyle samo (F6-01).
+                               Teraz 4,64:1 w obie strony. */
   --jad: #21f363;           /* zielony CRT: sukcesy, punkty */
   --urzad: #b3241a;         /* czerwien pieczatki */
   --kosmos: #0b0330;        /* tlo sekcji kosmicznych (egzamin) */

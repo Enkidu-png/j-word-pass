@@ -108,7 +108,8 @@ export default function Brama() {
   return (
     <main className="brama">
       <h1 className="brama__krzyk gif-less gif-less--chrom">J-WORD PASS</h1>
-      <p className="brama__pion" aria-label={PION}>
+      {/* pionowy napis to obrazek z liter - bez role="img" aria-label na <p> jest zabroniony */}
+      <p className="brama__pion" role="img" aria-label={PION}>
         {PION.split("").map((z, i) => (
           <span key={i} aria-hidden="true">
             {z === " " ? " " : z}
