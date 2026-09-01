@@ -384,10 +384,21 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
   AC: symbole modułowo prywatne tracą `export`; `pnpm run check` i `pnpm build` nadal zielone; negatywne: nic poza tymi plikami ich nie importowało (sprawdzone grepem przed usunięciem).
   ✓ D1 `export` zdjęty z pięciu deklaracji, `tsc --noEmit` i `pnpm build` zielone.
 
-- [ ] **F7-04** `deploy` Projekt ma włączoną Deployment Protection (Vercel Authentication) - anonimowy `curl` na URL deployu dostaje 302 na `vercel.com/sso-api`.
+- [x] **F7-16** `infra` Każdy przebieg suite dopisywał śmieci do PŁATNEGO, prywatnego store'a Vercel Blob: `.env.local` ma `BLOB_READ_WRITE_TOKEN`, więc `/api/zgloszenie` w trybie dev pisał naprawdę, a nie do `dev-log`.
+  ZNALEZIONE W: bramka F8 (sprzątanie store'a przed publikacją). Skala: **332 pliki**, nie „kilkanaście" jak szacował review.
+  DLACZEGO TESTY GO NIE ZŁAPAŁY: `tests/f5-02.spec.ts:33` akceptuje oba tryby (`["blob","dev-log"]`), więc realny zapis wyglądał jak sukces.
+  AC: poza `NODE_ENV === "production"` route NIE pisze do Bloba nawet z tokenem w środowisku; formularz nadal działa lokalnie (200, `tryb: "dev-log"`); negatywne: produkcja pisze normalnie.
+  ✓ D1 warunek `!process.env.BLOB_READ_WRITE_TOKEN || process.env.NODE_ENV !== "production"` schodzi na `dev-log`.
+  ✓ D2 `npx playwright test tests/f5-02.spec.ts` = 12 passed po zmianie.
+  ✓ D3 store wyczyszczony: `vercel blob empty-store` = `All blobs deleted (332 total)`, `vercel blob list` = `No blobs in this store`.
+
+- [x] **F7-04** `deploy` Projekt ma włączoną Deployment Protection (Vercel Authentication) - anonimowy `curl` na URL deployu dostaje 302 na `vercel.com/sso-api`.
   ZNALEZIONE W: F2-04 (weryfikacja AC „URL preview działa"; obejście: `vercel curl <url>`, które dokłada token).
   DLACZEGO TO PROBLEM: kandydat wchodzący z linku zobaczy ekran logowania Vercela, a nie bramę. Dopóki gra ma być publiczna, ochrona musi zniknąć albo dostać bypass.
   AC: decyzja użytkownika na bramce F8-01 - albo `vercel project` / dashboard wyłącza Vercel Authentication dla produkcji, albo zostaje świadomie (gra prywatna). Weryfikacja: `curl -sI <url produkcyjny>` zwraca 200, nie 302.
+  ✓ DECYZJA USERA (bramka F8): zdjąć - gra ma być publiczna. `vercel project protection disable --sso` -> `"ssoProtection": false`.
+  ✓ D1 anonimowy `curl -sI https://j-word-pass.vercel.app` = **HTTP/2 200** (było 302 na `vercel.com/sso-api`).
+  ✓ D2 ochroną `/api/ocena` zostaje wyłącznie limit 5/min/IP (F3-01 D7) przy kluczu z limitem $4 - świadome ryzyko usera.
 
 - [x] **F7-08** `silnik` `zapiszStan` z debounce 400 ms gubił WERDYKT etapu: kandydat, który odświeżył stronę w ciągu 400 ms od wyniku, tracił punkty (a `StrazEtapu` odsyłał go z powrotem).
   ZNALEZIONE W: F4-03 (test `powrot na /quiz po werdykcie` padał na `reload()` tuż po werdykcie - to nie flake, tylko realna utrata danych, ta sama w etapie 1: `app/egzamin/Plansza.tsx` zapisywał punkty egzaminu tym samym debouncem).
@@ -415,8 +426,17 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
 
 ## F8 - BRAMKA DECYZYJNA: PRODUKCJA
 
-- [ ] **F8-01** `deploy` ⏳ STOP-GATE przed wykonaniem: pokaż userowi URL preview + WERYFIKACJA.md, zapytaj o zgodę na `vercel --prod` (i ewentualną domenę).
+- [x] **F8-01** `deploy` STOP-GATE przed wykonaniem: pokaż userowi URL preview + WERYFIKACJA.md, zapytaj o zgodę na `vercel --prod` (i ewentualną domenę).
   AC: produkcyjny URL działa, `/api/ocena` na produkcji odpowiada (1 test-curl, koszt ~$0.0001); rate limit: 6 szybkich żądań, szóste dostaje 429 (08→B pkt 7); formularz zapisuje do Blob na produkcji (1 wpis testowy, potem usunięty).
+  ✓ ZGODA USERA (2026-09-01, w czacie): "go public, push, usun stoper vercela i lecisz dalej".
+  ✓ D1 `vercel deploy --prod` -> https://j-word-pass.vercel.app ; anonimowy `curl -sI` = HTTP/2 200.
+  ✓ D2 wszystkie cztery strony 200 (`/`, `/egzamin`, `/quiz`, `/proba-ognia`), `/dev/animacje` = 404, `/nie-ma` = 404.
+  ✓ D3 `og:image` na produkcji = `https://j-word-pass.vercel.app/opengraph-image?...` (dowód, że F7-09 działa w prawdziwym środowisku, nie tylko lokalnie).
+  ✓ D4 `/api/ocena` odpowiedziało realnie: `{"punkty":6,"komentarz":"Wniosek formalny Komisji: ..."}` - model, clamp i głos Komisji działają na produkcji.
+  ✓ D5 rate limit na produkcji: `1:200 2:200 3:200 4:200 5:200 6:429`.
+  ✓ D6 formularz zapisał `zgloszenia/2026-09-01T21:33:01.258Z-8lziwe.json` (`tryb:"blob"`), wpis usunięty, `vercel blob list` = `No blobs in this store`.
+  ✓ D7 walidacja serwerowa na produkcji: `{"email":"x"}` -> 400.
+  ✓ D8 `git push origin main` - 39 commitów na `Enkidu-png/j-word-pass`, drzewo zsynchronizowane.
 
 ---
 

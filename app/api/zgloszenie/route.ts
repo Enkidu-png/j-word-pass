@@ -103,7 +103,9 @@ export async function POST(request: Request) {
   const sciezka = `zgloszenia/${zgloszenie.ts}-${losowe6()}.json`;
 
   // Bez tokena (lokalny dev) formularz ma DZIALAC, nie wywalac sie na infrastrukturze.
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+  // Poza produkcja NIE piszemy do Bloba nawet z tokenem: `.env.local` go ma, wiec kazdy
+  // przebieg suite dopisywal smieci do platnego store'a (332 pliki przed sprzatnieciem).
+  if (!process.env.BLOB_READ_WRITE_TOKEN || process.env.NODE_ENV !== "production") {
     console.log(`[zgloszenie dev-log] ${sciezka} ${JSON.stringify(zgloszenie)}`);
     return Response.json({ tryb: "dev-log", sciezka });
   }
