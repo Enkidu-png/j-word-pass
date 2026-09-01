@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import PasGoniec from "@/components/scena/PasGoniec";
+import PassOMetr from "@/components/shell/PassOMetr";
+import StrazEtapu from "@/components/shell/StrazEtapu";
+import StopkaWebring from "@/components/shell/StopkaWebring";
 
 // Bez `metadataBase` Next sklada absolutne URL-e obrazka OG na localhost:3000 -
 // podglad linku na Slacku czy Discordzie wtedy nie dziala. Na Vercelu adres
@@ -21,11 +25,19 @@ export const metadata: Metadata = {
   },
 };
 
-// Shell (pas-goniec, PassOMetr, StrazEtapu, webring) wraca w F2-01.
+// Kolejnosc w DOM wiazaca (plan/05 A). EkranLadowania wchodzi w F2-04,
+// RadioTinyDesk w F5-03 (slot na niego stoi juz w stopce).
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pl">
-      <body>{children}</body>
+      <body>
+        <PasGoniec tekst="KOMISJA CZUWA - ALEKSANDRO, KOMISJA CZUWA" wariant="odbijany" czas={12000} />
+        <PassOMetr />
+        <main className="tresc">
+          <StrazEtapu>{children}</StrazEtapu>
+        </main>
+        <StopkaWebring />
+      </body>
     </html>
   );
 }

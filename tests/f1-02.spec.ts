@@ -37,7 +37,7 @@ test("PasGoniec przy reduced motion stoi i jest wysrodkowany", async ({ page }) 
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/dev/scena");
   const styl = await page
-    .locator(".pas-goniec__tresc")
+    .locator('[data-goniec="zwykly"] .pas-goniec__tresc')
     .first()
     .evaluate((e) => {
       const s = getComputedStyle(e);
@@ -51,7 +51,7 @@ test("PasGoniec przy reduced motion stoi i jest wysrodkowany", async ({ page }) 
 test("PasGoniec bez reduced motion realnie sie przewija", async ({ page }) => {
   await page.goto("/dev/scena");
   const nazwa = await page
-    .locator(".pas-goniec__tresc")
+    .locator('[data-goniec="zwykly"] .pas-goniec__tresc')
     .first()
     .evaluate((e) => getComputedStyle(e).animationName);
   expect(nazwa).toBe("goniec");

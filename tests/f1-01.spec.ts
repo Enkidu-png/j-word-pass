@@ -21,9 +21,22 @@ test("reduced motion podmienia KAZDA ozdobe na klatke statyczna (Z11)", async ({
   // .first() nie nadaje sie: pierwsza ozdoba w DOM to plomien z warstwy, ktora
   // reduced motion chowa przez display:none. Czekamy na widoczna z siatki.
   await expect(page.locator(".playground-siatka img[data-ozdoba]").first()).toBeVisible();
-  const zrodla = await page.evaluate(() =>
-    [...document.querySelectorAll("img[data-ozdoba]")].map((e) => (e as HTMLImageElement).getAttribute("src") ?? ""),
-  );
+  // Skan zawezony do tresci strony: stopka shellu (F2-01) dokłada plakietki
+  // webringu, ktore maja role "plakietka", a Z11 wymaga klatki statycznej
+  // wylacznie od rol "ozdoba" i "pas" (plan/03 D). Skan po calym dokumencie
+  // przewracal ten test na plakietce, nie na regresji silnika.
+  const czytajZrodla = () =>
+    page.evaluate(() =>
+      [...document.querySelectorAll("main.tresc img[data-ozdoba]")].map((e) => (e as HTMLImageElement).getAttribute("src") ?? ""),
+    );
+  // SSR oddaje wersje ANIMOWANA (plan/04 G: strona bez JS ma sie ruszac), a na
+  // klatke statyczna podmienia dopiero hydracja. Bez tej bariery test czytal
+  // czasem HTML sprzed hydracji i padal na /assets/statek.gif - zlapane przy
+  // pelnym przebiegu na czterech workerach, nie przy uruchomieniu w izolacji.
+  await expect
+    .poll(async () => (await czytajZrodla()).filter((s) => !s.includes("/statyczne/")).length)
+    .toBe(0);
+  const zrodla = await czytajZrodla();
   expect(zrodla.length).toBeGreaterThan(0);
   for (const s of zrodla) {
     expect(s, `zrodlo ozdoby: ${s}`).toContain("/statyczne/");

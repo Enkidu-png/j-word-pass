@@ -1,0 +1,178 @@
+/* SHELL WSPOLNY (plan/05 A). Pas-goniec gorny, PassOMetr, straz etapu, stopka.
+   Zero position: fixed, zero sticky headera, zero hamburgera (anty-spec 2). */
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.tresc {
+  flex: 1 0 auto;
+}
+
+/* --- PassOMetr (plan/05 A1) --- */
+
+.pass-o-metr__lista {
+  list-style: none;
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  padding: 8px;
+}
+
+.pass-o-metr__pole {
+  flex: 1 1 0;
+  border: 3px outset var(--chrom-a);
+  background: var(--papier);
+}
+
+.pass-o-metr__tresc {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  color: var(--tusz);
+  font-family: var(--font-czytany);
+  font-size: var(--stopien-drobny);
+  text-decoration: none;
+}
+
+.pass-o-metr__numer {
+  font-family: var(--font-terminal);
+}
+
+.pass-o-metr__stan {
+  margin-left: auto;
+  font-family: var(--font-terminal);
+}
+
+.pass-o-metr__ozdoba {
+  width: 22px;
+  height: auto;
+}
+
+.pass-o-metr__pole--zamkniety {
+  background: var(--chrom-b);
+}
+
+.pass-o-metr__pole--zamkniety .pass-o-metr__tresc {
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+
+.pass-o-metr__pole--otwarty {
+  border-color: var(--jad);
+}
+
+/* --- Straz etapu (plan/05 A2) --- */
+
+.straz {
+  margin: 32px auto;
+  max-width: 520px;
+  padding: 16px;
+  background: var(--druk-tlo);
+  border: 4px ridge var(--chrom-b);
+  text-align: center;
+}
+
+.straz__tresc {
+  font-family: var(--font-odreczny);
+  font-size: var(--stopien-h2);
+  color: var(--alarm);
+  margin: 0 0 12px;
+}
+
+.straz__powrot {
+  display: inline-block;
+  padding: 6px 12px;
+  border: 3px outset var(--chrom-a);
+  background: var(--papier);
+  color: var(--tusz);
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-tresc);
+  text-decoration: none;
+}
+
+.straz__powrot:hover {
+  border-style: inset;
+  background: var(--jad);
+}
+
+/* --- Stopka-webring (plan/05 A3) --- */
+
+.stopka {
+  text-align: center;
+  padding-bottom: 12px;
+  background: var(--papier);
+}
+
+/* .pas jest pozycjonowany absolutnie (plan/04 C), wiec potrzebuje wlasnej szyny
+   o znanej wysokosci - inaczej wyskoczylby na krawedz calego dokumentu. */
+.stopka__szyna {
+  position: relative;
+  height: 14px;
+  margin-bottom: 10px;
+}
+
+.stopka__licznik {
+  margin: 0 0 8px;
+  font-family: var(--font-czytany);
+  font-size: var(--stopien-drobny);
+}
+
+.stopka__licznik-podpis {
+  margin-right: 6px;
+}
+
+.stopka__licznik-cyfry {
+  display: inline-block;
+  padding: 2px 8px;
+  background: var(--tusz);
+  color: var(--jad);
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-tresc);
+  letter-spacing: 3px;
+}
+
+.stopka__plakietki {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 0 8px;
+}
+
+.stopka__tekst {
+  margin: 8px 0 0;
+  font-family: var(--font-odreczny);
+  font-size: var(--stopien-h2);
+  color: var(--tusz);
+}
+
+.stopka__koperta {
+  /* .ozdoba jest display: block (scena.css), wiec samo text-align: center
+     stopki jej nie wysrodkuje - koperta lezala w lewym rogu. */
+  margin: 0 auto;
+  width: 44px;
+  height: auto;
+}
+
+/* --- 390 px: pola w kolumnie, PassOMetr schodzi NAD stopke (plan/05 A1) --- */
+
+@media (max-width: 480px) {
+  body > .pas-goniec {
+    order: 1;
+  }
+  .tresc {
+    order: 2;
+  }
+  .pass-o-metr {
+    order: 3;
+  }
+  .stopka {
+    order: 4;
+  }
+  .pass-o-metr__lista {
+    flex-direction: column;
+  }
+}

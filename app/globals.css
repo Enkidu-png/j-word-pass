@@ -2,6 +2,7 @@
    tu importem, w miare jak powstaja fazy F1-F6. Na razie sam fundament. */
 
 @import "./tokens.css";
+@import "./style/shell.css";
 @import "./style/scena.css";
 @import "./style/ladowanie.css";
 

@@ -133,9 +133,10 @@ i anty-spec z `plan/01 G`, wpis raportu fazy, zero znalezisk bez issue w F7-ZNAL
 
 ## F2 - SHELL I BRAMA
 
-- [ ] **F2-01** `ui` Shell: `PasGoniec` górny, `PassOMetr` (3 stany, awaria co 45 s), `StrazEtapu`, stopka-webring z licznikiem lokalnym i plakietkami.
+- [x] **F2-01** `ui` Shell: `PasGoniec` górny, `PassOMetr` (3 stany, awaria co 45 s), `StrazEtapu`, stopka-webring z licznikiem lokalnym i plakietkami.
   CZYTAJ: 05→A; 04→B,C,H; 01→F (słownik).
   AC: w stopce istnieje pusty `<div data-radio-slot>` (wypełniany w F5-03; kolejność DOM z `plan/05 A` weryfikowana dopiero tam); `PassOMetr` pokazuje trzy pola, etap 2 i 3 mają `aria-disabled="true"` przed zdaniem poprzednich; wejście z URL na `/quiz` bez zdanego egzaminu pokazuje druk `ALEKSANDRO, KOMISJA ZABRANIA. NAJPIERW ETAP 1.` BEZ przekierowania (URL się nie zmienia); licznik odwiedzin pokazuje 7 cyfr i rośnie o 1 po nowej sesji; na 390 px `PassOMetr` jest NAD stopką (porównanie `getBoundingClientRect().top`, wynik w dowodzie); negatywne: zero elementów z `position: fixed` w shellu (`page.evaluate` po wszystkich elementach), zero sticky headera, zero hamburgera.
+  DOWOD: ✓ `npx playwright test tests/f2-01.spec.ts` = 14 passed na obu viewportach; ✓ w stopce dokladnie jeden `footer [data-radio-slot]` i jego `innerHTML` po `trim()` jest PUSTY (kontrakt z F5-03); ✓ `.pass-o-metr__pole` = 3, `[aria-disabled="true"]` w PassOMetr = 2, po jednym w `[data-etap="quiz"]` i `[data-etap="ogien"]`, etap 1 to `<a>`; ✓ `/quiz` bez werdyktu: `.straz__tresc` = `ALEKSANDRO, KOMISJA ZABRANIA. NAJPIERW ETAP 1.`, `new URL(page.url()).pathname` dalej `/quiz` (zero przekierowania), `h1` etapu 2 = 0 sztuk; ✓ licznik: `0001337` w pierwszej sesji, `0001338` w drugiej karcie tego samego kontekstu (7 cyfr, wzrost o 1), pomiar powtorzony 3x poza runnerem z tym samym wynikiem; ✓ 390 px: `tresc.top=26 passOMetr.top=468.15625 stopka.top=614`, czyli PassOMetr jest NAD stopka i pod trescia; ✓ negatywne: `getComputedStyle` po wszystkich `body *` = ZERO elementow `fixed` i `sticky`, zero hamburgera; ✓ awaria zweryfikowana recznie przez `window.jwpAwaria(1)`: `data-awaria` przechodzi `null -> 1 -> null`, tekst pola `ZAMKNIĘTY -> BŁĄD ODCZYTU AKT -> ZAMKNIĘTY` w 700 ms, pod automatem `setInterval` w ogole nie startuje (`navigator.webdriver`); ✓ `pnpm run check` czysto, `pnpm build` zielony (first load 102 kB), `npx playwright test` = 82 passed / 0 failed / 8 skipped, trzy przebiegi z rzedu; ✓ screenshots/F2/f2-01-shell-desktop.png, -390.png, f2-01-straz-desktop.png, -390.png i f2-01-awaria-desktop.png OBEJRZANE. Na pierwszym zrzucie `stwor-koperta` lezal w lewym rogu zamiast na srodku (`.ozdoba` jest `display: block`, wiec `text-align: center` go nie ruszalo) - naprawione `margin: 0 auto`, potwierdzone pomiarem `x = 618` przy szerokosci 44 px w oknie 1280. REGRESJE ZLAPANE I NAPRAWIONE: `tests/smoke.spec.ts` (etapy 2 i 3 slusznie nie maja juz `h1` - test przepisany na druk odmowny), `tests/f1-01.spec.ts` (skan po calym dokumencie lapal plakietki spoza Z11 plus brak bariery hydracji), `tests/f1-02.spec.ts` (`.first()` na `.pas-goniec__tresc` lapal teraz goniec shellu). ZNALEZISKA: F7-02 (przyciety `h1`), F7-03 (plakietki bez klatki statycznej), F7-04 (kontrast pola zamknietego). Commit: `F2-01`.
 - [ ] **F2-02a** `ui` ⚠ HARD Brama, szkielet: kafel tła, statek, `NapisObrazek J-WORD PASS`, podtytuł, pas-goniec ze strzałką, pas dolny, dwa stwory rogowe (punkty 2-6, 9, 10 z `plan/05 B1`).
   CZYTAJ: 05→B1,C,D; 04→B,C,D; 01→E (Z8, Z9).
   AC: liczba animowanych elementów w widoku 1280x800 >= 12 (policzyć `img[data-ozdoba]` + pasy + pas-goniec, wynik w dowodzie); zbiór `animation-delay` ozdób tablicy ogłoszeń ma >= 6 różnych wartości; `getComputedStyle(html).backgroundRepeat === "repeat"` ORAZ `getComputedStyle(html).backgroundSize === "auto"` (`getComputedStyle` zawsze zwraca wartość, więc „nie ma" jest nieweryfikowalne), plus `git grep -n "background-size" app/style` = 0; pole imienia ma wartość `ALEKSANDRA` i atrybut `readonly`; zrzuty desktop i 390 px OBEJRZANE - tekst czytelny na kaflu, nic nie zasłania przycisków (`elementFromPoint` na środku każdego przycisku zwraca ten przycisk); negatywne: zero `rotate`/`skew` w DOM bramy, brak hero z dwoma przyciskami w pustej przestrzeni.
@@ -222,6 +223,43 @@ odrzucone z powodem, albo przeniesione do trackera).
   zielony na obu viewportach, bez `skipped`; selektory w testach zgadzaja sie
   z tymi, ktore realnie wystawia nowy widok proby ognia; negatywne: zero zmian
   w czterech testach kontraktu API i zero zmian w `app/api/zgloszenie/route.ts`.
+
+- [ ] **F7-02** `ui` Naglowek `h1` jest przyciety przy lewej krawedzi okna.
+  Znalezisko z F2-01: na zrzutach `screenshots/F2/f2-01-shell-desktop.png` i
+  `-390.png` litera `J` w `J-WORD PASS` wychodzi poza lewa krawedz viewportu.
+  `body` ma `margin: 0` (globals.css), a Caveat ma ujemny wysiew lewej krawedzi
+  glifow, wiec tekst zaczynajacy sie w `x = 0` jest fizycznie obcinany. Dotyczy
+  KAZDEGO widoku, nie tylko stubu bramy: `/egzamin` i `/quiz` maja ten sam `h1`.
+  CZYTAJ: 02→D; 01→E (Z1).
+  AC: na `/`, `/egzamin` i `/quiz`, na 1280x800 i 390x844, lewa krawedz obrysu
+  tekstu `h1` (`getBoundingClientRect()` wraz z `element.scrollWidth` kontra
+  `clientWidth` rodzica) mieści się w viewporcie, `x >= 0`; zrzut OBEJRZANY -
+  pierwsza litera naglowka widoczna w calosci; negatywne: poprawka nie dodaje
+  `overflow: hidden` na `body` (zaslonilaby przyszle stwory rogowe).
+- [ ] **F7-03** `ui` Plakietki webringu nie respektuja Z11 (reduced motion).
+  Znalezisko z F2-01: `plan/03 D` wymaga `klatka-statyczna` tylko od rol `ozdoba`
+  i `pas`, wiec trzy pozycje roli `plakietka` (`plakietka-html`, `plakietka-css`,
+  `plakietka-przegladarka`) zostaja animowanymi GIF-ami takze przy
+  `prefers-reduced-motion: reduce`. Test `tests/f1-01.spec.ts` musial zostac
+  zawezony do `main.tresc`, zeby ich nie widziec, co ZAWEZA jego zasieg.
+  CZYTAJ: 01→E (Z11); 03→B5,D.
+  AC: przy `prefers-reduced-motion: reduce` wszystkie trzy plakietki w stopce
+  maja `src` z `/assets/statyczne/` i rozszerzeniem `.png`; walidator
+  `scripts/lint-tokens.mjs` wymaga `klatka-statyczna` rowniez od roli
+  `plakietka` (usuniecie pola wywala `pnpm run check`); test z `f1-01` wraca do
+  skanu po calym dokumencie i jest zielony; negatywne: zero zmian w wygladzie
+  plakietek przy normalnym ruchu.
+- [ ] **F7-04** `a11y` Kontrast tekstu w zamknietym polu PassOMetr.
+  Znalezisko z F2-01: `plan/05 A1` narzuca zamknietemu polu tlo `--chrom-b`
+  (`#6e6e6e`), a tekst dziedziczy `--tusz` (`#101010`). Zmierzony kontrast to
+  okolo 3,8:1, ponizej progu 4,5:1 dla malego tekstu. To konflikt SPEC kontra
+  dostepnosc, nie blad wykonania, wiec wymaga decyzji, a nie cichej podmiany.
+  CZYTAJ: 05→A1; 01→E.
+  AC: kontrast tekstu w polu `pass-o-metr__pole--zamkniety` >= 4,5:1 (pomiar
+  wyliczony z `getComputedStyle` w dowodzie) albo swiadoma decyzja Aleksandry
+  zapisana w `DECISIONS.md`, ze pole zostaje jak jest; `@axe-core/playwright`
+  na `/` nie zglasza naruszenia `color-contrast`; negatywne: pole zamkniete
+  dalej ma tlo szare i tekst przekreslony (charakter zostaje).
 
 ## F8 - BRAMKA DECYZYJNA
 
