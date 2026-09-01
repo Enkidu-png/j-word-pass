@@ -292,6 +292,15 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
   ✓ PUŁAPKA SATORI (info): `next/og` nie parsuje `border: 24px double #...` ani innych skrótów wielosłownych - odpowiedź leci wtedy 500 `failed to pipe response`. Podwójna ramka Komisji powstaje z dwóch prostokątów `solid`. Kolory w `opengraph-image.tsx` MUSZĄ być literałami (satori nie zna `var()`), więc plik dołączył do wyjątków Z3 w `scripts/lint-tokens.mjs` obok `app/tokens.css` - z komentarzem dlaczego.
   ✓ `pnpm build` zielony (`/opengraph-image` 136 B, `/icon.svg` 0 B); pełny `npx playwright test` = 215 passed + 17 skipped + 0 failed.
 
+## DoD FAZY F6 (odhaczone 2026-09-01)
+- ✓ `pnpm run check` zielony: `samotest: czysto` + `lint-tokens: czysto` + `tsc --noEmit` bez błędów (samotest walidatora doszedł w F7-02).
+- ✓ `pnpm build` zielony: `/` 104 kB, `/egzamin` 110 kB, `/proba-ognia` 108 kB, `/quiz` 113 kB, `/opengraph-image` 136 B, `/icon.svg` 0 B, shared 102 kB.
+- ✓ `npx playwright test` = **217 passed + 17 skipped + 0 failed**.
+- ✓ Screenshoty stanu fazy w `screenshots/F6/`: `F6-01-fokus-{brama,butelka}-{desktop,mobile}.png` (widoczny pierścień fokusu klawiatury), `F6-02-lighthouse-{brama,egzamin,quiz,proba-ognia}.report.html` (raporty wydajności), `F6-03-404-{desktop,mobile}.png`, `F6-03-opengraph-image.png`.
+- ✓ Zero znalezisk bez issue: F7-01 zamknięte pomiarem w F6-02, F7-02 naprawione osobnym commitem przed jakimkolwiek vendorowaniem. Trzy błędy własne fazy (kontrast `--alarm`, `aria-label` na `<p>`, nagłówek 404 na papierze) naprawione u źródła w swoich issues. F7-04 (Deployment Protection) świadomie ZOSTAJE otwarte - to decyzja użytkownika przy bramce F8.
+- ✓ `app/vendor/` nietknięte - w F6 nic nie vendorowano. Vendoring jest jednak od teraz ODBLOKOWANY: nagłówek licencyjny z hexem przechodzi walidator (dowód przy F7-02).
+- ✓ Budżety z plan/03 C i I: zero long tasków > 50 ms w 5 s idle na 4 stronach (build produkcyjny), LCP 1,8-1,9 s przy progu 2,5 s, first load 113 kB przy budżecie 160 kB.
+
 ## F7-ZNALEZISKA (rośnie w trakcie; DoD: każde znalezisko ma issue z dyspozycją zrobione / odrzucone z powodem / przeniesione)
 
 - [x] **F7-01** `perf` Long task ~116 ms przy starcie `/dev/animacje` (hydracja), zmierzony w F1-01. NIE łamie AC F1-01 (AC mierzy 5 s IDLE, a zadanie pada na `startTime` ~222 ms, czyli przed ustabilizowaniem strony; w oknie idle jest 0 wpisów > 50 ms) i pochodzi z serwera DEV, gdzie kod jest nieminifikowany i kompilowany na żądanie.

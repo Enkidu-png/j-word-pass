@@ -134,3 +134,20 @@ test("caly flow brama -> pergamin sama klawiatura", async ({ page }) => {
 
   console.log("NAGRANIE KROKÓW (bez myszy):\n" + kroki.map((k, i) => `${i + 1}. ${k}`).join("\n"));
 });
+
+test("zrzut dowodowy: widoczny fokus klawiatury na bramie i na butelce", async ({ page }, info) => {
+  await page.goto("/");
+  await tabujDo(page, "main [data-cta]");
+  await page.screenshot({ path: `screenshots/F6/F6-01-fokus-brama-${info.project.name}.png` });
+
+  await page.addInitScript(PELNY_STAN);
+  await page.goto("/proba-ognia");
+  await page.locator("[data-pole='email']").fill("kandydatka@komisja.pl");
+  await page.locator("[data-pole='but']").fill("39");
+  await page.locator("[data-pole='ucho']").fill("240");
+  await page.locator("[data-pokora]").check();
+  await page.locator("[data-cta]").click();
+  await expect(page.locator("[data-butelka]")).toBeFocused({ timeout: 12_000 });
+  await page.waitForTimeout(200);
+  await page.screenshot({ path: `screenshots/F6/F6-01-fokus-butelka-${info.project.name}.png` });
+});
