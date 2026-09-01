@@ -1,46 +1,67 @@
 # NEXT-TASKS - stan sztafety
 
 ## Następne issue
-**F0-05** (dokończenie, obecnie ⛔ BLOKADA) -> potem **F1-01** `⚠ HARD` (biblioteka
-`gif-less`, świeże okno).
+**F2-04** `deploy` - **STOP ORKIESTRATORA**. Worker zatrzymał się PRZED nim zgodnie
+z dyspozycją: issue wymaga Vercela, a ten jest zablokowany (patrz niżej). Kolejne
+issue możliwe do zrobienia bez Vercela to cała **F3** (F3-01 wymaga klucza
+OpenRouter w `.env.local` - do sprawdzenia, czy działa lokalnie bez `vercel env`).
 
-## Co zostało w F0
-- **F0-05** - część GitHub zrobiona (repo publiczne wypchnięte). Zostaje: `vercel link --yes`,
-  Blob store + `BLOB_READ_WRITE_TOKEN`, `vercel env add OPENROUTER_API_KEY production`.
-- F0-01, F0-02, F0-03, F0-04, F0-06 - odhaczone z dowodami w `plan/10-BACKLOG.md`.
-- DoD F0: `pnpm run check` zielony, `pnpm build` zielony (first load 102 kB),
-  screenshot `screenshots/F0/F0-01-brama.png`. Brakuje wyłącznie F0-05.
+## Zrobione w tej zmianie
+F1-01, F1-02, F1-03 (cała faza F1 + DoD), F2-01, F2-02, F2-03.
+Każde odhaczone w `plan/10-BACKLOG.md` z dowodem, jeden commit per issue.
 
-## Blokady wymagające użytkownika
+## Co zostało w F2
+- **F2-04** - `lib/stan.ts` ma już stronę CZYTAJĄCĄ (`czytajStan`, `etapUkonczony`,
+  typ `StanJWP` wg kontraktu plan/02 G) - dołożył ją F2-01, bo shell musi wiedzieć,
+  które etapy są ukończone. Do dopisania: `zapiszStan(patch)` z debounce 400 ms,
+  `wyczyscStan()`, tymczasowy `<input>` na stubie `/egzamin` do testu przeżycia
+  reloadu, oraz deploy preview. Deploy = część zablokowana, reszta wykonalna od ręki.
+
+## Blokady wymagające użytkownika (bez zmian)
 1. `vercel whoami` = `Logged out`. Potrzebne ręczne `vercel login` (interaktywne).
-2. Hook uprawnień odrzuca KAŻDĄ komendę dotykającą `.env.local`, także taką, która nie
-   drukuje wartości (`grep -c OPENROUTER_API_KEY .env.local`). Bez poluzowania hooka
-   worker nie ma jak podać klucza do `vercel env add`, a wklejenie go do czatu łamie Z12.
-   Obejście bez zmiany hooka: użytkownik wpisuje klucz w dashboardzie Vercel.
+   Blokuje F0-05 i deployową część F2-04.
+2. Hook uprawnień odrzuca KAŻDĄ komendę dotykającą `.env.local`. Bez tego worker nie
+   poda klucza do `vercel env add`. Obejście: użytkownik wpisuje klucz w dashboardzie.
 
-## Pułapki środowiskowe (zmierzone, nie zgadnięte)
-- `pnpm create next-app .` ODMAWIA pracy w tym katalogu (są `plan/`, `CLAUDE.md`,
-  `.env.local`). Scaffold jest ręczny - nie próbować ponownie.
-- **TypeScript 7 psuje Next 15.5.** `next.config.ts` wywala `TypeError: Cannot read
-  properties of undefined (reading 'fileExists')`. Dlatego konfiguracja to
-  `next.config.mjs`, a `typescript` jest przypięty do `^5`. Nie podnosić do 7.
-- Playwright MCP (`mcp__plugin_playwright_playwright__*`) startuje na kanale `chrome`,
-  którego na tej maszynie NIE MA. Do weryfikacji wzrokowej używać albo własnego
-  `npx playwright test`, albo binarki
-  `~/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell`
-  z `--headless --window-size=1280,800 --screenshot=... --virtual-time-budget=3000`.
-- `bash ~/.claude/agent-context.sh` w podagencie zwraca `NO-TRANSCRIPT` (exit 1).
-  Wg zasady 9: pracować dalej, nie wymyślać procentu. `~/.claude/context-usage.txt` żyje
-  i zwraca liczbę, ale dotyczy sesji orkiestratora, nie workera.
-- AC F0-05 `grep -r "sk-or-" = 0` jest niespełnialne dosłownie: ciąg występuje w treści
-  samych zasad w `plan/01`, `plan/08`, `plan/10`. Zero prawdziwych kluczy.
+## Pułapki środowiskowe (zmierzone w tej zmianie, nie zgadnięte)
+- **`reuseExistingServer: true` w `playwright.config.ts` to najdroższa pułapka tego
+  repo.** Kolejny przebieg podpina się pod dev-serwer z poprzedniego issue i serwuje
+  STARĄ stronę. Objaw mylący: wszystko interaktywne pada, `[data-odpraw]` = 0, mimo
+  że kod jest poprawny (kosztowało jeden fałszywy przebieg "8 failed").
+  Lekarstwo PRZED każdą serią: `for p in 3000 3001; do lsof -ti tcp:$p | xargs -r kill -9; done`
+  i w razie wątpliwości `rm -rf .next`.
+- `pkill -f "next start"` NIE ubija serwera produkcyjnego (proces nazywa się inaczej),
+  a `pnpm dev` cicho przeskakuje na port 3001 i skrypty gadają z poprzednim serwerem.
+  Zawsze ubijać po PORCIE, nie po nazwie.
+- Skrypty diagnostyczne z `import { chromium } from "@playwright/test"` muszą leżeć
+  W KATALOGU REPO (w `/tmp` nie rozwiąże się pakiet). Kasować po użyciu.
+- `getComputedStyle` serializuje `steps(N, end)` jako `steps(N)` - asercje muszą
+  dopuszczać obie formy. Podobnie `translateY(-0%)` wychodzi jako `translateY(0%)`.
+- `PerformanceObserver({type:"longtask", buffered:true})` łapie też zadania SPRZED
+  obserwacji (hydracja ~116 ms w dev). Przy mierzeniu "idle" filtrować po `startTime`.
+- React nie słucha surowego `dispatchEvent("mouseenter")` (delegacja przez mouseover) -
+  w testach używać `locator.hover()`.
+- Walidator `lint-tokens` skanuje TAKŻE komentarze CSS - hex w komentarzu wywala check
+  (opisane jako F7-02).
+- Zastane i nadal aktualne: TypeScript przypięty do `^5.9.3` (TS 7 psuje Next 15.5),
+  konfiguracja to `next.config.mjs`, Playwright MCP na kanale `chrome` nie działa -
+  używać `npx playwright test`.
+- `bash ~/.claude/agent-context.sh` w podagencie zwraca `NO-TRANSCRIPT` przez CAŁĄ
+  zmianę. Wg zasady 9: pracować dalej, nie wymyślać procentu.
 
 ## Stan środowiska
-node v26.7.0, pnpm 11.12.0, next 15.5.24, react 19.2.8, typescript 5.9.3,
-@playwright/test 1.62.1 + @axe-core/playwright 4.13.0, chromium zainstalowany.
-`gh` zalogowany (Enkidu-png), repo https://github.com/Enkidu-png/j-word-pass (public).
-`vercel` WYLOGOWANY.
+node v26.7.0, pnpm 11.12.0, next 15.5.24, react 19.2.8, typescript 5.9.3.
+`pnpm run check` zielony, `pnpm build` zielony (first load 102 kB, brama 104 kB),
+`npx playwright test` = **53 passed + 4 skipped** (6 plików: smoke, f1-01, f1-02,
+f2-01, f2-02, f2-03). `gh` zalogowany, `vercel` WYLOGOWANY.
 
-## Decyzje w toku
-DECISIONS.md ma wpisy #1 (@vercel/blob), #2 (scaffold ręczny, next.config.mjs, TS 5),
-#3 (blokada F0-05). Otwarte D1-D4 z `plan/README.md` nietknięte.
+## Nowe decyzje i znaleziska
+- **DECISIONS #4** - marquee paska krawędzi dostaje `steps(24)`/3800 ms, czyli poza
+  zakresem Z7 (N 2-8, 300-1400 ms). To konflikt plan/01 z plan/04 A2, który żąda tych
+  wartości wprost; wygrywa dokument szczegółowy, odstępstwo ograniczone do jednej klasy.
+- **F7-01** (`perf`) - long task ~116 ms przy starcie strony w DEV. Nie łamie AC F1-01
+  (AC mierzy idle). Dyspozycja: powtórzyć pomiar na buildzie produkcyjnym w F6-02.
+- **F7-02** (`infra`) - `lint-tokens.mjs` skanuje komentarze CSS. Zablokuje pierwszą
+  wklejkę do `app/vendor/` z nagłówkiem licencyjnym zawierającym hex. Do naprawy przed
+  pierwszym vendoringiem.
+- Otwarte D1-D4 z `plan/README.md` nadal nietknięte.
