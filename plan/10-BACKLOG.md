@@ -101,7 +101,7 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
   ✓ D4 dev z `OPENROUTER_API_KEY=` (klucz odpięty) -> HTTP 502 `{"blad":"Komisja nieosiągalna."}` w 0,43 s.
   ✓ D5 `grep -r "sk-or-"` (bez node_modules/.git/.next/.env.local) = 7 trafień, wszystkie to TREŚĆ AC w `plan/` i `DECISIONS.md`, zero kluczy (zgodnie z DECISIONS z F0-05).
   ✓ D6 `grep -rln OPENROUTER app lib components scripts` = tylko `app/api/ocena/route.ts`; import z `route.ts` w kliencie = 0 trafień.
-  ⏳ D7 rate limit - kod aktywny wyłącznie przy `NODE_ENV === "production"`, weryfikacja w F8-01 (tak przewiduje spec).
+  ✓ D7 rate limit zmierzony na lokalnym buildzie produkcyjnym (`pnpm build && next start -p 3100`, NODE_ENV=production), nie trzeba było czekać na F8: sześć kolejnych POST-ów daje `200 200 200 200 200 429`. Po F7-10 limiter mieszka w `lib/limit.ts` i ma własną pulę per route.
   UWAGA: plik route Next.js NIE MOŻE eksportować nic poza handlerami - `export function sanitizeDash` przechodzi `tsc --noEmit`, ale wywala `pnpm build` („does not match the required types of a Next.js Route"). Funkcja jest modułowo prywatna.
 - [x] **F3-02** `ui` ⚠ HARD Scena egzaminu: kosmos, słoń ze strzałem hoverowym + licznik naboi, 12 zeber (1 oficerska reverse), arkusz formularz-F7 z textarea.
   CZYTAJ: 05→A1,A2; 03→B (warianty); 02→F (kopiowanie).
@@ -296,6 +296,7 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
 - ✓ `pnpm run check` zielony: `samotest: czysto` + `lint-tokens: czysto` + `tsc --noEmit` bez błędów (samotest walidatora doszedł w F7-02).
 - ✓ `pnpm build` zielony: `/` 104 kB, `/egzamin` 110 kB, `/proba-ognia` 108 kB, `/quiz` 113 kB, `/opengraph-image` 136 B, `/icon.svg` 0 B, shared 102 kB.
 - ✓ `npx playwright test` = **217 passed + 17 skipped + 0 failed**.
+  UWAGA do liczb: 5 testów z `tests/f6-02.spec.ts` pomija się, gdy nie stoi ręcznie postawiony build na `:3100` - wtedy ten sam kod raportuje **212 passed + 22 skipped**. Liczba zależy od środowiska, nie od regresu.
 - ✓ Screenshoty stanu fazy w `screenshots/F6/`: `F6-01-fokus-{brama,butelka}-{desktop,mobile}.png` (widoczny pierścień fokusu klawiatury), `F6-02-lighthouse-{brama,egzamin,quiz,proba-ognia}.report.html` (raporty wydajności), `F6-03-404-{desktop,mobile}.png`, `F6-03-opengraph-image.png`.
 - ✓ Zero znalezisk bez issue: F7-01 zamknięte pomiarem w F6-02, F7-02 naprawione osobnym commitem przed jakimkolwiek vendorowaniem. Trzy błędy własne fazy (kontrast `--alarm`, `aria-label` na `<p>`, nagłówek 404 na papierze) naprawione u źródła w swoich issues. F7-04 (Deployment Protection) świadomie ZOSTAJE otwarte - to decyzja użytkownika przy bramce F8.
 - ✓ `app/vendor/` nietknięte - w F6 nic nie vendorowano. Vendoring jest jednak od teraz ODBLOKOWANY: nagłówek licencyjny z hexem przechodzi walidator (dowód przy F7-02).
@@ -343,6 +344,45 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
   AC: napis w pieczęci czyta się normalnie w obu ceremoniach; dowolnie długi tekst mieści się wewnątrz koła.
   ✓ D1 łuk zamieniony na `M 14,44 A 65,65 0 0 0 86,44` (kierunek dobrany empirycznie na zrzutach, nie z rozumowania o `sweep-flag`), plus `textLength="70" lengthAdjust="spacingAndGlyphs"`.
   ✓ D2 zweryfikowane na trzech użyciach: `8/10 - ZDANO` i `0/10 - PUSTKA` (F3-04), mini `ZAŁ.` na fiszkach (F3-03, wycinek screenshotu), `ZALACZONO` na `/dev/animacje` (test F1-02 nadal zielony).
+
+- [x] **F7-09** `deploy` ⛔ BLOKUJĄCE `app/layout.tsx` nie miał `metadataBase`, więc produkcyjny build wystawiał `og:image` jako `http://localhost:3000/opengraph-image` - podgląd linku na Slacku, Discordzie i Facebooku nie działał.
+  ZNALEZIONE W: review końcowy (zasada 10), pomiar curlem na `next start`.
+  DLACZEGO TESTY GO NIE ZŁAPAŁY: AC F6-03 grepowało `og:` na serwerze dev, gdzie `localhost:3000` był przypadkiem poprawnym adresem.
+  AC: produkcyjny build wystawia bezwzględny `og:image` na domenie produkcyjnej; lokalnie nadal `localhost:3000`; negatywne: adres nie jest zaszyty na sztywno w kodzie.
+  ✓ D1 `metadataBase` liczony z `VERCEL_PROJECT_PRODUCTION_URL` (Vercel ustawia ją sam w buildzie), fallback `http://localhost:3000`.
+  ✓ D2 zmierzone: `VERCEL_PROJECT_PRODUCTION_URL=j-word-pass.vercel.app pnpm build && next start -p 3100` -> `og:image content="https://j-word-pass.vercel.app/opengraph-image?..."`. Bez zmiennej ten sam build daje `http://localhost:3000/...`.
+
+- [x] **F7-10** `infra` ⛔ BLOKUJĄCE `/api/zgloszenie` nie miał ŻADNEGO limitu żądań (w przeciwieństwie do `/api/ocena`) - dowolny skrypt mógł pompować pliki do płatnego, prywatnego store'a Vercel Blob.
+  ZNALEZIONE W: review końcowy - 7 kolejnych POST-ów dało 7x 200 i 7 realnych plików w store.
+  AC: czwarte żądanie z tego samego adresu w ciągu minuty dostaje 429; liczniki obu route'ów są rozdzielone (złożenie druku nie zjada puli ocen egzaminu); poza produkcją limit nie działa (testy i dev bez czekania).
+  ✓ D1 limiter wyniesiony do `lib/limit.ts` (route.ts w Next.js nie może eksportować nic poza handlerami), wołany jako `limitPrzekroczony("zgloszenie", ip, 3)` i `limitPrzekroczony("ocena", ip, 5)`.
+  ✓ D2 zmierzone na `next start -p 3100` (NODE_ENV=production): zgłoszenie `z1:400 z2:400 z3:400 z4:429`, zaraz po tym ocena `o1..o5:200 o6:429` - pule niezależne.
+
+- [x] **F7-11** `infra` `/api/zgloszenie` cicho zerował `punktyEgzamin`/`punktyQuiz` spoza skali zamiast odrzucić druk: `{punktyEgzamin: 9999, punktyQuiz: -5}` dawało 200 i zapis do Bloba.
+  ZNALEZIONE W: review końcowy. Niespójna granica zaufania - but i ucho walidowane twardo, punkty cicho zerowane.
+  AC: punkty spoza zakresu (0-10 i 0-15) dają 400 z komunikatem w stylu Komisji, tak jak but i ucho.
+  ✓ D1 zmierzone: `{"email":"a@b.pl","rozmiarButa":42,"srednicaUchaMm":60,"punktyEgzamin":9999,"punktyQuiz":-5}` -> 400 `WYPEŁNIONO NIEGODNIE: PUNKTY Z ETAPU 1 POZA SKALĄ KOMISJI (0-10).`
+
+- [x] **F7-12** `infra` `scripts/lint-tokens.mjs` egzekwował tylko Z3, Z6 i dane kanoniczne. Z1 (`·`), Z2 (`—`) i Z5 (`border-left`) nie miały ŻADNEJ automatycznej kontroli - były czyste wyłącznie dzięki dyscyplinie autorów.
+  ZNALEZIONE W: review końcowy. Pierwszy nowy plik mógł złamać kanon bez czerwieni w `pnpm run check`.
+  AC: wstawienie `—`, `·` albo `border-left` do komponentu wywala `pnpm run check`; usunięcie wraca do zielonego; negatywne: sanitizer w `app/api/ocena/route.ts` (który MUSI zawierać te znaki, bo je wycina) nie jest łapany, komentarze też nie.
+  ✓ D1 `sprawdzKanon()` w walidatorze, wyjątek na `app/api/ocena/route.ts`, wycinanie komentarzy przez istniejące `bezKomentarzy()`.
+  ✓ D2 test negatywny: dopisanie trzech linii do `components/Pieczatka.tsx` dało `NARUSZEŃ: 3` (po jednym na Z1, Z2, Z5) i exit 1; po cofnięciu `lint-tokens: czysto`.
+
+- [x] **F7-13** `perf` Mapa limitera w `/api/ocena` nigdy nie usuwała wpisów dla adresów, które przestały pytać - rosła przez cały czas życia instancji. Komentarz `ponytail:` nazywał sufit rozproszenia, ale nie wyciek pamięci.
+  ZNALEZIONE W: review końcowy.
+  AC: wpisy starsze niż okno 60 s znikają z Mapy przy kolejnym żądaniu; limit nadal działa (dowód wspólny z F7-10 D2).
+  ✓ D1 `lib/limit.ts` kasuje przy każdym wywołaniu klucze, których wszystkie znaczniki są starsze niż 60 s.
+
+- [x] **F7-14** `infra` `.gitignore` miał whitelist `!.env.example`, ale samego pliku nie było w repo - świeży klon nie wiedział, jakich zmiennych potrzebuje.
+  ZNALEZIONE W: review końcowy.
+  AC: `.env.example` jest w repo z obiema nazwami zmiennych i opisem, co się dzieje bez każdej z nich; negatywne: zero wartości, tylko puste nazwy.
+  ✓ D1 `.env.example` z `OPENROUTER_API_KEY=` i `BLOB_READ_WRITE_TOKEN=`, przy każdej komentarz o zachowaniu bez niej (werdykt awaryjny / tryb `dev-log`).
+
+- [x] **F7-15** `ui` Pięć symboli miało `export` bez ani jednego importu z zewnątrz (`normalizuj`, `ocenPytanie` w `lib/quiz.ts`; `StanJWP`, `KLUCZ_STANU` w `lib/stan.ts`; `TonPieczatki` w `components/Pieczatka.tsx`) - zbędna powierzchnia API.
+  ZNALEZIONE W: review końcowy.
+  AC: symbole modułowo prywatne tracą `export`; `pnpm run check` i `pnpm build` nadal zielone; negatywne: nic poza tymi plikami ich nie importowało (sprawdzone grepem przed usunięciem).
+  ✓ D1 `export` zdjęty z pięciu deklaracji, `tsc --noEmit` i `pnpm build` zielone.
 
 - [ ] **F7-04** `deploy` Projekt ma włączoną Deployment Protection (Vercel Authentication) - anonimowy `curl` na URL deployu dostaje 302 na `vercel.com/sso-api`.
   ZNALEZIONE W: F2-04 (weryfikacja AC „URL preview działa"; obejście: `vercel curl <url>`, które dokłada token).

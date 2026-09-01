@@ -1,6 +1,8 @@
 // Ocena odpowiedzi egzaminacyjnej przez OpenRouter. Kontrakt: plan/08 sekcja B.
 // Klucz zyje wylacznie tutaj, po stronie serwera (Z12).
 
+import { adresZadania, limitPrzekroczony } from "@/lib/limit";
+
 const ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
 const MODEL_PRIMARY = "google/gemini-2.5-flash-lite";
 const MODEL_FALLBACK = "mistralai/mistral-small-3.2-24b-instruct";
@@ -44,19 +46,6 @@ function sanitizeDash(tekst: string): string {
   return koniec > 0 ? uciety.slice(0, koniec + 1) : uciety;
 }
 
-// ponytail: limit w pamieci procesu, bez KV. Sufit: kazda instancja serverless ma
-// wlasna Mape, wiec przy wielu instancjach limit jest luzniejszy niz 5/min. Na ruch
-// tej gry wystarcza; twardy limit dopiero gdyby klucz zaczal znikac.
-const zadania = new Map<string, number[]>();
-
-function limitPrzekroczony(ip: string): boolean {
-  if (process.env.NODE_ENV !== "production") return false;
-  const teraz = Date.now();
-  const swieze = (zadania.get(ip) ?? []).filter((t) => teraz - t < 60_000);
-  swieze.push(teraz);
-  zadania.set(ip, swieze);
-  return swieze.length > 5;
-}
 
 async function zapytajModel(model: string, odpowiedz: string, dowody: number, klucz: string) {
   const res = await fetch(ENDPOINT, {
@@ -110,8 +99,7 @@ export async function POST(request: Request) {
     return Response.json({ punkty: 0, komentarz: "PUSTKA." });
   }
 
-  const ip = (request.headers.get("x-forwarded-for") ?? "lokalny").split(",")[0].trim();
-  if (limitPrzekroczony(ip)) {
+  if (limitPrzekroczony("ocena", adresZadania(request), 5)) {
     return Response.json(
       { blad: "Komisja obraduje. Proszę odczekać minutę i złożyć wniosek ponownie." },
       { status: 429 },

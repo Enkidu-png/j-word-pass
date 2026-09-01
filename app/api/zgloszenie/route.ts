@@ -1,5 +1,7 @@
 import { put } from "@vercel/blob";
 
+import { adresZadania, limitPrzekroczony } from "@/lib/limit";
+
 // Zapis zgloszenia kandydatki. Kontrakt: plan/02 sekcja D. Jeden plik JSON per
 // zgloszenie, zero panelu admina (odczyt przez dashboard Vercel Blob).
 //
@@ -25,6 +27,16 @@ function losowe6(): string {
 }
 
 export async function POST(request: Request) {
+  // Druk bez auth zapisuje pliki do platnego store'a - limit jest tu jedyna
+  // zapora przed pompowaniem go skryptem. Prog nizszy niz w `ocena`, bo
+  // kandydatka sklada zgloszenie raz, nie piec razy na minute.
+  if (limitPrzekroczony("zgloszenie", adresZadania(request), 3)) {
+    return Response.json(
+      { blad: "Komisja przyjęła już Pani druk. Proszę odczekać minutę." },
+      { status: 429 },
+    );
+  }
+
   const surowy = await request.text();
   if (new TextEncoder().encode(surowy).length > LIMIT_BAJTOW) {
     return Response.json(
@@ -63,12 +75,29 @@ export async function POST(request: Request) {
     );
   }
 
+  // Punkty tez sa granica zaufania: ciche zerowanie wartosci spoza skali
+  // zapisywaloby do Bloba druk, ktorego Komisja nigdy nie wystawila.
+  const punktyEgzamin = liczbaWZakresie(cialo.punktyEgzamin, 0, 10);
+  if (punktyEgzamin === null) {
+    return Response.json(
+      { blad: "WYPEŁNIONO NIEGODNIE: PUNKTY Z ETAPU 1 POZA SKALĄ KOMISJI (0-10)." },
+      { status: 400 },
+    );
+  }
+  const punktyQuiz = liczbaWZakresie(cialo.punktyQuiz, 0, 15);
+  if (punktyQuiz === null) {
+    return Response.json(
+      { blad: "WYPEŁNIONO NIEGODNIE: PUNKTY Z ETAPU 2 POZA SKALĄ KOMISJI (0-15)." },
+      { status: 400 },
+    );
+  }
+
   const zgloszenie = {
     email,
     rozmiarButa,
     srednicaUchaMm,
-    punktyEgzamin: liczbaWZakresie(cialo.punktyEgzamin, 0, 10) ?? 0,
-    punktyQuiz: liczbaWZakresie(cialo.punktyQuiz, 0, 15) ?? 0,
+    punktyEgzamin,
+    punktyQuiz,
     ts: new Date().toISOString(),
   };
   const sciezka = `zgloszenia/${zgloszenie.ts}-${losowe6()}.json`;

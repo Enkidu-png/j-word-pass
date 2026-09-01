@@ -1,7 +1,7 @@
 // Kontrakt stanu kandydata z plan/02 sekcja G. Jeden klucz, jeden obiekt,
 // wylacznie sessionStorage (Z11). Jedyny localStorage w projekcie to `jwp.audio`.
 
-export type StanJWP = {
+type StanJWP = {
   v: 1;
   egzamin: {
     odpowiedz: string;
@@ -18,7 +18,7 @@ export type StanJWP = {
   } | null;
 };
 
-export const KLUCZ_STANU = "jwp.v1";
+const KLUCZ_STANU = "jwp.v1";
 
 export type Etap = "egzamin" | "quiz" | "ogien";
 

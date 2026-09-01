@@ -1,7 +1,7 @@
 // Reguly odpowiedzi quizu (plan/02 C2). Trzymane osobno od UI, bo maszyna
 // prawdy z F4-03 liczy punkty tym samym kodem, ktorym pytanie 14 sprawdza wpis.
 
-export function normalizuj(tekst: string): string {
+function normalizuj(tekst: string): string {
   return tekst
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "") // zdejmuje diakrytyki: "Mohsa" i "Móhsa" to to samo
@@ -29,7 +29,7 @@ type Pytanie = {
 
 // Werdykt jednego pytania. Nieodpowiedziane to `pustka` - liczy sie jak blad
 // (plan/06 B), ale ma wlasny stempel, bo to dwie rozne winy.
-export function ocenPytanie(p: Pytanie, odpowiedz: string | undefined): Werdykt15 {
+function ocenPytanie(p: Pytanie, odpowiedz: string | undefined): Werdykt15 {
   const wpis = (odpowiedz ?? "").trim();
   if (!wpis) return "pustka";
   if (p.typ === "otwarte") return dopasujOtwarte(wpis, p.kluczOtwarte) ? "prawda" : "falsz";

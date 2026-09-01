@@ -6,7 +6,7 @@ import { useId } from "react";
 // Wbicie odpala sie przy montowaniu: rodzic remontuje komponent (zmiana `key`),
 // zeby wbic ponownie. Ruch klasy `ceremonia` (Z8), CSS w bloku CEREMONIE.
 
-export type TonPieczatki = "urzad" | "alarm" | "jad";
+type TonPieczatki = "urzad" | "alarm" | "jad";
 
 export default function Pieczatka({
   tekst,

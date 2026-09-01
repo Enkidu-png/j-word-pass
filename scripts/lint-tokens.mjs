@@ -96,6 +96,35 @@ function sprawdzZ3() {
   }
 }
 
+/* ---------- (d) Z1, Z2, Z5: kanon typografii i ozdobnikow ---------- */
+
+// Z3 mial walidator od poczatku, kanon nie mial zadnego - byl czysty wylacznie
+// dzieki dyscyplinie autorow. Pierwszy nowy plik moglby go zlamac bez czerwieni.
+const MYSLNIK = /[—–]/;
+const SRODKOWA_KROPKA = /·/;
+const PASEK_AKCENTU = /(border-left|borderLeft)\s*[:=]/;
+
+function sprawdzKanon() {
+  const pliki = [
+    ...plikiRek(join(KORZEN, "app"), [".css", ".ts", ".tsx"]),
+    ...plikiRek(join(KORZEN, "components"), [".css", ".ts", ".tsx"]),
+  ]
+    // Sanitizer w `ocena` MUSI zawierac te znaki - to on je wycina z odpowiedzi modelu.
+    .filter((p) => relative(KORZEN, p) !== join("app", "api", "ocena", "route.ts"));
+
+  for (const plik of pliki) {
+    const linie = bezKomentarzy(readFileSync(plik, "utf8")).split("\n");
+    const oryginal = readFileSync(plik, "utf8").split("\n");
+    linie.forEach((linia, i) => {
+      const surowa = (oryginal[i] ?? linia).trim();
+      const gdzie = `${relative(KORZEN, plik)}:${i + 1}`;
+      if (MYSLNIK.test(linia)) bledy.push(`${gdzie} Z2 dlugi mysnik w copy/UI: ${surowa}`);
+      if (SRODKOWA_KROPKA.test(linia)) bledy.push(`${gdzie} Z1 srodkowa kropka jako ozdobnik: ${surowa}`);
+      if (PASEK_AKCENTU.test(linia)) bledy.push(`${gdzie} Z5 lewy pasek akcentu: ${surowa}`);
+    });
+  }
+}
+
 /* ---------- (b) Z6: allowlist zależności runtime ---------- */
 
 const DOZWOLONE = ["next", "react", "react-dom", "@vercel/blob"];
@@ -208,6 +237,7 @@ if (process.argv.includes("--samotest")) {
 /* ---------- start ---------- */
 
 sprawdzZ3();
+sprawdzKanon();
 sprawdzZaleznosci();
 sprawdzQuiz();
 sprawdzEgzamin();

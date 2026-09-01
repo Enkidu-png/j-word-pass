@@ -7,7 +7,15 @@ import RadioKomisji from "@/components/RadioKomisji";
 import StrazEtapu from "@/components/StrazEtapu";
 import WebringStopki from "@/components/WebringStopki";
 
+// Bez `metadataBase` Next sklada absolutne URL-e obrazka OG na localhost:3000 -
+// podglad linku na Slacku czy Discordzie wtedy nie dziala. Na Vercelu adres
+// produkcyjny siedzi w VERCEL_PROJECT_PRODUCTION_URL (bez schematu).
+const ADRES = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : "http://localhost:3000";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(ADRES),
   title: "J-WORD PASS",
   description: "System egzaminacyjny Międzygalaktycznej Komisji Kwalifikacyjnej.",
   // og:image dokleja sam Next z `app/opengraph-image.tsx`; tu tylko tytul i opis
