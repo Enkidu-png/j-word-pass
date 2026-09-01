@@ -16,9 +16,129 @@ button, input, textarea, select { font: inherit; color: inherit; }
 a { color: var(--urzad); }
 :focus-visible { outline: 3px dashed var(--alarm); outline-offset: 2px; }
 
-/* == KLASY KAFLI (puste, wypelniane w F1) == */
-.gif-less {}
-.kafel-tla {}
 .pasek-krawedzi {}
 .formularz-F7 {}
 .pieczatka {}
+
+/* == DEKORACJE: gif-less (Z7, Z8) == */
+/* Baza. Warianty ustawiaja WYLACZNIE longhandy - skrot `animation:` nadpisalby
+   timing-function na `ease` i zabil charakter GIF-a. */
+.gif-less {
+  animation-timing-function: steps(var(--klatki, 4), end);
+  animation-iteration-count: infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .gif-less { animation: none !important; }
+}
+
+.gif-less--blink { --klatki: 2; animation-name: jwp-blink; animation-duration: 700ms; }
+@keyframes jwp-blink {
+  0% { visibility: visible; }
+  50% { visibility: hidden; }
+  100% { visibility: visible; }
+}
+
+.gif-less--majtanie {
+  --klatki: 4;
+  animation-name: jwp-majtanie;
+  animation-duration: 900ms;
+  transform-origin: top center;
+}
+@keyframes jwp-majtanie {
+  0% { transform: rotate(-12deg); }
+  50% { transform: rotate(12deg); }
+  100% { transform: rotate(-12deg); }
+}
+
+.gif-less--skok { --klatki: 3; animation-name: jwp-skok; animation-duration: 500ms; }
+@keyframes jwp-skok {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
+}
+
+.gif-less--obrot { --klatki: 8; animation-name: jwp-obrot; animation-duration: 1400ms; }
+@keyframes jwp-obrot {
+  0% { transform: rotate(0); }
+  100% { transform: rotate(360deg); }
+}
+
+.gif-less--jazda { --klatki: 8; animation-name: jwp-jazda; animation-duration: 1200ms; }
+@keyframes jwp-jazda {
+  0% { background-position-x: 0; }
+  100% { background-position-x: var(--kafel, 48px); }
+}
+
+/* Blysk przelatujacy po chromowym gradiencie naglowka. */
+.gif-less--chrom {
+  --klatki: 6;
+  animation-name: jwp-chrom;
+  animation-duration: 1300ms;
+  background-image: linear-gradient(100deg, var(--chrom-a) 0%, var(--chrom-b) 30%,
+    var(--gwiazda) 45%, var(--chrom-c) 60%, var(--chrom-a) 100%);
+  background-size: 300% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+@keyframes jwp-chrom {
+  0% { background-position-x: 0%; }
+  100% { background-position-x: 100%; }
+}
+
+.gif-less--tancz { --klatki: 2; animation-name: jwp-tancz; animation-duration: 600ms; }
+@keyframes jwp-tancz {
+  0% { transform: scaleX(1); }
+  50% { transform: scaleX(-1); }
+  100% { transform: scaleX(1); }
+}
+
+/* == KAFLE TLA (proceduralne, zero plikow) == */
+.kafel-tla { background-repeat: repeat; }
+
+.kafel--kosmos {
+  background-color: var(--kosmos);
+  background-image:
+    radial-gradient(var(--gwiazda) 1px, transparent 1.6px),
+    radial-gradient(var(--gwiazda) 1px, transparent 1.6px),
+    radial-gradient(var(--gwiazda) 1px, transparent 1.6px);
+  background-size: 67px 67px, 131px 131px, 199px 199px;
+}
+
+.kafel--zebra {
+  background-image: repeating-linear-gradient(
+    105deg,
+    var(--zebra-a) 0 24px,
+    var(--zebra-b) 24px 48px
+  );
+}
+
+.kafel--urzad {
+  background-color: var(--papier);
+  background-image:
+    repeating-linear-gradient(0deg, var(--krata) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(90deg, var(--krata) 0 1px, transparent 1px 28px);
+}
+
+.kafel--ogien {
+  background-image: repeating-conic-gradient(
+    var(--alarm) 0 10deg,
+    var(--chrom-b) 10deg 20deg
+  );
+  background-size: 96px 96px;
+}
+
+.kafel--morze {
+  --kafel: 48px;
+  background-image: repeating-linear-gradient(
+    180deg,
+    var(--chrom-a) 0 12px,
+    var(--atrament) 12px 24px
+  );
+  background-size: 48px 48px;
+}
+
+/* == CEREMONIE START == */
+/* Jedyne miejsce w projekcie, gdzie wolno easing inny niz steps() (Z7). */
+.ceremonia { animation-timing-function: ease-in-out; }
+/* == CEREMONIE END == */

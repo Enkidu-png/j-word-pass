@@ -13,6 +13,7 @@
   --gwiazda: #ffffff;       /* kropki gwiazd w kafel--kosmos; tez literal w data: URI kursora */
   --zebra-a: #f4e9c8;
   --zebra-b: #f6f186;       /* bialo-zolte pasy kafel--zebra (= papier/chrom-b) */
+  --krata: #d8cba6;         /* linie kraty papieru kancelaryjnego, kafel--urzad */
   /* typografia */
   --font-urzad: "Courier New", Courier, monospace;    /* druki, dane, formularze */
   --font-krzyk: Impact, "Arial Black", sans-serif;    /* naglowki-krzyki */
