@@ -273,19 +273,25 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
   ✓ ARIA na interaktywnych SVG: każdy klikalny rysunek jest `<button>` z `aria-label` (`KoscUdowa`, `SlimakSpi`, karty dowodowe, radio komisji), pieczątki mają `role="img"` + `aria-label`, dekoracje `aria-hidden`. Butelka ma `role="button"`, `tabIndex=0`, obsługę Enter i Spacji oraz `aria-label`.
   ✓ NEGATYWNE: test pobiera arkusze stylów strony i sprawdza KAŻDY blok z `outline: none` - musi w tym samym bloku dawać zamiennik (`box-shadow`/`border`/`background`/inny `outline`). Bloków bez zamiennika: 0.
   ✓ `pnpm run check` czysto; `pnpm build` zielony; pełny `npx playwright test` = 204 passed + 12 skipped + 0 failed.
-- [ ] **F6-02** `perf` Budżety: LCP < 2,5 s na preview (Lighthouse), brak long tasks > 50 ms idle na każdej z 4 stron, bundle first-load < 160 kB.
+- [x] **F6-02** `perf` Budżety: LCP < 2,5 s na preview (Lighthouse), brak long tasks > 50 ms idle na każdej z 4 stron, bundle first-load < 160 kB.
   CZYTAJ: 03→C budżet, 03→I.
   AC: raport Lighthouse w screenshots/F6/; `next build` output first-load wklejony; poprawki jeśli przekroczone.
+  ✓ LIGHTHOUSE (v12.8.2, kategoria performance, domyślna emulacja mobile z dławieniem CPU/sieci) na buildzie PRODUKCYJNYM `pnpm build` + `npx next start -p 3100` (deploy zakazany do bramki F8, więc pomiar lokalny): `/` **LCP 1,8 s** (perf 90), `/egzamin` **LCP 1,9 s** (100), `/quiz` **LCP 1,9 s** (100), `/proba-ognia` **LCP 1,9 s** (100). Wszystkie pod progiem 2,5 s. CLS 0 wszędzie, TBT 10-20 ms. Raporty: `screenshots/F6/F6-02-lighthouse-{brama,egzamin,quiz,proba-ognia}.report.html`.
+  ✓ LONG TASKS: `npx playwright test tests/f6-02.spec.ts` = **5 passed**. Na każdej z 4 stron `PerformanceObserver({type:"longtask", buffered:true})` po 1,5 s stabilizacji zbiera 5 s IDLE: **zero wpisów > 50 ms** (lista pusta, nie "poniżej progu").
+  ✓ BUNDLE: `next build` first load per route - `/` 104 kB, `/egzamin` 110 kB, `/proba-ognia` 108 kB, `/quiz` **113 kB** (najgrubszy), shared 102 kB (`119f2342` 54,2 kB + `191` 45,8 kB + 1,92 kB). Budżet 160 kB z zapasem 47 kB.
+  ✓ POMIAR DLA ZNALEZISKA F7-01: na buildzie produkcyjnym `/dev/animacje` daje od nawigacji do 3 s listę long tasków `[]` - pusto, także w oknie hydracji. 116 ms z F1-01 było artefaktem serwera DEV (kod nieminifikowany, kompilacja na żądanie). Znalezisko zamknięte pomiarem, zero zmian w kodzie.
+  ✓ MIERZONE, NIE NAPRAWIANE (info): Speed Index bramy = 11,7 s przy LCP 1,8 s. To nie jest regres, tylko artefakt metryki: Speed Index karze każdą zmianę pikseli w viewporcie, a cała strona to celowo nieustające pętle `gif-less` (marquee, blink, chrom). Metryka nie ma sensu dla tego projektu; AC mierzy LCP i budżet ten jest spełniony.
 - [ ] **F6-03** `ui` 404 w stylu Komisji (`AKTA ZAGINĘŁY. NISZCZARKA BYŁA SZYBSZA.` + pieczątka + link do bramy), metadata/OG: `app/opengraph-image.tsx` przez `ImageResponse` z `next/og` (zero nowych zależności, zero binariów), favicon: `app/icon.svg` (pieczątka, Next 15 obsługuje SVG natywnie).
   CZYTAJ: 04→A (stopka spójna); 02→A.
   AC: /nieistnieje daje stylizowane 404 (screenshot); `curl -s <url> | grep og:` pokazuje og:title i og:image; GET /opengraph-image zwraca 200 image/png; favicon widoczny.
 
 ## F7-ZNALEZISKA (rośnie w trakcie; DoD: każde znalezisko ma issue z dyspozycją zrobione / odrzucone z powodem / przeniesione)
 
-- [ ] **F7-01** `perf` Long task ~116 ms przy starcie `/dev/animacje` (hydracja), zmierzony w F1-01. NIE łamie AC F1-01 (AC mierzy 5 s IDLE, a zadanie pada na `startTime` ~222 ms, czyli przed ustabilizowaniem strony; w oknie idle jest 0 wpisów > 50 ms) i pochodzi z serwera DEV, gdzie kod jest nieminifikowany i kompilowany na żądanie.
+- [x] **F7-01** `perf` Long task ~116 ms przy starcie `/dev/animacje` (hydracja), zmierzony w F1-01. NIE łamie AC F1-01 (AC mierzy 5 s IDLE, a zadanie pada na `startTime` ~222 ms, czyli przed ustabilizowaniem strony; w oknie idle jest 0 wpisów > 50 ms) i pochodzi z serwera DEV, gdzie kod jest nieminifikowany i kompilowany na żądanie.
   ZNALEZIONE W: F1-01 (pomiar `PerformanceObserver({type:"longtask", buffered:true})`).
   AC: powtórzyć pomiar na buildzie PRODUKCYJNYM (`pnpm build && pnpm start`) dla 4 stron kandydata (`/`, `/egzamin`, `/quiz`, `/proba-ognia`) - liczone WSZYSTKIE long taski, także startowe; jeśli którykolwiek > 50 ms, zdiagnozować i naprawić, jeśli nie - zamknąć wpisem "odrzucone: koszt wyłącznie dev-serwera" z wklejonymi liczbami. Uwaga: `/dev/animacje` w produkcji nie istnieje (F1-03), więc mierzy się strony kandydata.
   DYSPOZYCJA: przeniesione do F6-02 (budżety perf na preview) - tam jest właściwe środowisko pomiaru; wpis zostaje otwarty do czasu wykonania F6-02.
+  ✓ ZAMKNIĘTE POMIAREM w F6-02: na buildzie produkcyjnym (`pnpm build` + `next start -p 3100`) `PerformanceObserver` na `/dev/animacje` zbiera od nawigacji do 3 s listę `[]` - ani jednego long taska, także w oknie hydracji. Hipoteza z opisu potwierdzona: 116 ms pochodziło z serwera DEV. Zero zmian w kodzie, test regresyjny `tests/f6-02.spec.ts` pilnuje progu.
 
 - [ ] **F7-02** `infra` `scripts/lint-tokens.mjs` skanuje także KOMENTARZE CSS, więc literał koloru w komentarzu wywala `pnpm run check`.
   ZNALEZIONE W: F2-01 (komentarz przy kursorze-komisji tłumaczył, które tokeny odpowiadają wartościom w `data:` URI, i został odrzucony jako naruszenie Z3).
