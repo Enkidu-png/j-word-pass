@@ -32,6 +32,18 @@ function bezDataUri(linia) {
   return linia.replace(/url\(\s*(['"]?)data:[^)]*\1\s*\)/gi, 'url("data:USUNIETE")');
 }
 
+// KOMENTARZE NIE SĄ KODEM (znalezisko F7-02). Z3(c) każe wskazać token
+// „w komentarzu obok" wartości z `data:` URI, a DoD faz dopuszcza literały koloru
+// w nagłówku licencyjnym pliku vendor - jedno i drugie wywracało walidator.
+// Treść komentarza znika, ale ZNAKI NOWEJ LINII zostają, żeby numery linii
+// w komunikatach dalej wskazywały prawdziwe miejsce.
+export function bezKomentarzy(tresc) {
+  const bezBlokowych = tresc.replace(/\/\*[\s\S]*?\*\//g, (blok) => blok.replace(/[^\n]/g, " "));
+  // `//` ucinamy tylko wtedy, gdy NIE jest częścią `://` - inaczej zjadłoby
+  // resztę linii z adresem URL i schowało literał, który stoi za nim.
+  return bezBlokowych.replace(/(^|[^:])\/\/[^\n]*/g, (_, przed) => przed);
+}
+
 /* ---------- (a) Z3: literały kolorów i rozmiarów czcionki ---------- */
 
 const NAZWY_KOLOROW = `aliceblue antiquewhite aqua aquamarine azure beige bisque black blanchedalmond blue
@@ -69,9 +81,11 @@ function sprawdzZ3() {
     });
 
   for (const plik of pliki) {
-    const linie = readFileSync(plik, "utf8").split("\n");
-    linie.forEach((surowa, i) => {
-      const linia = bezDataUri(surowa);
+    const linie = bezKomentarzy(readFileSync(plik, "utf8")).split("\n");
+    const oryginal = readFileSync(plik, "utf8").split("\n");
+    linie.forEach((bezKom, i) => {
+      const surowa = oryginal[i] ?? bezKom;
+      const linia = bezDataUri(bezKom);
       const gdzie = `${relative(KORZEN, plik)}:${i + 1}`;
       if (HEX.test(linia)) bledy.push(`${gdzie} literał koloru (hex): ${surowa.trim()}`);
       else if (FUNKCJA_KOLORU.test(linia)) bledy.push(`${gdzie} literał koloru (funkcja): ${surowa.trim()}`);
@@ -159,6 +173,36 @@ function sprawdzKomisje() {
     bledy.push("data/komisja.json: werdyktAwaryjny musi mieć co najmniej 5 wariantów");
   }
   if (EMOJI.test(JSON.stringify(k))) bledy.push("data/komisja.json: emoji w danych (Z4)");
+}
+
+/* ---------- samotest (F7-02) ---------- */
+// `node scripts/lint-tokens.mjs --samotest` - najmniejszy sprawdzian, ktory pada,
+// gdy strippera komentarzy ktos zepsuje. Bez frameworka, bez fixture'ow na dysku.
+
+if (process.argv.includes("--samotest")) {
+  const przypadki = [
+    ["/* src: https://x.dev (MIT) tlo #ff2079 */\n.a { color: var(--alarm); }", false, "hex w komentarzu blokowym"],
+    ["// tlo to #ff2079\nconst a = 1;", false, "hex w komentarzu liniowym"],
+    [".a { color: #ff2079; }", true, "hex w kodzie"],
+    ['const u = "https://x.dev/a"; const c = "#ff2079";', true, "hex za adresem z //"],
+    ["/* wielolinijkowy\n   #ff2079 */\n.a { color: red2; }", false, "hex w komentarzu wieloliniowym"],
+  ];
+  let bledne = 0;
+  for (const [wejscie, maZnalezc, opis] of przypadki) {
+    const znalazl = HEX.test(bezKomentarzy(wejscie));
+    if (znalazl !== maZnalezc) {
+      console.error(`SAMOTEST PADL: ${opis} - oczekiwano ${maZnalezc}, jest ${znalazl}`);
+      bledne += 1;
+    }
+  }
+  // numeracja linii nie moze sie rozjechac po wycieciu komentarza
+  const linie = bezKomentarzy("/* a\n   b */\n.c { color: #fff; }").split("\n");
+  if (linie.length !== 3 || !HEX.test(linie[2])) {
+    console.error("SAMOTEST PADL: komentarz zjadl znaki nowej linii");
+    bledne += 1;
+  }
+  console.log(bledne === 0 ? "samotest: czysto" : `samotest: ${bledne} bledow`);
+  process.exit(bledne === 0 ? 0 : 1);
 }
 
 /* ---------- start ---------- */

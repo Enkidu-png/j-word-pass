@@ -20,6 +20,6 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "check": "node scripts/lint-tokens.mjs && tsc --noEmit"
+    "check": "node scripts/lint-tokens.mjs --samotest && node scripts/lint-tokens.mjs && tsc --noEmit"
   }
 }

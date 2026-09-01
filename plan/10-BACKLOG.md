@@ -300,11 +300,18 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
   DYSPOZYCJA: przeniesione do F6-02 (budżety perf na preview) - tam jest właściwe środowisko pomiaru; wpis zostaje otwarty do czasu wykonania F6-02.
   ✓ ZAMKNIĘTE POMIAREM w F6-02: na buildzie produkcyjnym (`pnpm build` + `next start -p 3100`) `PerformanceObserver` na `/dev/animacje` zbiera od nawigacji do 3 s listę `[]` - ani jednego long taska, także w oknie hydracji. Hipoteza z opisu potwierdzona: 116 ms pochodziło z serwera DEV. Zero zmian w kodzie, test regresyjny `tests/f6-02.spec.ts` pilnuje progu.
 
-- [ ] **F7-02** `infra` `scripts/lint-tokens.mjs` skanuje także KOMENTARZE CSS, więc literał koloru w komentarzu wywala `pnpm run check`.
+- [x] **F7-02** `infra` `scripts/lint-tokens.mjs` skanuje także KOMENTARZE CSS, więc literał koloru w komentarzu wywala `pnpm run check`.
   ZNALEZIONE W: F2-01 (komentarz przy kursorze-komisji tłumaczył, które tokeny odpowiadają wartościom w `data:` URI, i został odrzucony jako naruszenie Z3).
   DLACZEGO TO PROBLEM: (a) Z3(c) każe wskazać token „w komentarzu obok" wartości z `data:` URI; (b) DoD każdej fazy dopuszcza literały kolorów w vendor „tylko w komentarzu licencyjnym" - a taki komentarz dziś nie przejdzie walidatora. Pierwsza wklejka do `app/vendor/` z nagłówkiem `/* src: URL (licencja) */` zawierającym hex zablokuje build.
   OBEJŚCIE ZASTOSOWANE W F2-01: komentarz nazywa tokeny (`--urzad`, `--atrament`) zamiast powtarzać hex. Działa, ale nie skaluje się na vendor.
   AC: walidator pomija treść komentarzy CSS (`/* ... */`) przy szukaniu literałów kolorów i rozmiarów czcionki, zachowując wykrywanie w kodzie; test negatywny: `color:#fff` w KODZIE nadal wywala check (exit 1), a ten sam literał w komentarzu przechodzi (exit 0); test na `app/vendor/x.css` z nagłówkiem licencyjnym zawierającym hex -> exit 0.
+  ✓ NAPRAWIONE (osobny commit, przed jakimkolwiek vendorowaniem): `scripts/lint-tokens.mjs` dostał `bezKomentarzy()` - wycina komentarze blokowe `/* */` i liniowe `//` PRZED szukaniem literałów, zostawiając znaki nowej linii, żeby numeracja w komunikatach nie rozjechała się o wycięte linie. `//` ucinane jest tylko wtedy, gdy nie jest częścią `://`, bo inaczej adres URL zjadłby resztę linii razem z prawdziwym naruszeniem za nim.
+  ✓ DOWÓD (uruchomione na kopii roboczej, pliki skasowane po pomiarze):
+    (1) `app/_probny.css` z `.probny { color: #ffffff; }` -> `KOMISJA ODRZUCA KOD. NARUSZEŃ: 1` + `app/_probny.css:1 literał koloru (hex)`, **exit=1**;
+    (2) ten sam hex przeniesiony do komentarza `/* tlo #ffffff to token --gwiazda */` -> `lint-tokens: czysto`, **exit=0**;
+    (3) `app/vendor/x.css` z nagłówkiem `/* src: https://github.com/jdan/98.css (MIT) - paleta zrodlowa #c0c0c0 */` -> `lint-tokens: czysto`, **exit=0**.
+  ✓ SAMOTEST: `node scripts/lint-tokens.mjs --samotest` (5 przypadków + kontrola numeracji linii) = `samotest: czysto`. Wpięty w `pnpm run check`, więc regresja strippera wywala check, a nie dopiero czyjąś wklejkę.
+  KONSEKWENCJA: vendoring jest ODBLOKOWANY - nagłówek licencyjny z hexem przechodzi walidator.
 
 - [x] **F7-03** `test` `tests/f1-02.spec.ts` (licznik mechaniczny) pada na strict-mode violation: `[data-licznik]` znajduje 2 elementy na `/dev/animacje`.
   ZNALEZIONE W: F2-04 (pełny przebieg `npx playwright test` = 2 failed / 58 passed / 4 skipped).
