@@ -1,0 +1,64 @@
+/* BRAMA, etap 0 (plan/05 B1, C, D). Kafel tla siedzi na <html> przez
+   KafelTla - tu tylko uklad tresci. */
+
+.brama {
+  position: relative;
+  min-height: 80vh;
+  /* miejsce na pas dolny (45 px) i na stwory rogowe, zeby nie lezaly na tresci */
+  padding: 12px 12px 150px;
+  text-align: center;
+}
+
+.brama__statek {
+  width: 200px;
+  height: auto;
+  margin: 0 auto;
+}
+
+.brama__naglowek {
+  margin: 4px 0 0;
+}
+
+.brama__napis {
+  width: min(90vw, 720px);
+  height: auto;
+}
+
+.brama__podtytul {
+  display: inline-block;
+  margin: 0 0 12px;
+  padding: 6px 14px;
+  background: var(--papier);
+  border: 3px ridge var(--chrom-b);
+  color: var(--tusz);
+  font-family: var(--font-czytany);
+  font-size: var(--stopien-tresc);
+  letter-spacing: 2px;
+}
+
+.brama__zjazd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 720px;
+  margin: 0 auto 16px;
+}
+
+.brama__zjazd .pas-goniec {
+  flex: 1 1 auto;
+}
+
+.brama__strzalka {
+  flex: 0 0 auto;
+  width: 55px;
+  height: auto;
+}
+
+@media (max-width: 480px) {
+  .brama {
+    padding-bottom: 130px;
+  }
+  .brama__statek {
+    width: 140px;
+  }
+}

@@ -285,3 +285,22 @@ dostaje prawidlowa wartosc juz przy PIERWSZYM renderze kazdego komponentu,
 niezaleznie od tego, kiedy ten komponent powstal, a serwer zawsze wersje
 animowana, wiec strona bez JS nadal sie rusza. Krocej niz wersja na efekcie
 i bez okna, w ktorym Z11 jest lamane.
+
+## #18 - AC issue F2-02a jest kopia AC issue F2-02b, wykonane w dwoch commitach
+
+Znalezisko z F2-02a. Tytul issue zawęża zakres wprost do punktow 2-6, 9 i 10
+z `plan/05 B1` (kafel, statek, napis-obrazek, podtytul, pas-goniec, pas dolny,
+dwa stwory rogowe), a tablica ogloszen i druk wstepny sa osobnym issue F2-02b.
+Tymczasem AC F2-02a jest slowo w slowo AC F2-02b i zada rzeczy, ktorych ten
+zakres nie zawiera: minimum 12 animowanych elementow, szesciu roznych
+`animation-delay` na ozdobach tablicy, pola `ALEKSANDRA` z `readonly`
+i `elementFromPoint` na srodku kazdego przycisku. Szkielet z punktow 2-6, 9, 10
+ma dokladnie szesc animowanych elementow, wiec progu 12 nie da sie osiagnac
+bez wykonania F2-02b - AC F2-02a jest w swoim wlasnym zakresie sprzeczne.
+
+Dyspozycja: nie zgadujemy, ktora polowa AC jest prawdziwa. Wykonane oba issues
+po kolei, kazde swoim commitem, a kryteria wspolne (>= 12 animowanych, >= 6
+roznych opoznien, pole readonly, `elementFromPoint`) zmierzone i wpisane jako
+dowod przy F2-02b, bo dopiero tam zakres pozwala im byc prawda. Przy F2-02a
+odhaczone to, co lezy w jego zakresie: kafel `repeat` bez `background-size`,
+komplet elementow szkieletu, wzorzec ROGI i zero obrotu w DOM bramy.
