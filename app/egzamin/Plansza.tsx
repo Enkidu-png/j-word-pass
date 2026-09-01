@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import komisja from "@/data/komisja.json";
 import egzamin from "@/data/egzamin.json";
 import { chceRedukcjiRuchu } from "@/lib/animacje";
-import { czytajStan, zapiszStan } from "@/lib/stan";
+import { czytajStan, zapiszStan, zapiszTeraz } from "@/lib/stan";
 import Arkusz from "./Arkusz";
 import KartaDowodowa from "./KartaDowodowa";
 import Narada, { type Werdykt } from "./Narada";
@@ -93,7 +93,8 @@ export default function Plansza() {
   function zakoncz(wynik: Werdykt) {
     ustawWerdykt(wynik);
     ustawFaze("werdykt");
-    zapiszStan({ egzamin: { punkty: wynik.punkty, komentarz: wynik.komentarz } });
+    // to samo co w quizie: werdykt to kamien milowy, nie znak w polu (F7-08)
+    zapiszTeraz({ egzamin: { punkty: wynik.punkty, komentarz: wynik.komentarz } });
   }
 
   async function oceniaj(odpowiedz: string) {

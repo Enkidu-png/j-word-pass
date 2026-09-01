@@ -80,6 +80,22 @@ export function zapiszStan(patch: Patch): void {
   }, 400);
 }
 
+// Zapis NATYCHMIASTOWY - do kamieni milowych (werdykt etapu), gdzie debounce
+// jest realnym ryzykiem: kandydat, ktory odswiezy strone w ciagu 400 ms od
+// werdyktu, straciłby wynik. Pisanie po kazdym znaku dalej idzie przez debounce.
+export function zapiszTeraz(patch: Patch): void {
+  if (typeof window === "undefined") return;
+  if (timer) clearTimeout(timer);
+  timer = null;
+  const doZapisu = { ...oczekujacy, ...patch };
+  oczekujacy = null;
+  try {
+    window.sessionStorage.setItem(KLUCZ_STANU, JSON.stringify(scal(czytajStan(), doZapisu)));
+  } catch {
+    // brak miejsca / tryb prywatny - kandydat traci zapis, nie strone
+  }
+}
+
 export function wyczyscStan(): void {
   if (typeof window === "undefined") return;
   if (timer) clearTimeout(timer);

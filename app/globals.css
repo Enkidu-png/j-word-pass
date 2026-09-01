@@ -1363,3 +1363,166 @@ a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
   50% { visibility: visible; }
   100% { visibility: visible; }
 }
+
+/* == ETAP 2: MASZYNA PRAWDY, WYNIK, REWIZJA (plan/06 B) == */
+/* Zakladka barwi sie werdyktem dopiero w maszynie - wczesniej zaden sygnal
+   poprawnosci nie moze wyciec (anty-spec 06 F2). */
+.zakladka[data-werdykt="prawda"] { background-color: var(--jad); }
+.zakladka[data-werdykt="falsz"], .zakladka[data-werdykt="pustka"] { background-color: var(--alarm); color: var(--papier); }
+
+.segregator__oddanie { grid-column: 1; margin: 12px 0 0; }
+.segregator__oddaj {
+  border: var(--ramka);
+  background: var(--chrom-b);
+  font-family: var(--font-krzyk);
+  letter-spacing: 1px;
+  padding: 8px 12px;
+  box-shadow: var(--cien-x) var(--cien-y) 0 var(--cien);
+}
+.segregator__potwierdzenie { grid-column: 1; margin-top: 12px; padding: 12px; }
+.segregator__druk { font-family: var(--font-krzyk); margin: 0 0 8px; }
+.segregator__potwierdzenie button { border: 2px outset var(--atrament); background: var(--papier); padding: 4px 8px; }
+
+.maszyna { padding: 16px; }
+.maszyna__naglowek { font-family: var(--font-krzyk); letter-spacing: 1px; margin-bottom: 8px; }
+.maszyna__obudowa { position: relative; display: flex; justify-content: center; }
+.maszyna__rysunek { width: 240px; height: 180px; }
+.maszyna__lej { fill: var(--krata); stroke: var(--atrament); stroke-width: 3; }
+.maszyna__pudlo { fill: var(--papier); stroke: var(--atrament); stroke-width: 3; }
+.maszyna__korba-os { fill: var(--atrament); }
+.maszyna__korba { fill: none; stroke: var(--urzad); stroke-width: 3; transform-origin: 96px 56px; }
+.maszyna__wyjscie { fill: var(--kosmos); stroke: var(--atrament); stroke-width: 2; }
+/* teczka wpada do leja: 3 klatki, zawsze ten sam tor */
+.maszyna__teczka {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 26px;
+  height: 20px;
+  border: 2px solid var(--atrament);
+  background: var(--chrom-b);
+  --klatki: 3;
+  animation-name: jwp-wpada;
+  animation-duration: 400ms;
+}
+@keyframes jwp-wpada {
+  0% { transform: translate(-50%, -20px); }
+  100% { transform: translate(-50%, 60px); }
+}
+.maszyna__dym { position: absolute; top: 0; left: 50%; display: flex; gap: 6px; }
+.maszyna__klab {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--atrament);
+  background: var(--papier);
+  --klatki: 4;
+  animation-name: jwp-para;
+  animation-duration: 1200ms;
+}
+.maszyna__licznik { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.maszyna__stempel { display: flex; justify-content: center; align-items: center; gap: 16px; min-height: 110px; margin: 0; }
+/* pieczec wypada z maszyny co 400 ms, wiec praktycznie zawsze widac ja w trakcie
+   wbicia - w domyslnych 120 px klatka poczatkowa zajmowala pol ekranu */
+.maszyna__stempel .pieczatka { width: 84px; }
+.maszyna__podpis {
+  align-self: center;
+  border: var(--ramka);
+  background: var(--papier);
+  font-family: var(--font-krzyk);
+  letter-spacing: 1px;
+  padding: 2px 8px;
+}
+/* jad i alarm jako TLO, nie kolor tekstu - na papierze same w sobie sa nieczytelne */
+.maszyna__podpis[data-podpis="prawda"] { background: var(--jad); }
+.maszyna__podpis[data-podpis="falsz"], .maszyna__podpis[data-podpis="pustka"] { background: var(--alarm); color: var(--papier); }
+/* wstrzas obudowy przy werdykcie FALSZ/PUSTKA: 2 px, 2 klatki */
+.maszyna[data-ostatni="falsz"] .maszyna__rysunek,
+.maszyna[data-ostatni="pustka"] .maszyna__rysunek {
+  animation-name: jwp-wstrzas;
+  animation-duration: 300ms;
+  animation-timing-function: steps(2, end);
+  animation-iteration-count: 1;
+}
+@keyframes jwp-wstrzas {
+  0% { transform: translateX(-2px); }
+  50% { transform: translateX(2px); }
+  100% { transform: translateX(0); }
+}
+
+.wynik { grid-column: 1; margin-top: 12px; padding: 16px; text-align: center; }
+.wynik__pieczec { display: block; }
+.wynik__kwestia { font-family: var(--font-glos); }
+.wynik__rewizja { font-size: var(--rozmiar-drobny); }
+.wynik button {
+  border: var(--ramka);
+  background: var(--alarm);
+  color: var(--papier);
+  font-family: var(--font-krzyk);
+  letter-spacing: 1px;
+  padding: 8px 12px;
+}
+
+/* tryb rewizji: poprawna obwiedziona, wybrana bledna przekreslona odrecznie */
+.wariant[data-rewizja="poprawna"] { border: 3px double var(--jad); background-color: var(--papier); }
+.wariant[data-rewizja="bledna"] { position: relative; }
+.wariant__skreslenie {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: var(--alarm);
+  stroke-width: 2;
+}
+.teczka__klucz { border: 2px dashed var(--jad); padding: 0 4px; }
+.teczka[data-rewizja="tak"] .wariant:hover { transform: none; border-color: transparent; }
+.teczka[data-rewizja="tak"] .wariant[data-rewizja="poprawna"]:hover { border-color: var(--jad); }
+
+/* przejscie podanie-do-ognia (06 C): samolocik leci, zapala sie, ogien zalewa ekran */
+.podanie-do-ognia {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+}
+.podanie__samolocik {
+  position: absolute;
+  top: 40%;
+  left: 10%;
+  display: block;
+  width: 90px;
+  animation-name: jwp-lot;
+  animation-duration: 2200ms;
+  animation-timing-function: steps(8, end);
+  animation-fill-mode: forwards;
+}
+.podanie__samolocik svg { fill: var(--papier); stroke: var(--atrament); stroke-width: 2; }
+@keyframes jwp-lot {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(90vw); }
+}
+.podanie__plomienie { display: flex; gap: 2px; --klatki: 4; animation-name: jwp-blink; animation-duration: 400ms; }
+.podanie__plomienie span {
+  width: 10px;
+  height: 14px;
+  background: var(--alarm);
+  border: 1px solid var(--chrom-b);
+  border-radius: 50% 50% 50% 0;
+}
+/* ogien zalewa ekran kolem rosnacym w 6 skokach */
+.podanie-do-ognia[data-przejscie="ogien"] {
+  background-image: repeating-conic-gradient(var(--alarm) 0 10deg, var(--chrom-b) 10deg 20deg);
+  background-size: 96px 96px;
+  animation-name: jwp-ogien-rosnie;
+  animation-duration: 800ms;
+  animation-timing-function: steps(6, end);
+  animation-fill-mode: forwards;
+}
+@keyframes jwp-ogien-rosnie {
+  0% { clip-path: circle(0% at 90% 40%); }
+  100% { clip-path: circle(140% at 90% 40%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .maszyna__teczka, .podanie__samolocik, .podanie-do-ognia[data-przejscie="ogien"] { animation: none !important; }
+}

@@ -193,9 +193,28 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
   ✓ budżet linii: RekinStarszyOdDrzew 20, MozartKanon 18, MrowkiHodowcy 20, SkalaTwardosci 14, WombatKostka 16 - wszystkie <= 30.
   ✓ screenshots/F4/F4-02c-sig-{11..15}-{desktop,mobile}.png - obejrzane: 11 = rekin z laską i mrugającymi skrzelami, oś kreskowana, zielone drzewko; 12 = cztery nutki na pięciolinii; 13 = karawana mrówek z mszycami-walizkami; 14 = dziesięć kamyków rosnących od talku do diamentu; 15 = wombat i rządek sześcianów dokładających się po kolei.
   ✓ negatywne: zero emoji w wyrenderowanym HTML teczek 11-15; `pnpm run check` zielony, `pnpm build` zielony (`/quiz` 7,33 kB), pełny `npx playwright test` = 138 passed + 12 skipped + 0 failed.
-- [ ] **F4-03** `ui` Maszyna prawdy: ceremonia 15x werdykt + licznik + pieczątka N/15 + tryb rewizji + przejście podanie-do-ognia.
+- [x] **F4-03** `ui` Maszyna prawdy: ceremonia 15x werdykt + licznik + pieczątka N/15 + tryb rewizji + przejście podanie-do-ognia.
   CZYTAJ: 06→B,C; 03→E,F.
   AC: pełna ceremonia ≤ 9 s (pomiar performance.now w teście); Esc = wszystkie werdykty naraz; nieodpowiedziane liczą się jako błędne po potwierdzeniu druku; rewizja: poprawna obwiedziona, błędna przekreślona; przejście z płonącym samolocikiem ≤ 2,2 s prowadzi na /proba-ognia; wynik w sessionStorage; screenshoty: maszyna w trakcie + rewizja.
+  DOWÓD: ✓ `npx playwright test tests/f4-03.spec.ts` = 12 passed (2 viewporty).
+  ✓ ceremonia: od kliknięcia `ODDAJĘ AKTA DO WERYFIKACJI` do `[data-wynik="15"]` mierzone `Date.now()` = poniżej 9000 ms na obu viewportach (harmonogram 600 ms + 15 x 400 ms + 600 ms = 7,2 s); pieczątka `15/15` (`aria-label`), 15 zakładek z `data-werdykt="prawda"`, fokus po ceremonii na `WZYWAM PRÓBĘ OGNIA` (Z9).
+  ✓ Esc: wszystkie 15 zakładek dostaje werdykt naraz, `[data-wynik]` w mniej niż 1,5 s od naciśnięcia.
+  ✓ nieodpowiedziane: druk `CZY NA PEWNO? 13 TECZEK ŚWIECI PUSTKĄ`, `WRACAM` zamyka druk i NIE uruchamia maszyny, `NIECH SIĘ DZIEJE` liczy 13 pustek jako błędne (wynik 2/15, 13 zakładek `data-werdykt="pustka"`).
+  ✓ rewizja: wariant poprawny ma `data-rewizja="poprawna"` (obwódka `--jad`), wybrany błędny `data-rewizja="bledna"` z widocznym SVG `.wariant__skreslenie` (dwie odręczne kreski `--alarm`), radia `disabled`; pytanie 14 pokazuje `KOMISJA UZNAJE: mohsa /// skala mohsa`.
+  ✓ przejście: klik `WZYWAM PRÓBĘ OGNIA` -> `[data-przejscie]`, faza `plonie` z płomieniami, `waitForURL('**/proba-ognia')` w 2,2 s ceremonii (asercja <= 2600 ms z narzutem nawigacji); po wejściu `[data-straz]` = 0, bo etap 2 jest zaliczony.
+  ✓ stan: `sessionStorage.jwp.v1.quiz.punkty` = 15 zaraz po werdykcie; `reload()` wchodzi OD RAZU w rewizję (zero maszyny, zero przycisku oddania akt).
+  ✓ screenshots/F4/F4-03-maszyna-{desktop,mobile}.png (maszyna w trakcie: lej, korba, teczka w locie, licznik trafień, stempel `AKTA NN /// PRAWDA`) i F4-03-rewizja-{desktop,mobile}.png (akta z odpowiedzią Komisji + pieczęć N/15 + kwestia komisji).
+  ✓ oględziny wyłapały dwie rzeczy poza asercjami: pieczęć werdyktu w maszynie startuje w skali 3 i przy stemplu co 400 ms praktycznie zawsze widać klatkę pośrednią (dołożony czytelny podpis `AKTA NN /// PRAWDA` obok stempla), a `--jad` jako kolor tekstu na papierze jest nieczytelny (podpis dostał `--jad` jako TŁO).
+  ✓ `pnpm run check` zielony, `pnpm build` zielony (`/quiz` 11,4 kB, first load 113 kB), pełny `npx playwright test` = 150 passed + 12 skipped + 0 failed.
+
+## DoD FAZY F4 (odhaczone 2026-09-01)
+- ✓ `pnpm run check` zielony (`lint-tokens: czysto`, `tsc --noEmit` bez błędów).
+- ✓ `pnpm build` zielony: `/quiz` 11,4 kB, first load 113 kB.
+- ✓ `npx playwright test` = **150 passed + 12 skipped + 0 failed**, dwa czyste przebiegi pod rząd.
+- ✓ Screenshoty stanu fazy w `screenshots/F4/`: `F4-01-segregator-{desktop,mobile}.png`, `F4-02a-sig-{1..5}-*`, `F4-02b-sig-{6..10}-*`, `F4-02c-sig-{11..15}-*` (15 unikalnych signature), `F4-03-maszyna-*`, `F4-03-rewizja-*`.
+- ✓ Zero znalezisk bez issue: F7-08 (debounce gubił werdykt etapu) dopisane i zamknięte w tej samej paczce; odstępstwo `steps(60)`/`steps(12)` opisane w DECISIONS #9.
+- ✓ `app/vendor/` nietknięte - w F4 nic nie vendorowano (scenki signature to 5-8 ścieżek SVG każda, wklejka byłaby większa od kodu), więc warunki vendorowe DoD nie mają zastosowania. F7-02 nadal otwarte.
+- ✓ Anty-spec 06 F: (F1) zero karuzeli i kropek postępu - nawigacją jest stos zakładek; (F2) zero feedbacku poprawności przy zaznaczaniu (test przechodzi po 14 pytaniach zaznaczając źle - nic się nie zapala; jedyny wyjątek to signature 14, dopuszczony wprost); (F3) zero emoji kategorii - kategorię niesie signature (regex po zakresach emoji = 0); (F4) wynik zawsze N/15, zero procentów.
 
 ## F5 - PRÓBA OGNIA
 
@@ -260,6 +279,11 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
   ZNALEZIONE W: F2-04 (weryfikacja AC „URL preview działa"; obejście: `vercel curl <url>`, które dokłada token).
   DLACZEGO TO PROBLEM: kandydat wchodzący z linku zobaczy ekran logowania Vercela, a nie bramę. Dopóki gra ma być publiczna, ochrona musi zniknąć albo dostać bypass.
   AC: decyzja użytkownika na bramce F8-01 - albo `vercel project` / dashboard wyłącza Vercel Authentication dla produkcji, albo zostaje świadomie (gra prywatna). Weryfikacja: `curl -sI <url produkcyjny>` zwraca 200, nie 302.
+
+- [x] **F7-08** `silnik` `zapiszStan` z debounce 400 ms gubił WERDYKT etapu: kandydat, który odświeżył stronę w ciągu 400 ms od wyniku, tracił punkty (a `StrazEtapu` odsyłał go z powrotem).
+  ZNALEZIONE W: F4-03 (test `powrot na /quiz po werdykcie` padał na `reload()` tuż po werdykcie - to nie flake, tylko realna utrata danych, ta sama w etapie 1: `app/egzamin/Plansza.tsx` zapisywał punkty egzaminu tym samym debouncem).
+  AC: zapis werdyktu jest natychmiastowy, `reload()` bezpośrednio po werdykcie zachowuje punkty na OBU etapach; pisanie po każdym znaku nadal idzie przez debounce.
+  DOWÓD: ✓ `lib/stan.ts` dostaje `zapiszTeraz(patch)` (flush pending + synchroniczny `setItem`), użyty w `app/quiz/Segregator.tsx` i `app/egzamin/Plansza.tsx` wyłącznie dla werdyktów; ✓ test `powrot na /quiz po werdykcie: od razu rewizja` (reload zaraz po werdykcie) przechodzi na obu viewportach, wcześniej padał; ✓ testy etapu 1 (`f3-04`) nadal zielone.
 
 - [x] **F7-05** `ui` Na 390 px widżet RadioKomisji (lewy dolny róg) NAKŁADA SIĘ na treść `WebringStopki` - zasłania wiersz „ostatnia aktualizacja / projekt" i etykietę licznika odwiedzin.
   ZNALEZIONE W: F2-04 (oględziny screenshotu DoD `screenshots/F2/F2-DoD-egzamin-mobile.png`; testy tego nie łapią, bo asercje sprawdzają istnienie elementów, nie kolizję prostokątów).
