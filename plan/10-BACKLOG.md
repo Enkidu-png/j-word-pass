@@ -169,6 +169,10 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
   DLACZEGO TO PROBLEM: kandydat wchodzący z linku zobaczy ekran logowania Vercela, a nie bramę. Dopóki gra ma być publiczna, ochrona musi zniknąć albo dostać bypass.
   AC: decyzja użytkownika na bramce F8-01 - albo `vercel project` / dashboard wyłącza Vercel Authentication dla produkcji, albo zostaje świadomie (gra prywatna). Weryfikacja: `curl -sI <url produkcyjny>` zwraca 200, nie 302.
 
+- [ ] **F7-05** `ui` Na 390 px widżet RadioKomisji (lewy dolny róg) NAKŁADA SIĘ na treść `WebringStopki` - zasłania wiersz „ostatnia aktualizacja / projekt" i etykietę licznika odwiedzin.
+  ZNALEZIONE W: F2-04 (oględziny screenshotu DoD `screenshots/F2/F2-DoD-egzamin-mobile.png`; testy tego nie łapią, bo asercje sprawdzają istnienie elementów, nie kolizję prostokątów).
+  AC: na 390x844 prostokąt widżetu radia nie przecina żadnego prostokąta tekstu stopki (Playwright: `getBoundingClientRect()` obu, assert brak przecięcia) - np. przez dolny padding stopki równy wysokości widżetu; screenshot mobile w `screenshots/F7/`; desktop 1280x800 bez zmian wizualnych.
+
 ## F8 - BRAMKA DECYZYJNA: PRODUKCJA
 
 - [ ] **F8-01** `deploy` ⏳ STOP-GATE przed wykonaniem: pokaż userowi URL preview + WERYFIKACJA.md, zapytaj o zgodę na `vercel --prod` (i ewentualną domenę).
