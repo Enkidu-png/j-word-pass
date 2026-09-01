@@ -1,10 +1,14 @@
-import PoleRobocze from "./PoleRobocze";
+import Arkusz from "./Arkusz";
+import Scena from "./Scena";
 
 export default function Egzamin() {
   return (
-    <main>
+    <main className="egzamin">
       <h1 tabIndex={-1}>ETAP 1 /// EGZAMIN Z FIZYKI</h1>
-      <PoleRobocze />
+      <div className="egzamin__plansza">
+        <Scena />
+        <Arkusz />
+      </div>
     </main>
   );
 }

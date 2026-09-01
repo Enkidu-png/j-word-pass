@@ -529,3 +529,197 @@ a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
   }
 }
 /* == CEREMONIE END == */
+
+/* == ETAP 1: SCENA EGZAMINU (plan/05 A1) == */
+.egzamin { padding: 16px; }
+.egzamin__plansza {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.scena {
+  position: relative;
+  min-height: 520px;
+  border: var(--ramka);
+  box-shadow: var(--cien-x) var(--cien-y) 0 var(--cien);
+  overflow: hidden;
+}
+
+.scena__licznik {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+}
+.scena__etykieta { font-size: var(--rozmiar-drobny); }
+.scena__przerwa { color: var(--alarm); font-size: var(--rozmiar-drobny); }
+
+/* -- SLON -- */
+.scena__slon {
+  position: absolute;
+  /* strzelec na pierwszym planie, zeby przeskakujaca zebra go nie zaslaniala */
+  z-index: 1;
+  right: 4%;
+  bottom: 6%;
+  width: 46%;
+  max-width: 300px;
+}
+/* Cala zawartosc slonia jest przezroczysta dla kursora: celem hoveru zostaje
+   sam kontener. Bez tego salwa (remont pociskow) i majtanie podmieniaja element
+   pod wskaznikiem, przegladarka wysyla kolejny mouseenter i slon strzela seria. */
+.scena__slon * { pointer-events: none; }
+.slon { display: block; overflow: visible; }
+.slon__cialo { fill: var(--chrom-a); stroke: var(--atrament); stroke-width: 3; }
+.slon__ucho { fill: var(--chrom-c); stroke: var(--atrament); stroke-width: 3; }
+.slon__oko { fill: var(--atrament); }
+.slon__kreska { fill: none; stroke: var(--atrament); stroke-width: 3; }
+.slon__traba { fill: none; stroke: var(--chrom-a); stroke-width: 9; stroke-linecap: round; }
+.slon__karabin { fill: var(--atrament); stroke: var(--atrament); stroke-width: 3; }
+.slon__lufa { fill: var(--chrom-b); stroke: var(--atrament); stroke-width: 2; }
+
+/* odrzut: slon odskakuje o 8 px w tyl i wraca, skokowo (Z7 dotyczy dekoracji,
+   ale ceremonia tez ma tu byc twarda - to zart z zalozenia `odrzut`) */
+.slon__odrzut {
+  display: block;
+  animation-name: jwp-odrzut;
+  animation-duration: 400ms;
+  animation-timing-function: steps(5, end);
+  animation-iteration-count: 1;
+}
+@keyframes jwp-odrzut {
+  0% { transform: translateX(0); }
+  40% { transform: translateX(8px); }
+  100% { transform: translateX(0); }
+}
+
+.slon__pocisk {
+  position: absolute;
+  right: 0;
+  width: 9px;
+  height: 9px;
+  background: var(--chrom-b);
+  border: 2px solid var(--atrament);
+  animation-name: jwp-pocisk;
+  animation-duration: 400ms;
+  animation-timing-function: steps(5, end);
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+@keyframes jwp-pocisk {
+  0% { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(-220px); opacity: 0; }
+}
+
+/* -- STADO ZEBR -- */
+.scena__stado { list-style: none; margin: 0; padding: 0; }
+.scena__zebra { position: absolute; width: 96px; }
+.scena__skok { display: block; }
+.zebra { display: block; overflow: visible; pointer-events: none; }
+.zebra__cialo { fill: var(--zebra-a); stroke: var(--atrament); stroke-width: 3; }
+/* pasy bialo-zolte roznia sie ledwo co, wiec czyta je dopiero obrys */
+.zebra__pas { fill: var(--zebra-b); stroke: var(--atrament); stroke-width: 2; }
+.zebra__grzywa { fill: none; stroke: var(--atrament); stroke-width: 3; }
+.zebra__oko { fill: var(--atrament); }
+.zebra__jetpack { fill: var(--atrament); }
+.zebra__plomien { fill: var(--alarm); }
+.zebra__czapka { fill: var(--urzad); stroke: var(--atrament); stroke-width: 3; }
+.zebra__dyplom { fill: var(--papier); stroke: var(--atrament); stroke-width: 3; }
+
+/* beczka: pelny obrot raz, 500 ms, steps(4) - plan/05 C */
+.zebra__beczka {
+  display: block;
+  animation-name: jwp-beczka;
+  animation-duration: 500ms;
+  animation-timing-function: steps(4, end);
+  animation-iteration-count: 1;
+}
+@keyframes jwp-beczka {
+  0% { transform: rotate(0); }
+  100% { transform: rotate(360deg); }
+}
+
+/* == ETAP 1: ARKUSZ formularz-F7 (plan/05 A2) == */
+.arkusz { display: block; }
+.arkusz__pasek { background-color: var(--kosmos); border: var(--ramka); padding: 6px 8px; margin-bottom: 12px; }
+.arkusz__naglowek { margin: 0; font-family: var(--font-krzyk); font-size: var(--rozmiar-tekst); }
+.arkusz__tresc { font-family: var(--font-glos); }
+.arkusz__polecenie {
+  border: var(--ramka);
+  padding: 8px;
+  font-size: var(--rozmiar-drobny);
+}
+.arkusz__etykieta { display: block; font-size: var(--rozmiar-drobny); }
+.arkusz__dowody { margin-bottom: 12px; }
+.arkusz__sloty {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.arkusz__slot {
+  min-height: 62px;
+  border: 3px dashed var(--krata);
+}
+
+.arkusz__pole { position: relative; }
+.arkusz__textarea {
+  display: block;
+  width: 100%;
+  max-height: 60vh;
+  overflow: auto;
+  border: var(--ramka);
+  padding: 8px;
+  resize: vertical;
+}
+.arkusz__znaki {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  padding: 2px 6px;
+  border: 3px double var(--urzad);
+  color: var(--urzad);
+  font-size: var(--rozmiar-drobny);
+  transform: rotate(-6deg);
+  background: var(--papier);
+}
+.arkusz__znaki--mruga {
+  animation-name: jwp-mrug-zachety;
+  animation-duration: 600ms;
+  animation-timing-function: steps(3, end);
+  animation-iteration-count: 1;
+}
+@keyframes jwp-mrug-zachety {
+  0% { transform: rotate(-6deg) scale(1); }
+  50% { transform: rotate(-6deg) scale(1.25); }
+  100% { transform: rotate(-6deg) scale(1); }
+}
+
+.arkusz__cta {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px;
+  border: var(--ramka);
+  background: var(--chrom-b);
+  box-shadow: var(--cien-x) var(--cien-y) 0 var(--cien);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slon__odrzut, .slon__pocisk, .zebra__beczka, .arkusz__znaki--mruga { animation: none !important; }
+}
+
+/* mobile: kolumna, scena nad arkuszem, 5 zeber zamiast 12 (plan/05 C) */
+@media (max-width: 767px) {
+  .egzamin__plansza { grid-template-columns: 1fr; }
+  .scena { min-height: 340px; }
+  .scena__zebra:nth-child(n + 6) { display: none; }
+  .arkusz__sloty { grid-template-columns: repeat(2, 1fr); }
+}
