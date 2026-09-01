@@ -212,3 +212,26 @@ Swiadomie zostawione z nieprzezroczystym prostokatem: `stwor-klodka`
 (bialy) i `stwor-kula-ziemska` (ciemny). Oba trafiaja na powierzchnie o
 zblizonym kolorze (`--druk-tlo` w PassOMetr, sciana szescianu ladowania),
 wiec ramka tam nie przeszkadza. Do podmiany, gdyby wyladowaly gdzie indziej.
+
+## #14 - agent-context.sh nie mierzy okna WORKERA, tylko sesji nadrzednej
+
+Pomiar z F0-06. `bash ~/.claude/agent-context.sh` zwraca `STALE-TRANSCRIPT`
+przez caly przebieg workera i nigdy nie zwrocil liczby.
+
+Przyczyna, ustalona z lektury skryptu (bez modyfikacji): skrypt liczy slug
+z katalogu roboczego i bierze najnowszy `*.jsonl` z
+`~/.claude/projects/<slug>/`, po czym odrzuca plik starszy niz 120 s. W tym
+katalogu lezy transkrypt sesji ORKIESTRATORA, ktory zamarl w chwili spawnu
+workera (`00:44`, przy pomiarze `01:18`). Transkrypt samego workera nie
+laduje w katalogu projektu, wiec skryptowi nie ma czego zmierzyc.
+
+Konsekwencja dla kontraktu sztafety: warunek „przy >= 55% zostaw NEXT-TASKS.md"
+jest dla workera NIEMIERZALNY tym narzedziem. `~/.claude/context-usage.txt`
+zwraca liczbe (`37` przy tym pomiarze), ale to pomiar sesji nadrzednej,
+nie workera, wiec podstawienie go pod ten warunek byloby zgadywaniem
+w przebraniu pomiaru.
+
+NIE naprawiamy tego po cichu: `~/.claude` to prywatne repo z hookiem
+auto-commit i pushem na druga maszyne (F0-06 jest jawnie „tylko odczyt").
+Do decyzji Aleksandry, wariant rekomendowany: worker konczy paczke na
+granicy fazy albo na ustalonej liczbie issues, zamiast na procencie okna.
