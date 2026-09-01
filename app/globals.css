@@ -1,0 +1,24 @@
+@import "./tokens.css";
+
+/* == RESET == */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--papier);
+  color: var(--atrament);
+  font-family: var(--font-urzad);
+  font-size: var(--rozmiar-tekst);
+}
+h1, h2, h3, p, ul, ol { margin: 0 0 1rem; }
+ul, ol { padding-left: 1.5rem; }
+img, svg { max-width: 100%; }
+button, input, textarea, select { font: inherit; color: inherit; }
+a { color: var(--urzad); }
+:focus-visible { outline: 3px dashed var(--alarm); outline-offset: 2px; }
+
+/* == KLASY KAFLI (puste, wypelniane w F1) == */
+.gif-less {}
+.kafel-tla {}
+.pasek-krawedzi {}
+.formularz-F7 {}
+.pieczatka {}

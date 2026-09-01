@@ -21,9 +21,10 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
 
 ## F0 - FUNDAMENT
 
-- [ ] **F0-01** `infra` Scaffold Next.js 15 + struktura katalogów + tokens.css + globals.css (reset, klasy kafli PUSTE na razie) + 4 stuby route'ów + DECISIONS.md + skrypt `check` (stub).
+- [x] **F0-01** `infra` Scaffold Next.js 15 + struktura katalogów + tokens.css + globals.css (reset, klasy kafli PUSTE na razie) + 4 stuby route'ów + DECISIONS.md + skrypt `check` (stub).
   CZYTAJ: 02→A, 02→B.
   AC: `pnpm dev` serwuje 4 route'y (`/`, `/egzamin`, `/quiz`, `/proba-ognia`), każdy ze stubem `<h1 tabIndex={-1}>` z nazwą etapu; strona główna pokazuje J-WORD PASS na `--papier`; `package.json` ma skrypt `check` = `node scripts/lint-tokens.mjs && tsc --noEmit` (skrypt na razie stub zwracający 0); `DECISIONS.md` istnieje z wpisem #1 (@vercel/blob - wyjątek od Z6, zatwierdzony w plan/02 D); dependencies = next/react/react-dom (@vercel/blob dochodzi w F5-02 - allowlist walidatora go przewiduje); `tsc --noEmit` czysty; po scaffoldzie `.gitignore` nadal zawiera `.env*` i `git status --porcelain` NIE pokazuje `.env.local` (weryfikacja PRZED pierwszym pushem - klucz nie może wyjść na publiczne repo).
+  DOWÓD: ✓ curl 4 route'y = 200 z `<h1 tabindex="-1">` (`/`, `/egzamin`, `/quiz`, `/proba-ognia`); ✓ screenshots/F0/F0-01-brama.png (J-WORD PASS na `--papier`, chrome-headless-shell 1280x800); ✓ `pnpm run check` exit 0, test negatywny (`const x: number = "nie"`) exit 2; ✓ `git check-ignore -v .env.local` = `.gitignore:1:.env*`, `git status --porcelain` bez `.env.local`. Commit bdde793.
 - [ ] **F0-02** `infra` Walidator `scripts/lint-tokens.mjs`: (a) literały kolorów/font-size w `app/**` i `components/**` poza tokens.css -> exit 1 z listą (pomija `app/vendor/**` i wnętrza `url("data:...")` - wyjątki Z3); (b) allowlist dependencies = next, react, react-dom, @vercel/blob; (c) walidacja JSON-ów z data/ (aktywuje się, gdy pliki istnieją).
   CZYTAJ: 01→B (Z3), 02→C4.
   AC: wstawienie testowe `color:#fff` do komponentu wywala `pnpm run check` (pokazać output); usunięcie -> zielony; negatywne: `translateX(3px)` NIE jest łapane, literał wewnątrz `url("data:...")` NIE jest łapany.

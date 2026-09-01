@@ -1,0 +1,30 @@
+:root {
+  /* kolory */
+  --papier: #f4e9c8;        /* tlo drukow, pozolkly papier */
+  --atrament: #1a1447;      /* tekst podstawowy, granat dlugopisu */
+  --alarm: #ff2079;         /* magenta: bledy, kara smierci, blink */
+  --jad: #21f363;           /* zielony CRT: sukcesy, punkty */
+  --urzad: #b3241a;         /* czerwien pieczatki */
+  --kosmos: #0b0330;        /* tlo sekcji kosmicznych (egzamin) */
+  --chrom-a: #7df9ff;
+  --chrom-b: #f6f186;
+  --chrom-c: #ff9bf2;       /* gradient chromowy naglowkow */
+  --cien: #000000;          /* twardy cien, zawsze pelny czarny */
+  --gwiazda: #ffffff;       /* kropki gwiazd w kafel--kosmos; tez literal w data: URI kursora */
+  --zebra-a: #f4e9c8;
+  --zebra-b: #f6f186;       /* bialo-zolte pasy kafel--zebra (= papier/chrom-b) */
+  /* typografia */
+  --font-urzad: "Courier New", Courier, monospace;    /* druki, dane, formularze */
+  --font-krzyk: Impact, "Arial Black", sans-serif;    /* naglowki-krzyki */
+  --font-glos: Georgia, "Times New Roman", serif;     /* narracja komisji */
+  --rozmiar-krzyk: clamp(44px, 8vw, 96px);
+  --rozmiar-tekst: 18px;
+  --rozmiar-drobny: 13px;
+  /* geometria */
+  --cien-x: 4px;
+  --cien-y: 4px;                   /* twardy offset cienia (anty-spec D3) */
+  --ramka: 4px double var(--atrament);
+  /* ruch */
+  --t-dekoracja: 800ms;  /* bazowy czas petli gif-less */
+  --t-ceremonia: 600ms;  /* bazowy krok ceremonii */
+}
