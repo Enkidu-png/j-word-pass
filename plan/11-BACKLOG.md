@@ -51,6 +51,36 @@ i anty-spec z `plan/01 G`, wpis raportu fazy, zero znalezisk bez issue w F7-ZNAL
   AC: `bash ~/.claude/agent-context.sh` zwraca liczbę albo `NO-AGENT-TRANSCRIPT`; `cat ~/.claude/context-usage.txt` zwraca liczbę albo pliku brak; negatywne: **zero modyfikacji czegokolwiek w `~/.claude`**. `~/.claude` to prywatne repo Aleksandry z hookiem auto-commit i push na drugą maszynę - brak pliku `context-usage.txt` raportujemy jako `[do decyzji]`, nie łatamy po cichu.
   DOWOD: ✓ `bash ~/.claude/agent-context.sh` zwraca `STALE-TRANSCRIPT` (exit 1), czyli sentinel z wlasnego kontraktu skryptu, NIGDY liczby udawanej; ✓ `cat ~/.claude/context-usage.txt` zwraca `37`; ✓ `git -C ~/.claude status --short` PUSTE, zero modyfikacji. UWAGA `[do decyzji]`: AC wymienia `NO-AGENT-TRANSCRIPT`, a skrypt oddaje `STALE-TRANSCRIPT` - i oddaje go przez CALY przebieg workera, bo szuka transkryptu po katalogu roboczym i trafia na sesje orkiestratora zamarla w chwili spawnu (mtime 00:44 przy pomiarze 01:18, prog to 120 s). Warunek sztafety „>= 55% okna" jest wiec dla workera niemierzalny tym narzedziem; szczegoly i rekomendacja w DECISIONS.md #14. Commit: `F0-06`.
 
+### RAPORT FAZY F0 (DoD punkt po punkcie)
+
+- `pnpm run check` ZIELONY: `samotest: czysto`, `lint-tokens: czysto`, `tsc --noEmit` bez bledow.
+- `pnpm build` ZIELONY: 7 route'ow, first load 102 kB dla kazdego (limit 160 kB z F6-02 z zapasem).
+- `npx playwright test` BEZ FAILOW: 30 passed, 0 failed, 8 skipped na obu viewportach.
+  Skipy: 4 testy kontraktu `/api/ocena` pomijane na drugim projekcie (limit 5/min)
+  plus 2 testy UI z `f5-02` sparkowane pod issue F7-01.
+- Zrzut stanu fazy: `screenshots/F0/F0-DoD-stan-fazy.png`, OBEJRZANY. Cztery route'y
+  renderuja stub `h1` krojem Caveat, polskie znaki poprawne, nic nie jest przekrzywione.
+- Ocena wzgledem Z7-Z9 i anty-spec `plan/01 G`: **wiekszosc punktow jeszcze NIE MA
+  do czego sie odniesc** i to jest stan zamierzony. F0 to rusztowanie, warstwa
+  wizualna zaczyna sie w F1 i F2. Konkretnie:
+  - Z7 (assety to pliki, nie kod): SPELNIONY w wymiarze, w jakim juz obowiazuje.
+    43 pozycje w `data/assety.json`, zero sciezek wpisanych wprost (`git grep 'src=\"/assets'`
+    w `app` i `components` = 0 trafien, bo `components/` jest puste).
+  - Z8 (gestosc, min. 6 animowanych elementow na widok): NIE DOTYCZY jeszcze, widoki
+    to stuby. Wchodzi w F2-02a i jest tam mierzone.
+  - Z9 (wlasny kafel na strone): NIE DOTYCZY jeszcze; piec kafli jest zdobytych
+    i zwalidowanych (PNG, <= 350 px), podpiecie do widokow to F2-F6.
+  - Anty-spec 2-9: NIE DOTYCZY, brak hero, kart, cieni, animacji i mechaniki -
+    w repo nie ma ani jednego komponentu.
+  - Anty-spec 10 (tekst bez podkladu): brak naruszenia, stub stoi na `--papier`,
+    nie na kaflu.
+  - Z1, Z2, Z3, Z4, Z6: EGZEKWOWANE MASZYNOWO od tej fazy, `pnpm run check`
+    plus `tests/kanon.spec.ts`, oba zielone.
+- Znaleziska bez issue: BRAK. Jedyne znalezisko fazy (dwa testy `f5-02` sterujace
+  usunietym UI) ma issue **F7-01** z pelnym AC.
+- Do decyzji Aleksandry przed F1: `agent-context.sh` nie mierzy okna workera,
+  szczegoly w `DECISIONS.md` #14.
+
 ## F1 - SILNIK SCENY (przekrojowy, test-first z playgroundem)
 
 - [ ] **F1-01** `silnik` ⚠ HARD `lib/assety.ts` + `components/scena/Ozdoba.tsx` + `StworRogowy.tsx` + `Pas.tsx` + playground `/dev/scena` pokazujący wszystkie pozycje manifestu.
