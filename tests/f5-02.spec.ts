@@ -71,7 +71,7 @@ test("pierwszy submit wysyla POST, powrot z flaga wyslano juz nie (07 D2)", asyn
   await page.locator("[data-pole='ucho']").fill("240");
   await page.locator("[data-pokora]").check();
   await page.locator("[data-cta]").click();
-  await expect(page.locator("[data-przyjeto]")).toBeVisible();
+  await expect(page.locator("[data-butelka]")).toBeVisible({ timeout: 9000 });
   await expect.poll(() => posty.length).toBe(1);
 
   // flaga wyslano musi wyladowac w stanie, inaczej powrot na URL wysle drugi raz
@@ -80,7 +80,7 @@ test("pierwszy submit wysyla POST, powrot z flaga wyslano juz nie (07 D2)", asyn
     .toBe(true);
 
   await page.reload();
-  await expect(page.locator("[data-przyjeto]")).toBeVisible();   // od razu stan po wysylce
+  await expect(page.locator("[data-butelka]")).toBeVisible();   // od razu stan po wysylce
   await expect(page.locator("[data-cta]")).toHaveCount(0);       // nie ma czym wyslac drugi raz
   await page.waitForTimeout(800);
   expect(posty).toHaveLength(1);
@@ -101,7 +101,9 @@ test("awaria Bloba nie psuje druku: stempel o pamieci ulotnej po jednym ponowien
   await page.locator("[data-pokora]").check();
   await page.locator("[data-cta]").click();
 
-  await expect(page.locator("[data-przyjeto]")).toBeVisible();   // teatr nie czeka na siec
+  // teatr rusza NATYCHMIAST, nie po odpowiedzi serwera
+  await expect(page.locator("[data-faza='skladanie']")).toBeVisible({ timeout: 400 });
+  await expect(page.locator("[data-butelka]")).toBeVisible({ timeout: 9000 });
   await expect(page.locator("[data-ulotna]")).toContainText("KOMISJA ZAPISAŁA W PAMIĘCI ULOTNEJ");
   expect(prob).toBe(2);                                          // retry dokladnie 1x (07 B)
   expect(await page.evaluate(() => JSON.parse(sessionStorage.getItem("jwp.v1") ?? "{}")?.ogien?.wyslano))

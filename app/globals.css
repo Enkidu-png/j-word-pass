@@ -1531,15 +1531,23 @@ a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
 /* Kafel ognia w pelnej mocy zjada tekst, wiec sekcja dostaje overlay --kosmos 60%
    (plan/07 naglowek). Tresc jedzie warstwe wyzej. */
 .ogien { position: relative; padding: 16px; }
-.ogien::before {
+/* Tlo jest WARSTWA, nie klasa na <main>: w kroku 4 ceremonii zjezdza po nim
+   roleta morza, wiec musza istniec dwa kafle naraz. */
+.ogien__tlo { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.ogien__tlo::after {
   content: "";
   position: absolute;
   inset: 0;
   background: var(--kosmos);
-  opacity: 0.6;
-  pointer-events: none;
+  opacity: 0.6;                 /* ogien przygaszony (plan/07 naglowek sekcji) */
 }
-.ogien > * { position: relative; }
+.ogien__tlo--morze { animation: jwp-roleta-morza 800ms steps(8) 1 both; }
+@keyframes jwp-roleta-morza {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+.ogien > *, .ogien__plansza { position: relative; }
+.ogien > h1, .ogien__scena { z-index: 1; }
 .ogien > h1 {
   font-family: var(--font-krzyk);
   font-size: var(--rozmiar-krzyk);
@@ -1701,3 +1709,178 @@ a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
   .ogien__pole[data-zle="tak"] { animation: none; }   /* zostaje sam stempel (plan/07 C) */
 }
 .ogien__ulotna { display: block; margin-top: 6px; font-size: var(--rozmiar-drobny); color: var(--urzad); }
+
+/* == PROBA OGNIA: CEREMONIA SPALENIA I LIST W BUTELCE (plan/07 B) == */
+/* Klasa `ceremonia`: ruch jednorazowy, wyzwolony, do pominiecia Esc (Z8, Z9). */
+
+/* krok 2: ekran blyska na 80 ms w chwili, gdy druk wpada w ogien */
+.ogien__blysk {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  background: var(--chrom-b);
+  pointer-events: none;
+  /* `steps(2)` (czyli jump-end) NIGDY nie dochodzi do ostatniej klatki: blysk
+     zostawal na 45% przez caly krok 2 i pral cala scene na zolto (widoczne
+     dopiero na zrzucie). `jump-none` oddaje obie skrajne wartosci. */
+  animation: jwp-blysk 80ms steps(2, jump-none) 1 both;
+}
+@keyframes jwp-blysk {
+  0% { opacity: 0.9; }
+  100% { opacity: 0; }
+}
+
+/* krok 1 i 2: druk sklada sie w kwadrat, potem wpada w ognisko */
+.ogien__druk-w-locie {
+  width: 240px;
+  height: 300px;
+  margin: 0 auto;
+  background: var(--papier);
+  border: var(--ramka);
+  box-shadow: var(--cien-x) var(--cien-y) 0 var(--cien);
+}
+.ogien__druk-w-locie[data-skladanie="skladanie"] { animation: jwp-skladanie 500ms steps(3) 1 both; }
+@keyframes jwp-skladanie {
+  0% { clip-path: inset(0 0 0 0); }
+  100% { clip-path: inset(28% 22% 28% 22%); }
+}
+.ogien__druk-w-locie[data-skladanie="spalanie"] {
+  clip-path: inset(28% 22% 28% 22%);
+  animation: jwp-w-ogien 1000ms steps(3) 1 both;
+}
+@keyframes jwp-w-ogien {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(220px) scale(0.1); }
+}
+
+/* krok 2: plomienie buchaja dwa razy */
+.ognisko[data-bucha="tak"] .ognisko__plomien {
+  animation-name: jwp-bucha;
+  animation-duration: 500ms;
+  animation-timing-function: steps(3, end);
+  animation-iteration-count: 2;
+  animation-delay: 0ms;
+}
+@keyframes jwp-bucha {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.5); }
+  100% { transform: scale(1); }
+}
+
+/* krok 3: dym formuje sie w butelke - cztery podmienione rysunki */
+.ogien__morfoza { display: flex; justify-content: center; }
+.ogien__morfoza-svg { width: 200px; height: 280px; }
+.ogien__dym-ksztalt circle, .ogien__dym-ksztalt ellipse, .ogien__dym-ksztalt path {
+  fill: var(--krata);
+  stroke: var(--cien);
+  stroke-width: 3;
+}
+.ogien__dym-ksztalt--zarys path { fill: none; }
+
+/* krok 5: butelka dryfuje po falach */
+.ogien__morze-scena { position: relative; display: flex; flex-direction: column; align-items: center; padding: 24px 0; }
+.ogien__butelka {
+  width: 140px;                 /* cel dotykowy grubo ponad 44 px takze na mobile */
+  --klatki: 6;
+  animation-name: jwp-dryf;
+  /* Z7 trzyma petle dekoracji w 300-1400 ms, wiec 2,4 s z tabeli 07 B zjezdza
+     na 1200 ms przy tych samych szesciu pozycjach (DECISIONS #10). */
+  animation-duration: 1200ms;
+}
+/* fokus ustawiony PROGRAMOWO po ceremonii nie odpala :focus-visible w Chrome,
+   a kandydat musi widziec, gdzie stoi (Z9) - stad zwykly :focus */
+.ogien__butelka:focus { outline: 3px dashed var(--alarm); outline-offset: 4px; }
+@keyframes jwp-dryf {
+  0% { transform: translate(0, 0) rotate(-4deg); }
+  16% { transform: translate(10px, -6px) rotate(0deg); }
+  33% { transform: translate(20px, 0) rotate(4deg); }
+  50% { transform: translate(10px, 6px) rotate(0deg); }
+  66% { transform: translate(-10px, 0) rotate(-4deg); }
+  83% { transform: translate(-20px, -6px) rotate(0deg); }
+  100% { transform: translate(0, 0) rotate(-4deg); }
+}
+.ogien__butelka-svg { width: 140px; height: 196px; display: block; }
+.ogien__butelka-szklo { fill: var(--chrom-a); stroke: var(--cien); stroke-width: 3; }
+.ogien__butelka-zwoj { fill: var(--papier); stroke: var(--cien); stroke-width: 2; }
+.ogien__butelka-zwoj-linia { stroke: var(--atrament); stroke-width: 2; fill: none; }
+.ogien__butelka-korek { fill: var(--urzad); stroke: var(--cien); stroke-width: 3; }
+.ogien__butelka-korek.ceremonia { animation: jwp-korek 400ms steps(4) 1 both; }
+@keyframes jwp-korek {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-70px) rotate(40deg); }
+}
+.ogien__dymek {
+  font-family: var(--font-krzyk);
+  background: var(--papier);
+  border: var(--ramka);
+  padding: 4px 10px;
+  margin: 8px 0 0;
+}
+.ogien__chlup { position: absolute; bottom: 24px; left: 50%; }
+.ogien__kropla {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: var(--chrom-a);
+  border: 1px solid var(--cien);
+  animation: jwp-chlup 600ms steps(3) 1 both;
+}
+.ogien__kropla[data-kropla="0"] { animation-delay: 0ms; --lot: -40px; }
+.ogien__kropla[data-kropla="1"] { animation-delay: 60ms; --lot: -20px; }
+.ogien__kropla[data-kropla="2"] { animation-delay: 120ms; --lot: 0px; }
+.ogien__kropla[data-kropla="3"] { animation-delay: 180ms; --lot: 20px; }
+.ogien__kropla[data-kropla="4"] { animation-delay: 240ms; --lot: 40px; }
+@keyframes jwp-chlup {
+  0% { transform: translate(0, 0); opacity: 1; }
+  100% { transform: translate(var(--lot), -60px); opacity: 0; }
+}
+
+/* krok 6: pergamin rozwija sie ze zwoju */
+.ogien__pergamin {
+  position: relative;
+  max-width: 560px;
+  margin: 16px auto 0;
+  transform-origin: top center;
+  animation: jwp-zwoj 700ms steps(5) 1 both;
+  font-family: var(--font-glos);
+}
+@keyframes jwp-zwoj {
+  from { transform: scaleY(0.05); }
+  to { transform: scaleY(1); }
+}
+/* Pieczec w rogu MUSI miec swoj kat papieru: bez wciecia naglowka i pierwszego
+   akapitu wchodzila na adres kandydatki (widoczne dopiero na zrzucie mobile).
+   `.pieczatka` ma wlasna szerokosc 120 px, wiec sam kontener jej nie zwezi. */
+.ogien__pergamin-pieczec { position: absolute; top: 8px; right: 8px; width: 80px; }
+/* Pieczatka siedzi w INLINE'owym opakowaniu drgniecia - bez `display: block`
+   na nim `width: 100%` nie ma od czego liczyc i pieczec znika (zero szerokosci,
+   asercja na aria-label dalej przechodzi). */
+.ogien__pergamin-pieczec .pieczatka-drgniecie { display: block; width: 100%; }
+.ogien__pergamin-pieczec .pieczatka { width: 100%; }
+.ogien__pergamin-naglowek, .ogien__pergamin > p:first-of-type { padding-right: 92px; }
+.ogien__pergamin-naglowek { font-family: var(--font-krzyk); font-size: var(--rozmiar-tekst); margin: 0 0 12px; }
+.ogien__podpisy { display: flex; gap: 12px; justify-content: space-between; margin: 20px 0 8px; }
+.ogien__gryzmol { width: 90px; height: 30px; }
+.ogien__gryzmol path { fill: none; stroke: var(--atrament); stroke-width: 2; }
+.ogien__dorobek { font-family: var(--font-urzad); display: flex; align-items: center; gap: 8px; margin: 0 0 4px; }
+.ogien__data { font-family: var(--font-urzad); font-size: var(--rozmiar-drobny); }
+.ogien__od-nowa {
+  font-family: var(--font-urzad);
+  font-size: var(--rozmiar-drobny);
+  background: var(--papier);
+  border: 2px outset var(--atrament);
+  padding: 6px 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Z10: ceremonia schodzi do jednego kroku - reszte skraca odprawCeremonie */
+  .ogien__blysk, .ogien__kropla { animation: none; opacity: 0; }
+  .ogien__druk-w-locie, .ogien__tlo--morze, .ogien__butelka-korek.ceremonia { animation: none; }
+  .ogien__pergamin { animation-duration: 300ms; animation-timing-function: steps(1); }
+}
+
+@media (max-width: 767px) {
+  .ogien__druk-w-locie { width: 200px; height: 260px; }
+  .ogien__pergamin-pieczec { width: 60px; }
+  .ogien__pergamin-naglowek, .ogien__pergamin > p:first-of-type { padding-right: 68px; }
+}

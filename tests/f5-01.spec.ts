@@ -33,7 +33,7 @@ test("submit bez checkboxa zablokowany, z checkboxem czynny", async ({ page }) =
   await page.locator("[data-pole='ucho']").fill("60");
   // nadal disabled - pokora niezlozona
   await expect(page.locator("[data-cta]")).toBeDisabled();
-  await expect(page.locator("[data-przyjeto]")).toHaveCount(0);
+  await expect(page.locator("[data-butelka]")).toHaveCount(0);
 
   const tlemDisabled = await page.locator("[data-cta]").evaluate((el) => getComputedStyle(el).backgroundColor);
   await page.locator("[data-pokora]").check();
@@ -41,7 +41,7 @@ test("submit bez checkboxa zablokowany, z checkboxem czynny", async ({ page }) =
   // stan blokady musi byc WIDOCZNY, nie tylko obecny w atrybucie
   expect(await page.locator("[data-cta]").evaluate((el) => getComputedStyle(el).backgroundColor)).not.toBe(tlemDisabled);
   await page.locator("[data-cta]").click();
-  await expect(page.locator("[data-przyjeto]")).toBeVisible();
+  await expect(page.locator("[data-butelka]")).toBeVisible({ timeout: 9000 });
   await expect(page.locator("[data-stempel]")).toHaveCount(0);
 });
 
@@ -69,7 +69,7 @@ test("bledny email: trzesienie, stempel niegodnosci, fokus wraca do pola", async
   expect(ruch.klatki).toContain("steps(2");
   // NEGATYWNE: zero czerwonych obwodek - pole wyglada tak samo jak przed bledem
   expect(await email.evaluate((el) => getComputedStyle(el).borderBottomColor)).toBe(spokojnaObwodka);
-  await expect(page.locator("[data-przyjeto]")).toHaveCount(0);
+  await expect(page.locator("[data-butelka]")).toHaveCount(0);
 });
 
 test("but 8 poza skala 10-70 dostaje stempel, 39 przechodzi", async ({ page }) => {
@@ -88,7 +88,7 @@ test("but 8 poza skala 10-70 dostaje stempel, 39 przechodzi", async ({ page }) =
   await page.locator("[data-pole='but']").fill("39");
   await page.locator("[data-cta]").click();
   await expect(page.locator("[data-stempel]")).toHaveCount(0);
-  await expect(page.locator("[data-przyjeto]")).toBeVisible();
+  await expect(page.locator("[data-butelka]")).toBeVisible({ timeout: 9000 });
 });
 
 test("ucho 200 przechodzi z dopiskiem podziwu, stopka skaluje sie z butem", async ({ page }) => {
@@ -109,7 +109,7 @@ test("ucho 200 przechodzi z dopiskiem podziwu, stopka skaluje sie z butem", asyn
   await page.locator("[data-pokora]").check();
   await page.locator("[data-cta]").click();
   await expect(page.locator("[data-stempel]")).toHaveCount(0);   // 200 mm nie blokuje
-  await expect(page.locator("[data-przyjeto]")).toBeVisible();
+  await expect(page.locator("[data-butelka]")).toBeVisible({ timeout: 9000 });
 });
 
 test("NEGATYWNE: zero steppera 1-2-3 nad formularzem (anty-spec 07 D3)", async ({ page }) => {

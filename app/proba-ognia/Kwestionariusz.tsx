@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Ognisko from "./Ognisko";
-import { czytajStan, zapiszStan, zapiszTeraz } from "@/lib/stan";
+import { czytajStan, zapiszStan } from "@/lib/stan";
 
 // Druk OGN-3/TAJ z plan/07 A. Dokladnie trzy pola (wymog usera), walidacja
 // wylacznie nasza (`noValidate` - natywny dymek przegladarki nie jest pieczatka,
 // a Z14 wymaga pieczatki albo formularza-F7), stempel zamiast czerwonej obwodki.
+
+export type DaneDruku = { email: string; rozmiarButa: number | null; srednicaUchaMm: number | null };
 
 type Pole = "email" | "but" | "ucho";
 
@@ -33,16 +34,19 @@ function zbadaj(email: string, but: string, ucho: string): Pole[] {
   return bledy;
 }
 
-export default function Kwestionariusz() {
+export default function Kwestionariusz({
+  naPrzyjecie,
+  naIskre,
+}: {
+  naPrzyjecie: (dane: DaneDruku) => void;   // zapis stanu, POST i ceremonia siedza w Planszy
+  naIskre: () => void;
+}) {
   const [email, ustawEmail] = useState("");
   const [but, ustawBut] = useState("");
   const [ucho, ustawUcho] = useState("");
   const [pokora, ustawPokore] = useState(false);
   const [bledy, ustawBledy] = useState<Pole[]>([]);
   const [proba, ustawProbe] = useState(0);   // numer podejscia: remontuje trzesienie
-  const [iskra, ustawIskre] = useState(0);   // fokus pola strzela iskra z ogniska
-  const [przyjete, ustawPrzyjete] = useState(false);
-  const [ulotna, ustawUlotna] = useState(false);   // Blob padl: zgloszenie zyje tylko w logu
   // natywny submit przed hydracja wypchnalby e-mail kandydata do adresu URL
   const [gotowy, ustawGotowy] = useState(false);
 
@@ -64,33 +68,7 @@ export default function Kwestionariusz() {
     ustawEmail(pola.current.email?.value || zapis?.email || "");
     ustawBut(pola.current.but?.value || (zapis?.rozmiarButa != null ? String(zapis.rozmiarButa) : ""));
     ustawUcho(pola.current.ucho?.value || (zapis?.srednicaUchaMm != null ? String(zapis.srednicaUchaMm) : ""));
-    // powrot na URL po wysylce: druk jest juz przyjety i NIE leci drugi POST (07 C)
-    if (zapis?.wyslano) ustawPrzyjete(true);
   }, []);
-
-  // POST leci OBOK teatru (plan/07 B): niczego nie blokuje, a przy awarii ponawia
-  // sie raz w tle. Druga proba ma sens tylko dla awarii serwera - 4xx znaczy, ze
-  // druk jest wadliwy i powtorka nic nie zmieni.
-  async function wyslij(dane: Record<string, unknown>) {
-    for (const podejscie of [0, 1]) {
-      try {
-        const res = await fetch("/api/zgloszenie", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(dane),
-        });
-        if (res.ok) {
-          zapiszTeraz({ ogien: { wyslano: true } });
-          return;
-        }
-        if (res.status < 500) break;
-      } catch {
-        // siec padla - drugie podejscie albo stempel o pamieci ulotnej
-      }
-      if (podejscie === 0) await new Promise((g) => setTimeout(g, 400));
-    }
-    ustawUlotna(true);
-  }
 
   const zapisz = (patch: { email?: string; rozmiarButa?: number | null; srednicaUchaMm?: number | null }) =>
     zapiszStan({ ogien: patch });
@@ -112,10 +90,7 @@ export default function Kwestionariusz() {
   }
 
   return (
-    <div className="ogien__scena">
-      <Ognisko iskra={iskra} />
-
-      <form
+    <form
         className="formularz-F7 ogien__druk"
         data-druk="OGN-3/TAJ"
         noValidate
@@ -125,22 +100,7 @@ export default function Kwestionariusz() {
           ustawBledy(nowe);
           ustawProbe((n) => n + 1);
           if (nowe.length > 0) return;   // fokus ustawia efekt po remoncie pol
-          // werdykt etapu nie moze zginac w debounce (znalezisko F7-08)
-          const stan = czytajStan();
-          zapiszTeraz({ ogien: { email, rozmiarButa: liczba(but), srednicaUchaMm: liczba(ucho) } });
-          ustawPrzyjete(true);
-          // idempotencja (anty-spec 07 D2): raz wyslane zgloszenie nie leci drugi raz
-          if (!stan?.ogien?.wyslano) {
-            void wyslij({
-              email,
-              rozmiarButa: liczba(but),
-              srednicaUchaMm: liczba(ucho),
-              punktyEgzamin: stan?.egzamin?.punkty ?? 0,
-              punktyQuiz: stan?.quiz?.punkty ?? 0,
-            });
-          }
-          // ponytail: ceremonia spalenia i list w butelce dochodza w F5-03,
-          // tu konczy sie na przyjeciu druku - zero toasta (anty-spec 07 D1).
+          naPrzyjecie({ email, rozmiarButa: liczba(but), srednicaUchaMm: liczba(ucho) });
         }}
       >
         <p className="ogien__numer">DRUK OGN-3/TAJ</p>
@@ -156,7 +116,7 @@ export default function Kwestionariusz() {
             type="email"
             autoComplete="email"
             value={email}
-            onFocus={() => ustawIskre((n) => n + 1)}
+            onFocus={naIskre}
             onChange={(e) => { ustawEmail(e.target.value); zapisz({ email: e.target.value }); }}
           />
           <span className="ogien__dopisek">(tej prawdziwej. Komisja pozna się na fałszu.)</span>
@@ -176,7 +136,7 @@ export default function Kwestionariusz() {
               max={70}
               step={0.5}
               value={but}
-              onFocus={() => ustawIskre((n) => n + 1)}
+              onFocus={naIskre}
               onChange={(e) => { ustawBut(e.target.value); zapisz({ rozmiarButa: liczba(e.target.value) }); }}
             />
             {/* stopka-miarka: skaluje sie skokowo wraz z wartoscia (plan/07 A) */}
@@ -208,7 +168,7 @@ export default function Kwestionariusz() {
               min={5}
               max={500}
               value={ucho}
-              onFocus={() => ustawIskre((n) => n + 1)}
+              onFocus={naIskre}
               onChange={(e) => { ustawUcho(e.target.value); zapisz({ srednicaUchaMm: liczba(e.target.value) }); }}
             />
             {/* ucho w suwmiarce: szczeki rozsuwaja sie wraz z wartoscia */}
@@ -244,19 +204,9 @@ export default function Kwestionariusz() {
           PRZYJMUJĘ Z POKORĄ
         </label>
 
-        {przyjete ? (
-          <p className="formularz-F7 ogien__przyjeto" data-przyjeto="" role="status">
-            DRUK OGN-3/TAJ PRZYJĘTY. KOMISJA SZYKUJE OGIEŃ.
-            {ulotna && (
-              <span className="ogien__ulotna" data-ulotna="">KOMISJA ZAPISAŁA W PAMIĘCI ULOTNEJ</span>
-            )}
-          </p>
-        ) : (
-          <button className="ogien__cta" type="submit" data-cta disabled={!gotowy || !pokora}>
-            JESTEM GOTOWA NA PRÓBĘ OGNIA
-          </button>
-        )}
-      </form>
-    </div>
+        <button className="ogien__cta" type="submit" data-cta disabled={!gotowy || !pokora}>
+          JESTEM GOTOWA NA PRÓBĘ OGNIA
+        </button>
+    </form>
   );
 }

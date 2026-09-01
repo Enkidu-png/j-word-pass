@@ -237,9 +237,19 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
   ✓ NEGATYWNE (idempotencja, anty-spec 07 D2): licznik żądań `page.on("request")` = **1** po pierwszym submicie; `sessionStorage.jwp.v1.ogien.wyslano === true`; po `reload()` strona od razu pokazuje `[data-przyjeto]`, CTA w ogóle nie ma w DOM, a licznik POST-ów po 800 ms nadal 1.
   ✓ RETRY (07 B): przy zamockowanym 502 druk jest przyjęty NATYCHMIAST (teatr nie czeka na sieć), route wołany dokładnie 2 razy (jedno ponowienie), pojawia się `[data-ulotna]` `KOMISJA ZAPISAŁA W PAMIĘCI ULOTNEJ`, a flaga `wyslano` NIE zostaje ustawiona.
   ✓ `pnpm run check` czysto (`@vercel/blob` przechodzi allowlistę Z6); `pnpm build` zielony; pełny `npx playwright test` = 176 passed + 12 skipped + 0 failed.
-- [ ] **F5-03** `ui` ⚠ HARD Ceremonia spalenia + list-w-butelce + pergamin + OD NOWA.
+- [x] **F5-03** `ui` ⚠ HARD Ceremonia spalenia + list-w-butelce + pergamin + OD NOWA.
   CZYTAJ: 07→B,C; 03→E; 02→F (kopiowanie).
   AC: sekwencja krok po kroku wg tabeli (wideo lub 4 screenshoty faz); klik butelki (i Enter na fokusie) rozwija pergamin z e-mailem kandydata i sumą N/25; Esc w 1-4 skacze do butelki; reduced-motion: 2 kroki po 300 ms; OD NOWA czyści stan i wraca do bramy; powrót na URL po wysłaniu: od razu butelka, zero POST.
+  ✓ `npx playwright test tests/f5-03.spec.ts` = **12 passed** (desktop+mobile). SEKWENCJA wg tabeli 07 B mierzona atrybutem `data-faza` na planszy: `[data-skladanie="skladanie"]` do 400 ms, `[data-skladanie="spalanie"]` + `[data-ognisko][data-bucha="tak"]` do 1500 ms, `[data-klatka]` przechodzi przez 4 rysunki morfozy, `[data-butelka]` + `.ogien__tlo--morze` + dymek `KLIKNIJ` na końcu; całość <= 9000 ms (Z9).
+  ✓ 4 ZRZUTY FAZ: screenshots/F5/F5-03-{krok1-skladanie,krok2-spalanie,krok3-dym,krok5-butelka,krok6-pergamin}-{desktop,mobile}.png.
+  ✓ Klik butelki ORAZ `Enter` na fokusie rozwijają pergamin: `[data-email-zwoju]` = `kandydatka@komisja.pl`, `[data-dorobek]` = `22` (9 z egzaminu + 13 z quizu) przy `/25`, pieczątka `TAJNE` z `aria-label` I zmierzonym pudełkiem > 40x40 px, fokus na nagłówku zwoju (Z9).
+  ✓ Esc w krokach 1-4: butelka pojawia się w < 1500 ms od naciśnięcia i `data-faza === "butelka"` (skrót, nie doczekanie harmonogramu).
+  ✓ Z10 `reducedMotion: reduce`: do butelki < 1200 ms zamiast 3400 ms, `animationName` dryfu = `none`, klik -> pergamin < 1200 ms (dwa kroki po 300 ms).
+  ✓ OD NOWA: `sessionStorage.jwp.v1` === null i URL wraca na bramę. POWRÓT NA URL po wysyłce: `reload()` -> butelka w < 3000 ms, `[data-druk]` nie istnieje, licznik POST-ów nadal 1.
+  ✓ OGLĘDZINY zrzutów wyłapały 3 błędy, których zielone asercje nie widziały: (a) `steps(2)` (jump-end) NIGDY nie dochodzi do ostatniej klatki, więc 80-milisekundowy błysk zostawał na 45 % krycia przez cały krok 2 i prał całą scenę na żółto - poprawione na `steps(2, jump-none)`; (b) pieczątka `TAJNE` wchodziła na adres kandydatki w zwoju - nagłówek i pierwszy akapit dostały wcięcie, pieczęć zwężona; (c) po zwężeniu pieczęć ZNIKŁA (jej `.pieczatka-drgniecie` jest inline, więc `width: 100%` nie miało od czego liczyć) przy dalej zielonej asercji na `aria-label` - stąd nowa asercja na wymiary pudełka.
+  ✓ `pnpm run check` czysto; `pnpm build`: `/proba-ognia` 6,35 kB / first load 108 kB, `/api/zgloszenie` 129 B; pełny `npx playwright test` = 188 passed + 12 skipped + 0 failed.
+  UWAGA (kopiowanie, 02→F.4): nic nie zvendorowano. Ceremonia to 7 kroków `odprawCeremonie` i 6 keyframes; gotowe kolekcje (animate.css, css-loaders) nie mają ani składania druku, ani morfozy dymu w butelkę, a każdy clip-art butelki CC0 trzeba by przemapować na tokeny i tak. F7-02 nadal otwarte.
+  ODSTĘPSTWO: pętla dryfu butelki ma 1200 ms zamiast 2,4 s z tabeli 07 B - Z7 zamyka dekorację w 300-1400 ms i wygrywa z tabelą (DECISIONS #10, precedens #9). Sześć pozycji z tabeli zostaje.
 
 ## F6 - POLISH
 

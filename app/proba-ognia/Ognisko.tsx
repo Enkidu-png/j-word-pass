@@ -12,7 +12,7 @@ import { useState } from "react";
 
 const IZKRY = [0, 1, 2, 3, 4, 5];
 
-export default function Ognisko({ iskra }: { iskra: number }) {
+export default function Ognisko({ iskra, bucha = false }: { iskra: number; bucha?: boolean }) {
   // 0 = plomien klania sie w lewo, 1 = stoi, 2 = w prawo (1 z 3 klatek, plan/07 C)
   const [kierunek, ustawKierunek] = useState(1);
 
@@ -20,6 +20,7 @@ export default function Ognisko({ iskra }: { iskra: number }) {
     <div
       className="ognisko"
       data-ognisko=""
+      data-bucha={bucha ? "tak" : "nie"}
       aria-hidden="true"
       onPointerMove={(e) => {
         const p = e.currentTarget.getBoundingClientRect();

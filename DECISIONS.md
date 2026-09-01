@@ -157,3 +157,18 @@ Decyzja: obie dekoracje jadą na `steps(8)`. Wskazówka skacze 8 razy na obrót,
 wózek myszy pokonuje trasę w 8 skokach z `animation-direction: alternate`.
 Efekt "rwanego GIF-a" zostaje, liczba klatek mieści się w budżecie Z7. Gdyby
 user chciał dosłownie 60 klatek, trzeba najpierw zmienić Z7 - nie odwrotnie.
+
+## #10 - Z7 wygrywa z pętlą 2,4 s butelki (plan/07 B krok 5)
+
+Tabela ceremonii z `plan/07` B każe butelce dryfować w pętli **2,4 s** (6 pozycji,
+klatkowo). Z7 zamyka czas trwania ruchu dekoracyjnego w przedziale **300-1400 ms**,
+a dryf butelki jest bezspornie dekoracją: zapętlony, nieinteraktywny, niczego nie
+blokuje. Dwa zapisy pakietu stoją w sprzeczności.
+
+Decyzja: wygrywa Z7 (zasada twarda, łamanie = issue niezaliczone), tabela ustępuje.
+Pętla dryfu ma **1200 ms** przy zachowanych sześciu pozycjach z tabeli, więc rytm
+klatek zostaje, skraca się tylko okres. Precedens: DECISIONS #9 (`steps(60)`
+i `steps(12)` z tabeli 06 D zjechały na `steps(8)` z tego samego powodu).
+
+Konsekwencja: gdyby user chciał wolniejszego dryfu, trzeba najpierw zmienić Z7
+w `plan/01`, a nie obchodzić go w komponencie.
