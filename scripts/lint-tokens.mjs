@@ -60,7 +60,13 @@ function sprawdzZ3() {
   const pliki = [
     ...plikiRek(join(KORZEN, "app"), [".css", ".ts", ".tsx"]),
     ...plikiRek(join(KORZEN, "components"), [".css", ".ts", ".tsx"]),
-  ].filter((p) => relative(KORZEN, p) !== join("app", "tokens.css"));
+  ]
+    // Z3 wyjątek (a): paleta. Plus `opengraph-image.tsx`: satori z `next/og` nie
+    // rozumie `var()`, więc obrazek OG MUSI mieć literały - te same, co w tokens.css.
+    .filter((p) => {
+      const wzgledna = relative(KORZEN, p);
+      return wzgledna !== join("app", "tokens.css") && wzgledna !== join("app", "opengraph-image.tsx");
+    });
 
   for (const plik of pliki) {
     const linie = readFileSync(plik, "utf8").split("\n");

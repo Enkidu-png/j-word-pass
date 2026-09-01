@@ -1885,3 +1885,23 @@ a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
   .ogien__pergamin-pieczec { width: 60px; }
   .ogien__pergamin-naglowek, .ogien__pergamin > p:first-of-type { padding-right: 68px; }
 }
+
+/* == 404: BRAK AKT (F6-03) == */
+.brak-akt { padding: 32px 16px; max-width: 640px; margin: 0 auto; }
+.brak-akt__pasek {
+  background: var(--atrament);
+  border: var(--ramka);
+  box-shadow: var(--cien-x) var(--cien-y) 0 var(--cien);
+  padding: 12px 16px;
+  margin: 0 0 24px;
+}
+.brak-akt__krzyk {
+  font-family: var(--font-krzyk);
+  font-size: var(--rozmiar-krzyk);
+  line-height: 0.95;
+  margin: 0;
+}
+.brak-akt__numer { font-size: var(--rozmiar-drobny); margin: 0 0 8px; }
+.brak-akt__druk { font-family: var(--font-glos); }
+.brak-akt__pieczec { display: flex; justify-content: flex-end; margin: 0 0 12px; }
+.brak-akt__powrot { font-family: var(--font-urzad); display: inline-block; }

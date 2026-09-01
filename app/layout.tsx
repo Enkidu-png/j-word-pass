@@ -10,6 +10,13 @@ import WebringStopki from "@/components/WebringStopki";
 export const metadata: Metadata = {
   title: "J-WORD PASS",
   description: "System egzaminacyjny Międzygalaktycznej Komisji Kwalifikacyjnej.",
+  // og:image dokleja sam Next z `app/opengraph-image.tsx`; tu tylko tytul i opis
+  openGraph: {
+    title: "J-WORD PASS /// KOMISJA CZUWA",
+    description: "Trzy etapy: egzamin z fizyki, quiz o wszystkim i o niczym, próba ognia.",
+    type: "website",
+    locale: "pl_PL",
+  },
 };
 
 // Kolejnosc DOM wg plan/04 sekcja A. Nawigacja to PassOMetr i webring -
