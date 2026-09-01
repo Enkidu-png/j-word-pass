@@ -183,9 +183,16 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
   ✓ budżet linii: RosjaStrefy 20, GalTopnieje 13, SaunaParowa 13, KoscUdowa 27, MyszDrewniana 16 - wszystkie <= 30.
   ✓ screenshots/F4/F4-02b-sig-{6..10}-{desktop,mobile}.png - obejrzane; po oględzinach poprawione trzy rzeczy niewidoczne w asercjach: kropla galu wisiała OBOK łyżeczki (teraz pod jej końcem), kłęby pary startowały pod dolną krawędzią slotu i były przycinane, wózek myszy wjeżdżał na podpis (tor dostał stałe 140 px).
   ✓ negatywne: zero emoji w wyrenderowanym HTML teczek 6-10; `pnpm run check` zielony, `pnpm build` zielony, pełny `npx playwright test` = 130 passed + 12 skipped + 0 failed.
-- [ ] **F4-02c** `ui` Signature pytań 11-15 z tabeli 06→D.
+- [x] **F4-02c** `ui` Signature pytań 11-15 z tabeli 06→D.
   CZYTAJ: 06→D (wiersze 11-15); 03→B.
   AC: jak F4-02a dla pytań 11-15; signature 12 reaguje na hover wariantu A (nutki w uśmiech); signature 14 błyska przy poprawnym wpisie.
+  DOWÓD: ✓ `npx playwright test tests/f4-02c.spec.ts` = 8 passed (2 viewporty). Pytania 11-15 mają nazwy z tabeli 06 D (`rekin-starszy-od-drzew`, `mozart-kanon`, `mrowki-hodowcy`, `skala-twardosci`, `wombat-kostka`), każdy slot z jednym `.sig`, 5 różnych `innerHTML`.
+  ✓ signature 12 na hover wariantu A: `animationName` czterech nutek `jwp-nutka` -> `none`, a `DOMMatrix(transform).f` układa się w uśmiech (skrajne wyżej niż środkowe, obie skrajne równo); po zejściu na wariant C wraca skakanie. Uwaga techniczna: `animation-play-state: paused` NIE wystarcza - transform z keyframes bije transform z reguły, więc uśmiech wymaga `animation-name: none`.
+  ✓ signature 14: `richtera` -> diament stoi (`animationName: none`), `skala Mohsa` -> `jwp-blink`, puste pole -> znowu stoi. To jedyny sygnał poprawnosci w quizie, dopuszczony wprost przez anty-spec 06 F2.
+  ✓ Z7 dla `.gif-less` w slotach 11-15: `steps(2..8)`, 300-1400 ms (dla 14 mierzone po wpisaniu klucza, bo przed trafieniem slot z założenia stoi).
+  ✓ budżet linii: RekinStarszyOdDrzew 20, MozartKanon 18, MrowkiHodowcy 20, SkalaTwardosci 14, WombatKostka 16 - wszystkie <= 30.
+  ✓ screenshots/F4/F4-02c-sig-{11..15}-{desktop,mobile}.png - obejrzane: 11 = rekin z laską i mrugającymi skrzelami, oś kreskowana, zielone drzewko; 12 = cztery nutki na pięciolinii; 13 = karawana mrówek z mszycami-walizkami; 14 = dziesięć kamyków rosnących od talku do diamentu; 15 = wombat i rządek sześcianów dokładających się po kolei.
+  ✓ negatywne: zero emoji w wyrenderowanym HTML teczek 11-15; `pnpm run check` zielony, `pnpm build` zielony (`/quiz` 7,33 kB), pełny `npx playwright test` = 138 passed + 12 skipped + 0 failed.
 - [ ] **F4-03** `ui` Maszyna prawdy: ceremonia 15x werdykt + licznik + pieczątka N/15 + tryb rewizji + przejście podanie-do-ognia.
   CZYTAJ: 06→B,C; 03→E,F.
   AC: pełna ceremonia ≤ 9 s (pomiar performance.now w teście); Esc = wszystkie werdykty naraz; nieodpowiedziane liczą się jako błędne po potwierdzeniu druku; rewizja: poprawna obwiedziona, błędna przekreślona; przejście z płonącym samolocikiem ≤ 2,2 s prowadzi na /proba-ognia; wynik w sessionStorage; screenshoty: maszyna w trakcie + rewizja.

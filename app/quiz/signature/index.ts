@@ -9,9 +9,13 @@ import GalTopnieje from "./GalTopnieje";
 import SaunaParowa from "./SaunaParowa";
 import KoscUdowa from "./KoscUdowa";
 import MyszDrewniana from "./MyszDrewniana";
+import RekinStarszyOdDrzew from "./RekinStarszyOdDrzew";
+import MozartKanon from "./MozartKanon";
+import MrowkiHodowcy from "./MrowkiHodowcy";
+import SkalaTwardosci from "./SkalaTwardosci";
+import WombatKostka from "./WombatKostka";
 
-// Rejestr signature z plan/06 D. Pytania bez wpisu maja na razie pusty slot -
-// dokladaja je kolejne issues F4-02b i F4-02c.
+// Rejestr signature z plan/06 D: nazwa z data/quiz.json -> komponent sceny.
 export const SIGNATURE: Record<string, ComponentType> = {
   "osmiornica-trzy-serca": OsmiornicaTrzySerca,
   "wenus-obraca-sie-zle": WenusObracaSieZle,
@@ -23,4 +27,9 @@ export const SIGNATURE: Record<string, ComponentType> = {
   "sauna-parowa": SaunaParowa,
   "kosc-udowa": KoscUdowa,
   "mysz-drewniana": MyszDrewniana,
+  "rekin-starszy-od-drzew": RekinStarszyOdDrzew,
+  "mozart-kanon": MozartKanon,
+  "mrowki-hodowcy": MrowkiHodowcy,
+  "skala-twardosci": SkalaTwardosci,
+  "wombat-kostka": WombatKostka,
 };

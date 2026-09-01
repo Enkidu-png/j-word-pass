@@ -1260,3 +1260,106 @@ a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
 }
 .sig__mysz { width: 56px; height: 28px; }
 .sig__mysz path:first-child { fill: var(--krata); }
+
+/* 11. rekin-starszy-od-drzew */
+.sig__rekin { width: 70px; height: 34px; }
+.sig__rekin path:first-child { fill: var(--krata); }
+.sig__skrzela { --klatki: 2; animation-name: jwp-blink; animation-duration: 700ms; }
+.sig__os { flex: none; width: 40px; border-top: 2px dashed var(--atrament); }
+.sig__drzewo { width: 30px; height: 34px; }
+.sig__drzewo path:last-child { fill: var(--jad); }
+
+/* 12. mozart-kanon */
+.sig__pieciolinia {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  height: 44px;
+  padding: 0 6px;
+  background-image: repeating-linear-gradient(0deg, var(--atrament) 0 1px, transparent 1px 10px);
+}
+.sig__nutka {
+  width: 16px;
+  height: 22px;
+  --klatki: 4;
+  animation-name: jwp-nutka;
+  animation-duration: 800ms;
+}
+.sig__nutka circle { fill: var(--atrament); }
+@keyframes jwp-nutka {
+  0% { transform: translateY(4px); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(4px); }
+}
+/* hover wariantu A: nutki ukladaja sie w usmiech (06 D wiersz 12). Animacja musi
+   zniknac (`animation-name: none`), bo transform z keyframes bije transform z reguly. */
+.teczka__warianty:has([data-wariant-etykieta="A"]:hover) ~ .teczka__signature .sig__nutka {
+  animation-name: none;
+}
+.teczka__warianty:has([data-wariant-etykieta="A"]:hover) ~ .teczka__signature .sig__nutka:nth-child(1),
+.teczka__warianty:has([data-wariant-etykieta="A"]:hover) ~ .teczka__signature .sig__nutka:nth-child(4) {
+  transform: translateY(-10px);
+}
+.teczka__warianty:has([data-wariant-etykieta="A"]:hover) ~ .teczka__signature .sig__nutka:nth-child(2),
+.teczka__warianty:has([data-wariant-etykieta="A"]:hover) ~ .teczka__signature .sig__nutka:nth-child(3) {
+  transform: translateY(8px);
+}
+
+/* 13. mrowki-hodowcy */
+.sig--mrowki { overflow: hidden; width: 100%; }
+.sig__karawana {
+  display: flex;
+  gap: 6px;
+  flex: none;
+  width: 180px;
+  --klatki: 6;
+  animation-name: jwp-karawana;
+  animation-duration: 1400ms;
+}
+@keyframes jwp-karawana {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(36px); }
+}
+.sig__mrowka { width: 38px; height: 26px; --klatki: 2; animation-name: jwp-emu-krok; animation-duration: 500ms; }
+.sig__mrowka circle { fill: var(--atrament); }
+.sig__mszyca { fill: var(--jad); stroke: var(--atrament); }
+
+/* 14. skala-twardosci */
+.sig--skala { gap: 4px; }
+.sig__kamyk {
+  display: inline-block;
+  border: 2px solid var(--atrament);
+  background: var(--krata);
+  border-radius: 40% 60% 55% 45%;
+}
+.sig__diament { display: block; width: 100%; height: 100%; }
+/* kamyk 10 blyska dopiero przy trafionym wpisie - jedyny sygnal poprawnosci
+   dopuszczony przez anty-spec 06 F2 (zart, nie ocena) */
+[data-otwarte-trafione="tak"] .sig__kamyk[data-twardosc="10"] {
+  background: var(--chrom-a);
+  border-color: var(--chrom-a);
+}
+[data-otwarte-trafione="tak"] .sig__diament {
+  --klatki: 2;
+  animation-name: jwp-blink;
+  animation-duration: 400ms;
+  background: var(--gwiazda);
+}
+
+/* 15. wombat-kostka */
+.sig__wombat { width: 46px; height: 30px; }
+.sig__wombat path:first-child { fill: var(--krata); }
+.sig__kostka {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--atrament);
+  background: var(--chrom-b);
+  --klatki: 2;
+  animation-name: jwp-kostka;
+  animation-duration: 1400ms;
+}
+@keyframes jwp-kostka {
+  0% { visibility: hidden; }
+  50% { visibility: visible; }
+  100% { visibility: visible; }
+}
