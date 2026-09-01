@@ -58,7 +58,12 @@ test("payload 3 KB odbity limitem objetosci", async ({ request }) => {
   expect((await res.json()).blad).toContain("objętość");
 });
 
-test("pierwszy submit wysyla POST, powrot z flaga wyslano juz nie (07 D2)", async ({ page }) => {
+// PARK F0-05: dwa ostatnie testy tego pliku steruja formularzem /proba-ognia,
+// ktory czystka F0-01 usunela i ktory wraca dopiero w F5-01. Kontrakt API
+// (cztery testy powyzej) dziala i zostaje aktywny. Odpiecie parkowania:
+// issue F7-01 w plan/11-BACKLOG.md.
+
+test.skip("pierwszy submit wysyla POST, powrot z flaga wyslano juz nie (07 D2)", async ({ page }) => {
   await page.addInitScript(WPUSC);
   const posty: string[] = [];
   page.on("request", (r) => {
@@ -86,7 +91,7 @@ test("pierwszy submit wysyla POST, powrot z flaga wyslano juz nie (07 D2)", asyn
   expect(posty).toHaveLength(1);
 });
 
-test("awaria Bloba nie psuje druku: stempel o pamieci ulotnej po jednym ponowieniu", async ({ page }) => {
+test.skip("awaria Bloba nie psuje druku: stempel o pamieci ulotnej po jednym ponowieniu", async ({ page }) => {
   await page.addInitScript(WPUSC);
   let prob = 0;
   await page.route("**/api/zgloszenie", async (route) => {

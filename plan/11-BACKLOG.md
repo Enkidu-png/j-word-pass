@@ -42,9 +42,10 @@ i anty-spec z `plan/01 G`, wpis raportu fazy, zero znalezisk bez issue w F7-ZNAL
   CZYTAJ: 02→D.
   AC: plik `woff2` istnieje i ma > 10 KB; **uwaga wykonawcza:** `fonts.googleapis.com/css2` bez nagłówka `User-Agent` przeglądarki oddaje `ttf`, nie `woff2` - użyj `curl -H "User-Agent: Mozilla/5.0 ... Chrome/120"` i pobierz adres `.woff2` z odpowiedzi; `curl -s localhost:3000 | grep -c "fonts.googleapis"` = 0; nagłówek na bramie renderuje się fontem odręcznym (zrzut OBEJRZANY); polskie znaki `ąćęłńóśźż` widoczne poprawnie; negatywne: zero żądań do zewnętrznych domen na starcie strony.
   DOWOD: ✓ `public/fonts/caveat.woff2` 72 KB i `caveat-ext.woff2` 28 KB, oba `Web Open Font Format (Version 2)` wg `file` (bez naglowka `User-Agent` przegladarki Google oddaje `ttf` - uzyty `curl -H "User-Agent: ... Chrome/120"`, zgodnie z uwaga wykonawcza); ✓ `curl -s localhost:3000 | grep -c fonts.googleapis` = 0; ✓ `page.on('request')` przy `waitUntil: networkidle` na `/`: zadan poza `localhost` BRAK; ✓ `h1` ma `font-family: Caveat, "Comic Sans MS", cursive` i `document.fonts` raportuje `Caveat loaded`; ✓ screenshots/F0/F0-04-font.png OBEJRZANY - naglowek pismem odrecznym, `ąćęłńóśźż` i `ĄĆĘŁŃÓŚŹŻ` wyrenderowane poprawnie, zero brakujacych glifow. Commit: `F0-04`.
-- [ ] **F0-05** `infra` Testy bazowe: `tests/smoke.spec.ts` (4 route'y 200 plus `h1`), `tests/kanon.spec.ts` (brak `·` i `—` w `document.body.innerText` na 4 stronach), szkielet `tests/budzet.spec.ts` (funkcja sumująca `transferSize` odpowiedzi `image/*`, na razie uruchamiana tylko na `/`).
+- [x] **F0-05** `infra` Testy bazowe: `tests/smoke.spec.ts` (4 route'y 200 plus `h1`), `tests/kanon.spec.ts` (brak `·` i `—` w `document.body.innerText` na 4 stronach), szkielet `tests/budzet.spec.ts` (funkcja sumująca `transferSize` odpowiedzi `image/*`, na razie uruchamiana tylko na `/`).
   CZYTAJ: 01→E (Z1, Z2, Z18), 03→C.
   AC: `npx playwright test` zielony na obu viewportach; test kanonu realnie mierzy (wstaw `—` do stubu, test pada, usuń); **realna walidacja budżetu przenosi się do F1-05** - w F0 strony są stubami bez obrazków i próg niczego by nie złapał; negatywne: zero nowych devDependencies.
+  DOWOD: ✓ `npx playwright test` = 30 passed, 0 failed, 8 skipped na obu viewportach (skipy to 4 testy kontraktu `/api/ocena` pomijane na drugim projekcie, zeby nie wpasc w limit 5/min, plus 2 sparkowane testy UI z `f5-02` opisane w F7-01); ✓ `tests/kanon.spec.ts` realnie mierzy: po wstawieniu `—` do stubu `/` test PADA z `Z2: dlugi mysnik w copy`, po usunieciu `8 passed`; ✓ `tests/budzet.spec.ts` uruchamia sie na `/` i wypisuje zmierzona sume `budzet / : 0 B, prog 2621440 B` (zero, bo stub nie ma obrazkow, dlatego realna walidacja progu jest przeniesiona do F1-05 zgodnie z AC); ✓ `tests/smoke.spec.ts` sprawdza 4 route'y na 200 i `h1`; ✓ `git diff HEAD -- package.json` = 0 zmian, zero nowych devDependencies. ZNALEZISKO: dwa testy `f5-02` sterowaly usunietym UI, issue F7-01 zalozone. Commit: `F0-05`.
 - [ ] **F0-06** `infra` Weryfikacja pomiarów kontekstu, **tylko odczyt**.
   CZYTAJ: 10→START.
   AC: `bash ~/.claude/agent-context.sh` zwraca liczbę albo `NO-AGENT-TRANSCRIPT`; `cat ~/.claude/context-usage.txt` zwraca liczbę albo pliku brak; negatywne: **zero modyfikacji czegokolwiek w `~/.claude`**. `~/.claude` to prywatne repo Aleksandry z hookiem auto-commit i push na drugą maszynę - brak pliku `context-usage.txt` raportujemy jako `[do decyzji]`, nie łatamy po cichu.
@@ -144,6 +145,20 @@ i anty-spec z `plan/01 G`, wpis raportu fazy, zero znalezisk bez issue w F7-ZNAL
 Każde znalezisko z zasady 7a ląduje tu jako osobne issue z pełnym AC.
 DoD fazy: każde znalezisko ma issue; każde issue ma dyspozycję (zrobione, świadomie
 odrzucone z powodem, albo przeniesione do trackera).
+
+- [ ] **F7-01** `infra` Odpiecie parkowania dwoch testow w `tests/f5-02.spec.ts`.
+  Znalezisko z F0-05: `plan/02 B` trzyma `tests/f5-02.spec.ts` jako „test kontraktu
+  `/api/zgloszenie`, zmiany: brak", ale dwa z szesciu testow tego pliku steruja
+  formularzem `/proba-ognia` (`[data-pole='email']`, `[data-cta]`, `[data-butelka]`),
+  a czystka F0-01 ten widok usunela. Zostawione aktywne padalyby na czerwono przez
+  cale F0-F4 i zaslanialyby prawdziwe regresje. Zmienione na `test.skip` z nota
+  wskazujaca to issue; cztery testy kontraktu API dzialaja bez zmian.
+  CZYTAJ: 02→B; 08→C,D.
+  AC: po ukonczeniu F5-02 oba testy wracaja na `test(` (grep `test.skip` w
+  `tests/f5-02.spec.ts` = 0 trafien); `npx playwright test tests/f5-02.spec.ts`
+  zielony na obu viewportach, bez `skipped`; selektory w testach zgadzaja sie
+  z tymi, ktore realnie wystawia nowy widok proby ognia; negatywne: zero zmian
+  w czterech testach kontraktu API i zero zmian w `app/api/zgloszenie/route.ts`.
 
 ## F8 - BRAMKA DECYZYJNA
 
