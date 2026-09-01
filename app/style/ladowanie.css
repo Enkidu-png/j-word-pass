@@ -1,0 +1,118 @@
+/* JEDYNY plik w projekcie, w ktorym wolno obracac (Z6 punkt b). Walidator
+   z F0-02 trzyma allowliste rotacji dokladnie na tej sciezce i na
+   components/scena/EkranLadowania.tsx. Nic innego tu nie wchodzi. */
+
+.ladowanie {
+  /* ponytail: absolute, nie fixed. Nakladka montuje sie na wejsciu, gdy strona
+     stoi na gorze, wiec pokrycie 100vh wystarcza, a `fixed` kolidowaloby
+     z assercja "zero position: fixed" z F2-01. Gdyby kiedys trzeba bylo
+     pokazac ja po przewinieciu, to jest miejsce na zmiane na `fixed`. */
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  min-height: 100vh;
+  background: var(--kosmos);
+  color: var(--jad);
+  font-family: var(--font-terminal);
+}
+
+.ladowanie-scena {
+  perspective: 600px;
+  width: 160px;
+  height: 160px;
+}
+
+.ladowanie-szescian {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  transform-style: preserve-3d;
+  animation: obrot-szescianu 2400ms steps(12) infinite;
+}
+
+@keyframes obrot-szescianu {
+  from {
+    transform: rotateX(-18deg) rotateY(0deg);
+  }
+  to {
+    transform: rotateX(-18deg) rotateY(360deg);
+  }
+}
+
+.ladowanie-sciana {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 3px ridge var(--chrom-a);
+  background: var(--kosmos);
+}
+
+.ladowanie-sciana--przod {
+  transform: translateZ(80px);
+}
+.ladowanie-sciana--prawa {
+  transform: rotateY(90deg) translateZ(80px);
+}
+.ladowanie-sciana--tyl {
+  transform: rotateY(180deg) translateZ(80px);
+}
+.ladowanie-sciana--lewa {
+  transform: rotateY(-90deg) translateZ(80px);
+}
+.ladowanie-sciana--gora {
+  transform: rotateX(90deg) translateZ(80px);
+}
+.ladowanie-sciana--dol {
+  transform: rotateX(-90deg) translateZ(80px);
+}
+
+.ladowanie-sciana .ozdoba {
+  max-width: 140px;
+  max-height: 140px;
+  width: auto;
+  height: auto;
+}
+
+.ladowanie__pasek {
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-h2);
+  letter-spacing: 6px;
+}
+
+.ladowanie__goniec {
+  width: 100%;
+}
+
+.ladowanie__dymek {
+  max-width: 40ch;
+  padding: 8px 12px;
+  background: var(--papier);
+  color: var(--tusz);
+  border: 3px outset var(--chrom-a);
+  font-family: var(--font-czytany);
+  font-size: var(--stopien-tresc);
+  text-align: center;
+}
+
+/* Z11: szescian stoi i pokazuje jedna sciane. */
+@media (prefers-reduced-motion: reduce) {
+  .ladowanie-szescian {
+    animation-name: none;
+    transform-style: flat;
+  }
+  .ladowanie-sciana:not(.ladowanie-sciana--przod) {
+    display: none;
+  }
+  .ladowanie-sciana--przod {
+    transform: none;
+  }
+}

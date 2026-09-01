@@ -5,6 +5,7 @@ import PlonacyNapis from "@/components/scena/PlonacyNapis";
 import Pas from "@/components/scena/Pas";
 import StworRogowy from "@/components/scena/StworRogowy";
 import { POZYCJE, pozycjeRoli } from "@/lib/assety";
+import Ladowanie from "./Ladowanie";
 
 // Playground silnika sceny (plan/04). Pokazuje KAZDA pozycje manifestu, zeby
 // bledna pozycja albo brakujaca klatka statyczna wyszla tu, a nie w widoku.
@@ -20,6 +21,9 @@ export default function Playground() {
         Pozycji w manifescie: {POZYCJE.length}, w tym ozdob: {ozdoby.length},
         pasow: {pasy.length}.
       </p>
+
+      <h2>EKRAN LADOWANIA</h2>
+      <Ladowanie />
 
       <h2>PLONACY NAPIS</h2>
       <div className="playground-plonacy">
