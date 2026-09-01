@@ -1,0 +1,142 @@
+{
+  "wersja": 1,
+  "pozycje": [
+    {
+      "id": "statek",
+      "plik": "/assets/statek.gif",
+      "szerokosc": 119,
+      "wysokosc": 108,
+      "opis": "Ladownik kosmiczny na nogach",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/statek.png"
+    },
+    {
+      "id": "statek-wir",
+      "plik": "/assets/statek-wir.gif",
+      "szerokosc": 154,
+      "wysokosc": 77,
+      "opis": "Zielony wirujacy spodek latajacy",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/statek-wir.png"
+    },
+    {
+      "id": "ogien",
+      "plik": "/assets/ogien.gif",
+      "szerokosc": 48,
+      "wysokosc": 78,
+      "opis": "Kepka pomaranczowych plomieni",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/ogien.png"
+    },
+    {
+      "id": "planeta",
+      "plik": "/assets/planeta.gif",
+      "szerokosc": 150,
+      "wysokosc": 150,
+      "opis": "Czerwona planeta z pierscieniem posrod gwiazd",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/planeta.png"
+    },
+    {
+      "id": "strzalka-dol",
+      "plik": "/assets/strzalka-dol.gif",
+      "szerokosc": 55,
+      "wysokosc": 55,
+      "opis": "Niebieska strzalka wskazujaca w dol",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/strzalka-dol.png"
+    },
+    {
+      "id": "nowe",
+      "plik": "/assets/nowe.gif",
+      "szerokosc": 32,
+      "wysokosc": 24,
+      "opis": "Zolta gwiazda z napisem NEW",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/nowe.png"
+    },
+    {
+      "id": "pas-budowa",
+      "plik": "/assets/pas-budowa.gif",
+      "szerokosc": 152,
+      "wysokosc": 50,
+      "opis": "Tablica UNDER CONSTRUCTION w zolto-czarne pasy",
+      "rola": "pas",
+      "klatka-statyczna": "/assets/statyczne/pas-budowa.png"
+    },
+    {
+      "id": "pas-balony",
+      "plik": "/assets/pas-balony.gif",
+      "szerokosc": 515,
+      "wysokosc": 60,
+      "opis": "Rzad kolorowych balonikow na sznurkach",
+      "rola": "pas",
+      "klatka-statyczna": "/assets/statyczne/pas-balony.png"
+    },
+    {
+      "id": "pas-cienki",
+      "plik": "/assets/pas-cienki.gif",
+      "szerokosc": 400,
+      "wysokosc": 14,
+      "opis": "Cienka ozdobna linia rozdzielajaca",
+      "rola": "pas",
+      "klatka-statyczna": "/assets/statyczne/pas-cienki.png"
+    },
+    {
+      "id": "kafel-brama",
+      "plik": "/assets/kafel-brama.png",
+      "szerokosc": 200,
+      "wysokosc": 200,
+      "opis": "Kafel tla bramy: biale gwiazdy na czerni",
+      "rola": "kafel"
+    },
+    {
+      "id": "kafel-egzamin",
+      "plik": "/assets/kafel-egzamin.png",
+      "szerokosc": 100,
+      "wysokosc": 100,
+      "opis": "Kafel tla egzaminu: kolorowe gwiazdki na granacie",
+      "rola": "kafel"
+    },
+    {
+      "id": "kafel-quiz",
+      "plik": "/assets/kafel-quiz.png",
+      "szerokosc": 144,
+      "wysokosc": 144,
+      "opis": "Kafel tla quizu: kremowy papier z gwiazdkami",
+      "rola": "kafel"
+    },
+    {
+      "id": "kafel-ogien",
+      "plik": "/assets/kafel-ogien.png",
+      "szerokosc": 100,
+      "wysokosc": 110,
+      "opis": "Kafel tla proby ognia: plomienie na czerni",
+      "rola": "kafel"
+    },
+    {
+      "id": "kafel-404",
+      "plik": "/assets/kafel-404.png",
+      "szerokosc": 100,
+      "wysokosc": 100,
+      "opis": "Kafel tla strony 404: fioletowa szachownica",
+      "rola": "kafel"
+    },
+    {
+      "id": "kursor",
+      "plik": "/assets/kursor.gif",
+      "szerokosc": 32,
+      "wysokosc": 32,
+      "opis": "Kursor komisji: migajaca strzalka",
+      "rola": "kursor"
+    },
+    {
+      "id": "kursor-rece",
+      "plik": "/assets/kursor-rece.gif",
+      "szerokosc": 20,
+      "wysokosc": 15,
+      "opis": "Kursor komisji: wskazujaca dlon",
+      "rola": "kursor"
+    }
+  ]
+}
