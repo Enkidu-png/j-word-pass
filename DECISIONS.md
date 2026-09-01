@@ -193,3 +193,22 @@ czerwony `npx playwright test` od pierwszego dnia budowy v2.
 Rozstrzygajaca jest sekcja `plan/02 B` (lista tego, co ZOSTAJE): z testow zostaja
 wylacznie `tests/f3-01.spec.ts` i `tests/f5-02.spec.ts` (kontrakty API) oraz
 `tests/smoke.spec.ts` (przepisywany w F0-05). Reszta skasowana w F0-01.
+
+## #13 - wyszukiwarka GifCities trafia w motyw w okolo polowie przypadkow
+
+Pomiar z F0-03a i F0-03b: z 40 pobranych plikow 18 trzeba bylo podmienic po
+OBEJRZENIU arkusza stykowego, mimo ze kazdy przeszedl filtr wymiarow, wagi
+i liczby klatek. Trafienia haslowe, ktore wygladaly poprawnie w logu, a byly
+bledne na ekranie: `planet` dal niebieski prostokat z napisem ANETTE,
+`arrow down` dal strzalke w prawo, `hot dog` dal psa, `waving hand` dal zdjecie
+czlowieka, `shoe` dal baner "I Love Shoes".
+
+Wniosek do konca budowy: kazdy nowy asset przechodzi przez arkusz stykowy
+renderowany na `--kosmos` I na `--papier` przed wpisaniem do manifestu.
+Dwa tla, bo najczestsza wada po motywie to nieprzezroczysta ramka, ktorej
+nie widac na tle o tym samym kolorze.
+
+Swiadomie zostawione z nieprzezroczystym prostokatem: `stwor-klodka`
+(bialy) i `stwor-kula-ziemska` (ciemny). Oba trafiaja na powierzchnie o
+zblizonym kolorze (`--druk-tlo` w PassOMetr, sciana szescianu ladowania),
+wiec ramka tam nie przeszkadza. Do podmiany, gdyby wyladowaly gdzie indziej.

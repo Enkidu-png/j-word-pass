@@ -137,6 +137,222 @@
       "wysokosc": 15,
       "opis": "Kursor komisji: wskazujaca dlon",
       "rola": "kursor"
+    },
+    {
+      "id": "stwor-osmiornica",
+      "plik": "/assets/stwor-osmiornica.gif",
+      "szerokosc": 259,
+      "wysokosc": 215,
+      "opis": "Cyjanowa osmiornica machajaca mackami",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/stwor-osmiornica.png"
+    },
+    {
+      "id": "stwor-ptak",
+      "plik": "/assets/stwor-ptak.gif",
+      "szerokosc": 62,
+      "wysokosc": 68,
+      "opis": "Golab niosacy list w dziobie",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/stwor-ptak.png"
+    },
+    {
+      "id": "stwor-mlotek",
+      "plik": "/assets/stwor-mlotek.gif",
+      "szerokosc": 70,
+      "wysokosc": 70,
+      "opis": "Mlotek stolarski",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/stwor-mlotek.png"
+    },
+    {
+      "id": "stwor-slimak",
+      "plik": "/assets/stwor-slimak.gif",
+      "szerokosc": 120,
+      "wysokosc": 114,
+      "opis": "Slimak z czulkami czytajacy kartke",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/stwor-slimak.png"
+    },
+    {
+      "id": "stwor-zegar",
+      "plik": "/assets/stwor-zegar.gif",
+      "szerokosc": 160,
+      "wysokosc": 120,
+      "opis": "Okragly zegar scienny z chodzacymi wskazowkami",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/stwor-zegar.png"
+    },
+    {
+      "id": "stwor-kropla",
+      "plik": "/assets/stwor-kropla.gif",
+      "szerokosc": 163,
+      "wysokosc": 225,
+      "opis": "Spadajaca kropla wody",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/stwor-kropla.png"
+    },
+    {
+      "id": "stwor-kosc",
+      "plik": "/assets/stwor-kosc.gif",
+      "szerokosc": 150,
+      "wysokosc": 38,
+      "opis": "Kosc, szkielet dloni",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/stwor-kosc.png"
+    },
+    {
+      "id": "stwor-mysz",
+      "plik": "/assets/stwor-mysz.gif",
+      "szerokosc": 153,
+      "wysokosc": 132,
+      "opis": "Mysz komputerowa",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/stwor-mysz.png"
+    },
+    {
+      "id": "stwor-dyskietka",
+      "plik": "/assets/stwor-dyskietka.gif",
+      "szerokosc": 130,
+      "wysokosc": 130,
+      "opis": "Dyskietka z rekami i nogami",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/stwor-dyskietka.png"
+    },
+    {
+      "id": "stwor-nuta",
+      "plik": "/assets/stwor-nuta.gif",
+      "szerokosc": 100,
+      "wysokosc": 100,
+      "opis": "Podwojna nuta muzyczna",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/stwor-nuta.png"
+    },
+    {
+      "id": "stwor-kula-ziemska",
+      "plik": "/assets/stwor-kula-ziemska.gif",
+      "szerokosc": 110,
+      "wysokosc": 90,
+      "opis": "Obracajaca sie kula ziemska",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/stwor-kula-ziemska.png"
+    },
+    {
+      "id": "stwor-krysztal",
+      "plik": "/assets/stwor-krysztal.gif",
+      "szerokosc": 59,
+      "wysokosc": 58,
+      "opis": "Blyszczacy niebieski krysztal",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/stwor-krysztal.png"
+    },
+    {
+      "id": "stwor-gwiazdka",
+      "plik": "/assets/stwor-gwiazdka.gif",
+      "szerokosc": 47,
+      "wysokosc": 47,
+      "opis": "Migoczaca zolta gwiazdka",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/stwor-gwiazdka.png"
+    },
+    {
+      "id": "stwor-koperta",
+      "plik": "/assets/stwor-koperta.gif",
+      "szerokosc": 44,
+      "wysokosc": 41,
+      "opis": "Koperta z listem i serduszkami",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/stwor-koperta.png"
+    },
+    {
+      "id": "stwor-klodka",
+      "plik": "/assets/stwor-klodka.gif",
+      "szerokosc": 78,
+      "wysokosc": 76,
+      "opis": "Klodka w ksztalcie serca z kluczykiem",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/stwor-klodka.png"
+    },
+    {
+      "id": "stwor-strzalka",
+      "plik": "/assets/stwor-strzalka.gif",
+      "szerokosc": 60,
+      "wysokosc": 40,
+      "opis": "Czerwona strzalka wskazujaca w prawo",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/stwor-strzalka.png"
+    },
+    {
+      "id": "stwor-kot",
+      "plik": "/assets/stwor-kot.gif",
+      "szerokosc": 140,
+      "wysokosc": 120,
+      "opis": "Szary kot machajacy ogonem",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/stwor-kot.png"
+    },
+    {
+      "id": "stwor-but",
+      "plik": "/assets/stwor-but.gif",
+      "szerokosc": 208,
+      "wysokosc": 124,
+      "opis": "Para bialych trampek",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/stwor-but.png"
+    },
+    {
+      "id": "stwor-ucho",
+      "plik": "/assets/stwor-ucho.gif",
+      "szerokosc": 58,
+      "wysokosc": 42,
+      "opis": "Ludzkie ucho",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/stwor-ucho.png"
+    },
+    {
+      "id": "stwor-butelka",
+      "plik": "/assets/stwor-butelka.gif",
+      "szerokosc": 56,
+      "wysokosc": 126,
+      "opis": "Czerwona butelka",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/stwor-butelka.png"
+    },
+    {
+      "id": "stwor-delfin",
+      "plik": "/assets/stwor-delfin.gif",
+      "szerokosc": 83,
+      "wysokosc": 120,
+      "opis": "Delfin wyskakujacy z wody",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/stwor-delfin.png"
+    },
+    {
+      "id": "stwor-hotdog",
+      "plik": "/assets/stwor-hotdog.gif",
+      "szerokosc": 89,
+      "wysokosc": 120,
+      "opis": "Hot dog na nogach w biegu",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/stwor-hotdog.png"
+    },
+    {
+      "id": "stwor-reka",
+      "plik": "/assets/stwor-reka.gif",
+      "szerokosc": 80,
+      "wysokosc": 60,
+      "opis": "Machajaca dlon",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/stwor-reka.png"
+    },
+    {
+      "id": "stwor-klepsydra",
+      "plik": "/assets/stwor-klepsydra.gif",
+      "szerokosc": 140,
+      "wysokosc": 255,
+      "opis": "Klepsydra w zdobionej ramie",
+      "rola": "ozdoba",
+      "klatka-statyczna": "/assets/statyczne/stwor-klepsydra.png"
     }
   ]
 }
