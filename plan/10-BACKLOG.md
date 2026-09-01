@@ -161,9 +161,17 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
   ✓ screenshots/F4/F4-01-segregator-{desktop,mobile}.png - oględziny: stos 15 zakładek po prawej (mobile: pozioma rolka u góry), otwarta teczka `formularz-F7`, mini-stemple `WYPEŁNIONO` przekrzywione o 6 stopni, krzyżyk wbity tylko na wybranym wariancie, zero karuzeli i zero kropek postępu (anty-spec 06 F1).
   ✓ dodatkowo zmierzone: żaden element klikalny segregatora nie jest zasłonięty (`elementFromPoint` na środku każdej zakładki, przycisków nawigacji i luki = 0 kolizji, oba viewporty).
   ✓ `pnpm run check` zielony; `pnpm build` zielony (`/quiz` 5,54 kB, first load 107 kB); pełny `npx playwright test` = 114 passed + 12 skipped + 0 failed.
-- [ ] **F4-02a** `ui` Signature pytań 1-5 z tabeli 06→D.
+- [x] **F4-02a** `ui` Signature pytań 1-5 z tabeli 06→D.
   CZYTAJ: 06→D (wiersze 1-5); 03→B.
   AC: pytania 1-5 mają unikalne elementy (screenshot-kolaż do screenshots/F4/); signature 1 reaguje na hover wariantu B (Playwright: `animation-play-state` jednego serca = paused); budżet: `node -e` liczy linie każdego pliku signature, max <= 30 (wynik w dowodzie odhaczenia); negatywne: zero emoji w DOM.
+  DOWÓD: ✓ `npx playwright test tests/f4-02a.spec.ts` = 8 passed (2 viewporty). Pytania 1-5 mają w slocie `[data-signature]` dokładnie te nazwy z tabeli 06 D (`osmiornica-trzy-serca`, `wenus-obraca-sie-zle`, `emu-marsz`, `mlotek-i-piorko`, `slimak-spi`), każdy slot ma dokładnie jeden element `.sig`, a `innerHTML` piątki daje 5 RÓŻNYCH ciągów (`new Set(...).size === 5`) - to nie są te same pudełka z inną etykietą.
+  ✓ screenshots/F4/F4-02a-sig-{1..5}-{desktop,mobile}.png (paski sceny 936x48) - obejrzane po kolei: 1 = trzy czerwone serca + podpis, 2 = kula Wenus z plamą i strzałka `WSZYSCY INNI` kręcące się w przeciwne strony, 3 = pięć emu w marszu z chorągiewką `EMU 1 : 0 ARMIA`, 4 = młotek i piórko spadające równo + `W PRÓŻNI. SERIO.`, 5 = ślimak w czapce nocnej z `ZzZ`.
+  ✓ signature 1 na hover wariantu B: `animationPlayState` trzech serc = `["running","running","running"]` na starcie, `["paused","running","running"]` przy hover B, i z powrotem `running` przy hover C (czysty CSS `:has()`, zero JS).
+  ✓ signature 5: klik ustawia `data-obudzony="tak"`, oko staje się widoczne, po 2 s wraca `nie`.
+  ✓ Z7: dla KAŻDEGO `.gif-less` w slotach 1-5 `animationTimingFunction` pasuje do `^steps\([2-8]\)$`, czas trwania w zakresie 300-1400 ms, `animationName != none`.
+  ✓ budżet linii (`node -e` po `app/quiz/signature/`): EmuMarsz 17, MlotekIPiorko 18, OsmiornicaTrzySerca 20, SlimakSpi 29, WenusObracaSieZle 17 - wszystkie <= 30 (rejestr `index.ts` 16 linii, to nie signature).
+  ✓ negatywne: regex po zakresach emoji na wyrenderowanym HTML każdej z 5 teczek = 0 trafień.
+  ✓ `pnpm run check` zielony; `pnpm build` zielony (`/quiz` 6,29 kB); pełny `npx playwright test` = 122 passed + 12 skipped + 0 failed.
 - [ ] **F4-02b** `ui` Signature pytań 6-10 z tabeli 06→D.
   CZYTAJ: 06→D (wiersze 6-10); 03→B.
   AC: jak F4-02a dla pytań 6-10; signature 7 reaguje na hover wariantu A (kropla kapie szybciej - zmiana `animation-duration`, assert w Playwright).

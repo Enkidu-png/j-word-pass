@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import pytania from "@/data/quiz.json";
 import { czytajStan, zapiszStan } from "@/lib/stan";
 import { dopasujOtwarte } from "@/lib/quiz";
+import { SIGNATURE } from "./signature";
 
 // Segregator akt (plan/06 A): 15 teczek w stosie, zakladki po prawej, jedna
 // teczka otwarta naraz. Wybor wariantu to natywne radio - wyglada jak odreczny
@@ -78,6 +79,7 @@ export default function Segregator() {
 
   const p = pytania[otwarta - 1];
   const wpis = odpowiedzi[p.id] ?? "";
+  const Sig = SIGNATURE[p.signature];
 
   return (
     <div className="segregator" data-segregator="" onKeyDown={naKlawisz}>
@@ -151,16 +153,19 @@ export default function Segregator() {
           </ul>
         )}
 
-        {/* Miejsce na signature pytania (plan/06 D) - wypelniaja je F4-02a/b/c.
-            Dla pytania 14 znacznik trafienia juz tu jest: signature `skala-twardosci`
-            ma na nim blysnac (jedyny dopuszczony sygnal poprawnosci, 06 F2). */}
+        {/* Signature pytania (plan/06 D). Pytania bez wpisu w rejestrze maja pusty
+            slot do czasu swojego issue. Dla pytania 14 znacznik trafienia jest tutaj:
+            signature `skala-twardosci` ma na nim blysnac (jedyny dopuszczony sygnal
+            poprawnosci, 06 F2). */}
         <div
           className="teczka__signature"
           data-signature={p.signature}
           data-otwarte-trafione={
             p.typ === "otwarte" ? (dopasujOtwarte(wpis, p.kluczOtwarte) ? "tak" : "nie") : undefined
           }
-        />
+        >
+          {Sig ? <Sig /> : null}
+        </div>
 
         <p className="teczka__nawigacja">
           <button type="button" data-poprzednia="" disabled={otwarta === 1} onClick={() => otworz(otwarta - 1)}>

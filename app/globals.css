@@ -1043,3 +1043,119 @@ a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
   .zakladka { width: auto; white-space: nowrap; }
   .zakladka__kategoria { flex: none; }
 }
+
+/* == SIGNATURE PYTAN QUIZU (plan/06 D) == */
+/* Wspolna baza: signature to pasek sceny pod wariantami, zawsze dekoracja (Z8). */
+.sig {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 4px 0;
+  font-size: var(--rozmiar-drobny);
+}
+.sig svg { display: block; fill: none; stroke: var(--atrament); stroke-width: 2; }
+.sig__podpis { font-family: var(--font-krzyk); letter-spacing: 1px; }
+
+/* 1. osmiornica-trzy-serca */
+.sig__serce { width: 26px; height: 24px; --klatki: 2; animation-name: jwp-puls; animation-duration: 700ms; }
+.sig__serce path { fill: var(--urzad); stroke: var(--atrament); }
+@keyframes jwp-puls {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+/* hover wariantu B: pierwsze serce ZAMIERA, reszta bije dalej (06 D wiersz 1) */
+.teczka__warianty:has([data-wariant-etykieta="B"]:hover) ~ .teczka__signature [data-serce="1"] {
+  animation-play-state: paused;
+}
+
+/* 2. wenus-obraca-sie-zle */
+.sig--wenus { gap: 20px; }
+.sig__kula {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--atrament);
+  border-radius: 50%;
+  background: var(--chrom-b);
+  overflow: hidden;
+  --klatki: 8;
+  animation-name: jwp-wenus;
+  animation-duration: 1400ms;
+  animation-direction: reverse;   /* Wenus kreci sie pod prad reszty ukladu */
+}
+.sig__plama {
+  position: absolute;
+  top: 8px;
+  left: 4px;
+  width: 16px;
+  height: 10px;
+  background: var(--urzad);
+}
+@keyframes jwp-wenus {
+  0% { transform: rotate(0); }
+  100% { transform: rotate(360deg); }
+}
+.sig__strzalka-blok { display: flex; align-items: center; gap: 6px; }
+.sig__strzalka { width: 32px; height: 32px; --klatki: 8; animation-name: jwp-wenus; animation-duration: 1400ms; }
+.sig__strzalka path:last-child { fill: var(--atrament); }
+
+/* 3. emu-marsz */
+.sig--emu { overflow: hidden; width: 100%; }
+.sig__kolumna {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  --klatki: 6;
+  animation-name: jwp-emu-marsz;
+  animation-duration: 1400ms;
+}
+@keyframes jwp-emu-marsz {
+  /* marsz zaczyna sie przy lewej krawedzi: nic nie ucieka poza kadr w klatce 0 */
+  0% { transform: translateX(0); }
+  100% { transform: translateX(56px); }
+}
+.sig__emu { width: 22px; height: 30px; --klatki: 2; animation-name: jwp-emu-krok; animation-duration: 500ms; }
+@keyframes jwp-emu-krok {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+  100% { transform: translateY(0); }
+}
+.sig__flaga {
+  border: 2px solid var(--atrament);
+  background: var(--chrom-b);
+  padding: 0 4px;
+  white-space: nowrap;
+}
+
+/* 4. mlotek-i-piorko */
+.sig--spadek { align-items: flex-start; min-height: 56px; }
+.sig__spadaja {
+  display: flex;
+  gap: 16px;
+  --klatki: 6;
+  animation-name: jwp-spadek;
+  animation-duration: 1200ms;
+}
+@keyframes jwp-spadek {
+  0% { transform: translateY(-8px); }
+  100% { transform: translateY(8px); }
+}
+.sig__mlotek, .sig__piorko { width: 30px; height: 40px; }
+.sig__mlotek path:last-child { fill: var(--chrom-b); }
+
+/* 5. slimak-spi */
+.sig--slimak { border: 0; background: none; padding: 4px 0; }
+.sig__slimak { width: 60px; height: 40px; }
+.sig__oko { fill: var(--atrament); stroke: none; visibility: hidden; }
+.sig--slimak[data-obudzony="tak"] .sig__oko { visibility: visible; }
+.sig__zzz {
+  font-family: var(--font-krzyk);
+  font-size: var(--rozmiar-tekst);
+  letter-spacing: 2px;
+  --klatki: 2;
+  animation-name: jwp-blink;
+  animation-duration: 900ms;
+}
+.sig--slimak[data-obudzony="tak"] .sig__zzz { visibility: hidden; animation-name: none; }
