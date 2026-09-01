@@ -388,6 +388,110 @@ a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
 .pieczatka[data-ton="alarm"] { color: var(--alarm); }
 .pieczatka[data-ton="jad"] { color: var(--jad); }
 
+/* == BRAMA (ETAP 0) == */
+.brama { position: relative; padding: 16px; }
+.brama__krzyk {
+  font-family: var(--font-krzyk);
+  font-size: var(--rozmiar-krzyk);
+  margin: 0;
+  letter-spacing: 2px;
+}
+/* rozstrzelone pionowo po lewej krawedzi - motyw Cameron's World */
+.brama__pion {
+  position: absolute;
+  left: 4px;
+  top: 120px;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-urzad);
+  font-size: var(--rozmiar-drobny);
+  line-height: 1.4;
+  margin: 0;
+}
+.brama__tablica { position: relative; min-height: 560px; margin-top: 24px; }
+.brama__ogloszenie { position: absolute; max-width: 220px; }
+.brama__zebra { font-family: var(--font-urzad); margin: 0; }
+.brama__odznaka {
+  display: inline-block;
+  border: var(--ramka);
+  background: var(--chrom-b);
+  padding: 2px 6px;
+  font-size: var(--rozmiar-drobny);
+}
+.brama__wniosek {
+  position: relative;
+  z-index: 2;
+  max-width: 460px;
+  margin: 80px auto 0;
+}
+.brama__wniosek h2 { font-family: var(--font-krzyk); margin: 0 0 8px; }
+.brama__akcje { margin: 12px 0 0; }
+.brama__cta {
+  font-family: var(--font-krzyk);
+  border: 4px outset var(--urzad);
+  background: var(--chrom-b);
+  padding: 8px 14px;
+}
+/* Uciekinier stoi POZA rzedem z CTA (anty-spec 01 D1: zero dwoch przyciskow
+   obok siebie) i skacze po rogach druku - skokowo, bez transition. */
+.brama__uciekinier {
+  position: absolute;
+  top: 100%;
+  left: 4%;
+  border: 2px outset var(--atrament);
+  background: var(--papier);
+  font-size: var(--rozmiar-drobny);
+  padding: 4px 8px;
+}
+
+/* Szuflada akt: prostokaty --papier wjezdzajace z prawej. */
+.brama__stempel {
+  position: fixed;
+  left: 50%;
+  top: 40%;
+  z-index: 60;
+  transform: translate(-50%, -50%);
+}
+.brama__szuflada {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  background-color: var(--papier);
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--atrament) 0 2px,
+    transparent 2px 64px
+  );
+  animation-name: jwp-szuflada;
+  animation-duration: 1200ms;
+  animation-timing-function: steps(6);
+  animation-fill-mode: both;
+}
+@keyframes jwp-szuflada {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Z10: zamiast szuflady pojedyncze pojawienie sie w 300 ms */
+  .brama__szuflada {
+    animation-name: jwp-fade;
+    animation-duration: 300ms;
+    animation-timing-function: steps(2);
+  }
+  @keyframes jwp-fade {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+}
+
+@media (max-width: 767px) {
+  .brama__pion { display: none; }
+  .brama__tablica { min-height: 0; }
+  .brama__ogloszenie { position: static; margin: 12px 0; max-width: none; }
+  .brama__uciekinier { position: static; display: block; margin-top: 12px; }
+  .brama__wniosek { margin-top: 24px; }
+}
+
 /* == CEREMONIE START == */
 /* Jedyny blok, w ktorym wolno easing inny niz steps() (Z7). Ruch klasy
    `ceremonia`: jednorazowy, wyzwolony, zawsze do pominiecia (Z8). */

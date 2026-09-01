@@ -12,19 +12,23 @@ export default function Pieczatka({
   tekst,
   ton,
   obrocDeg = 0,
+  dekoracyjna = false,
 }: {
   tekst: string;
   ton: TonPieczatki;
   obrocDeg?: number;
+  // Z8: element nie moze byc naraz dekoracja i ceremonia. Pieczec na tablicy
+  // ogloszen tylko wisi (i moze dostac gif-less od rodzica), wiec nie wbija sie.
+  dekoracyjna?: boolean;
 }) {
   const id = useId();
   const luk = `luk-${id.replace(/:/g, "")}`;
 
   return (
     // rodzic drgnie o 2 px w chwili uderzenia (03 sekcja G)
-    <span className="pieczatka-drgniecie">
+    <span className={dekoracyjna ? "" : "pieczatka-drgniecie"}>
       <span
-        className="pieczatka ceremonia"
+        className={`pieczatka${dekoracyjna ? "" : " ceremonia"}`}
         data-ton={ton}
         style={{ "--obrot": `${obrocDeg}deg` } as React.CSSProperties}
       >
