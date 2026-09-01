@@ -1,11 +1,14 @@
-// Walidator projektu J-WORD PASS. Trzy niezależne kontrole:
+// Walidator projektu J-WORD PASS. Niezależne kontrole:
 //   (a) Z3 - zero literałów kolorów i rozmiarów czcionki poza app/tokens.css
-//   (b) Z6 - lista zależności runtime zamknięta
-//   (c) spójność danych kanonicznych z data/ (aktywna, gdy pliki istnieją)
+//   (b) Z14 - lista zależności runtime zamknięta
+//   (c) Z6 - zakaz obrotu i skosu poza ekranem ładowania
+//   (d) Z9 - kafel tła musi być PNG, oraz spójność data/assety.json
+//   (e) spójność danych kanonicznych z data/ (aktywna, gdy pliki istnieją)
+//   (f) Z1, Z2, Z5 - kanon typografii i ozdobników
 // Uruchamiane przez `pnpm run check`. Exit 1 = lista naruszeń na stderr.
 
 import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
-import { join, relative } from "node:path";
+import { join, relative, sep } from "node:path";
 
 const KORZEN = process.cwd();
 const bledy = [];
@@ -96,7 +99,7 @@ function sprawdzZ3() {
   }
 }
 
-/* ---------- (d) Z1, Z2, Z5: kanon typografii i ozdobnikow ---------- */
+/* ---------- (f) Z1, Z2, Z5: kanon typografii i ozdobnikow ---------- */
 
 // Z3 mial walidator od poczatku, kanon nie mial zadnego - byl czysty wylacznie
 // dzieki dyscyplinie autorow. Pierwszy nowy plik moglby go zlamac bez czerwieni.
@@ -125,7 +128,7 @@ function sprawdzKanon() {
   }
 }
 
-/* ---------- (b) Z6: allowlist zależności runtime ---------- */
+/* ---------- (b) Z14: allowlist zależności runtime ---------- */
 
 const DOZWOLONE = ["next", "react", "react-dom", "@vercel/blob"];
 
@@ -133,12 +136,12 @@ function sprawdzZaleznosci() {
   const pkg = JSON.parse(readFileSync(join(KORZEN, "package.json"), "utf8"));
   for (const nazwa of Object.keys(pkg.dependencies ?? {})) {
     if (!DOZWOLONE.includes(nazwa)) {
-      bledy.push(`package.json zależność runtime spoza allowlisty (Z6): ${nazwa}`);
+      bledy.push(`package.json zależność runtime spoza allowlisty (Z14): ${nazwa}`);
     }
   }
 }
 
-/* ---------- (c) dane kanoniczne ---------- */
+/* ---------- (e) dane kanoniczne ---------- */
 
 const EMOJI = /\p{Extended_Pictographic}/u;
 
@@ -204,6 +207,123 @@ function sprawdzKomisje() {
   if (EMOJI.test(JSON.stringify(k))) bledy.push("data/komisja.json: emoji w danych (Z4)");
 }
 
+/* ---------- (c) Z6: zakaz obrotu i skosu ---------- */
+
+// Z6 nie mial walidatora, a w buildzie v1 przekrzywione karty byly najczestszym
+// nawrotem do generycznego szablonu. Wyjatki sa dokladnie dwa i sa wypisane
+// z nazwy - ekran ladowania 3D to jedyne miejsce, gdzie obrot jest zamowiony
+// wprost (plan/01 Z6 punkt b). `scaleX(-1)` i `scaleY(-1)` sa dozwolone
+// (punkty a i c) i celowo NIE lapie ich ten wzorzec.
+const OBROT = /\b(rotate|rotate3d|rotateX|rotateY|rotateZ|skew)\s*\(/;
+
+const OBROT_WYJATKI = [
+  join("components", "scena", "EkranLadowania.tsx"),
+  join("app", "style", "ladowanie.css"),
+];
+
+function sprawdzObrot() {
+  const pliki = [
+    ...plikiRek(join(KORZEN, "app"), [".css", ".ts", ".tsx"]),
+    ...plikiRek(join(KORZEN, "components"), [".css", ".ts", ".tsx"]),
+  ].filter((p) => !OBROT_WYJATKI.includes(relative(KORZEN, p)));
+
+  for (const plik of pliki) {
+    const linie = bezKomentarzy(readFileSync(plik, "utf8")).split("\n");
+    const oryginal = readFileSync(plik, "utf8").split("\n");
+    linie.forEach((linia, i) => {
+      if (!OBROT.test(linia)) return;
+      const gdzie = `${relative(KORZEN, plik)}:${i + 1}`;
+      bledy.push(`${gdzie} Z6 obrot: ${(oryginal[i] ?? linia).trim()}`);
+    });
+  }
+}
+
+/* ---------- (d) manifest assetow (plan/03 D) ---------- */
+
+// Kanoniczna tabela id z plan/03 D1. Zakaz wymyslania id spoza listy: nowy motyw
+// najpierw laduje w planie, dopiero potem w manifescie.
+const ID_KANONICZNE = {
+  ozdoba: `statek statek-wir ogien planeta strzalka-dol nowe stwor-osmiornica stwor-ptak
+    stwor-mlotek stwor-slimak stwor-zegar stwor-kropla stwor-kosc stwor-mysz stwor-dyskietka
+    stwor-nuta stwor-kula-ziemska stwor-krysztal stwor-gwiazdka stwor-koperta stwor-klodka
+    stwor-strzalka stwor-kot stwor-but stwor-ucho stwor-butelka stwor-delfin stwor-hotdog
+    stwor-reka stwor-klepsydra`,
+  pas: "pas-budowa pas-balony pas-cienki",
+  kafel: "kafel-brama kafel-egzamin kafel-quiz kafel-ogien kafel-404",
+  plakietka: "plakietka-html plakietka-css plakietka-przegladarka",
+  kursor: "kursor kursor-rece",
+};
+
+const ROLE = Object.keys(ID_KANONICZNE);
+
+function sprawdzAssety() {
+  const sciezka = join(KORZEN, "data", "assety.json");
+  if (!existsSync(sciezka)) return; // manifest powstaje w F0-03a
+  const manifest = JSON.parse(readFileSync(sciezka, "utf8"));
+  if (!Array.isArray(manifest.pozycje)) {
+    bledy.push("data/assety.json: brak tablicy \"pozycje\"");
+    return;
+  }
+
+  const widzianeId = new Set();
+  const uzytePliki = new Set();
+  const uzyteKlatki = new Set();
+
+  for (const [i, poz] of manifest.pozycje.entries()) {
+    const gdzie = `data/assety.json[${i}] ${poz.id ?? "bez-id"}`;
+    for (const pole of ["id", "plik", "szerokosc", "wysokosc", "opis", "rola"]) {
+      if (poz[pole] === undefined) bledy.push(`${gdzie}: brak pola "${pole}"`);
+    }
+    if (widzianeId.has(poz.id)) bledy.push(`${gdzie}: id nie jest unikalne`);
+    widzianeId.add(poz.id);
+
+    if (!ROLE.includes(poz.rola)) {
+      bledy.push(`${gdzie}: rola "${poz.rola}" spoza {${ROLE.join(", ")}}`);
+    } else if (!ID_KANONICZNE[poz.rola].split(/\s+/).includes(poz.id)) {
+      bledy.push(`${gdzie}: id spoza kanonicznej tabeli plan/03 D1 dla roli "${poz.rola}"`);
+    }
+
+    // Z9: kafel to PNG. Animowanego tla nie da sie zatrzymac przy reduced motion.
+    if (poz.rola === "kafel" && String(poz.plik).toLowerCase().endsWith(".gif")) {
+      bledy.push(`${gdzie}: Z9 kafel nie moze byc .gif`);
+    }
+
+    if (typeof poz.plik === "string") {
+      uzytePliki.add(poz.plik);
+      if (!existsSync(join(KORZEN, "public", poz.plik.replace(/^\//, "")))) {
+        bledy.push(`${gdzie}: plik nie istnieje na dysku: ${poz.plik}`);
+      }
+    }
+
+    // Z11: ozdoby i pasy musza miec klatke statyczna, kursor jest z niej zwolniony.
+    if (poz.rola === "ozdoba" || poz.rola === "pas") {
+      const klatka = poz["klatka-statyczna"];
+      if (typeof klatka !== "string") {
+        bledy.push(`${gdzie}: rola "${poz.rola}" wymaga pola "klatka-statyczna" (Z11)`);
+      } else {
+        uzyteKlatki.add(klatka);
+        if (!existsSync(join(KORZEN, "public", klatka.replace(/^\//, "")))) {
+          bledy.push(`${gdzie}: klatka-statyczna nie istnieje na dysku: ${klatka}`);
+        }
+      }
+    }
+  }
+
+  // Kazdy plik w public/assets/ ma pozycje w manifescie; kazda klatka w statyczne/
+  // jest przez ktoras pozycje wskazana. Inaczej biblioteka cicho puchnie.
+  const katalog = join(KORZEN, "public", "assets");
+  if (!existsSync(katalog)) return;
+  for (const plik of plikiRek(katalog, [".gif", ".png", ".jpg", ".jpeg", ".webp", ".svg", ".cur"])) {
+    const url = `/${relative(join(KORZEN, "public"), plik).split(sep).join("/")}`;
+    const wStatycznych = url.startsWith("/assets/statyczne/");
+    if (wStatycznych && !uzyteKlatki.has(url)) {
+      bledy.push(`public${url}: klatka statyczna, ktorej nie wskazuje zadna pozycja manifestu`);
+    } else if (!wStatycznych && !uzytePliki.has(url)) {
+      bledy.push(`public${url}: plik bez pozycji w data/assety.json`);
+    }
+  }
+}
+
 /* ---------- samotest (F7-02) ---------- */
 // `node scripts/lint-tokens.mjs --samotest` - najmniejszy sprawdzian, ktory pada,
 // gdy strippera komentarzy ktos zepsuje. Bez frameworka, bez fixture'ow na dysku.
@@ -238,7 +358,9 @@ if (process.argv.includes("--samotest")) {
 
 sprawdzZ3();
 sprawdzKanon();
+sprawdzObrot();
 sprawdzZaleznosci();
+sprawdzAssety();
 sprawdzQuiz();
 sprawdzEgzamin();
 sprawdzKomisje();
