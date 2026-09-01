@@ -1,0 +1,35 @@
+{
+  "tytul": "EGZAMIN PAŃSTWOWY Z FIZYKI STOSOWANEJ NR F-7/BIS",
+  "tresc": "Kto twoim zdaniem wygrałby pojedynek - 2000 zebr z jetpackami, ale biało-żółtych, czy 1 słoń z karabinem maszynowym na trąbie?",
+  "zalozenia": [
+    {
+      "id": "kosmos",
+      "tekst": "Pojedynek odbywa się w kosmosie."
+    },
+    {
+      "id": "zebra-v",
+      "tekst": "Prędkość zebry w kosmosie wynosi 300 km/h. Jetpacki mają zasięg około 1000 km (potem już tylko pęd)."
+    },
+    {
+      "id": "slon-oko",
+      "tekst": "Słoń ma sokole oko i 5000 naboi."
+    },
+    {
+      "id": "slon-masa",
+      "tekst": "Masa słonia wynosi około 10 t (elefantus gigantis)."
+    },
+    {
+      "id": "zebra-cv",
+      "tekst": "Jedna z zebr ma raka trzustki i skończyła akademię wojskową."
+    },
+    {
+      "id": "odrzut",
+      "tekst": "Przyjmujemy, że słoń przy każdym strzale przyspiesza o 1 km/h."
+    }
+  ],
+  "polecenie": "Zastosuj odpowiednie wzory i udowodnij wynik.",
+  "liczbaPodzadan": 1,
+  "punktyMin": 6,
+  "punktyMax": 10,
+  "punktyPuste": 0
+}

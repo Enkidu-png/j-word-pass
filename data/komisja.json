@@ -1,0 +1,180 @@
+{
+  "powitanie": [
+    {
+      "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
+      "tekst": "Siadaj. Obradujemy od 1998 roku i dzisiaj nie zamierzamy przestać."
+    },
+    {
+      "kto": "SEKRETARZ OKOŃ",
+      "tekst": "Wpisałem cię do rejestru. Rejestr jest w zeszycie. Zeszyt jest mój."
+    },
+    {
+      "kto": "CZŁONKINI Z URZĘDU",
+      "tekst": "Nie patrz tak na mnie. Ja tu tylko podbijam."
+    },
+    {
+      "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
+      "tekst": "Masz jedno zadanie i jedną kartkę. Kartki nie oddajemy."
+    },
+    {
+      "kto": "SEKRETARZ OKOŃ",
+      "tekst": "Poprzedni kandydat siedział tu cztery godziny. Napisał trzy słowa."
+    },
+    {
+      "kto": "CZŁONKINI Z URZĘDU",
+      "tekst": "Zaczynamy. Kawa stygnie, a ja mam jeszcze dwie komisje."
+    }
+  ],
+  "czekanie": [
+    {
+      "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
+      "tekst": "Piszesz czy myślisz? Bo to nie to samo i tylko jedno się liczy."
+    },
+    {
+      "kto": "SEKRETARZ OKOŃ",
+      "tekst": "Zanotowałem, że nic nie zanotowałeś."
+    },
+    {
+      "kto": "CZŁONKINI Z URZĘDU",
+      "tekst": "Ja bym już coś napisała. Cokolwiek."
+    },
+    {
+      "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
+      "tekst": "Zegar na ścianie stoi od 2003 roku, ale ja liczę w pamięci."
+    },
+    {
+      "kto": "SEKRETARZ OKOŃ",
+      "tekst": "Długopis działa. Sprawdzałem rano."
+    },
+    {
+      "kto": "CZŁONKINI Z URZĘDU",
+      "tekst": "Nie musi być prawda. Musi być uzasadnione."
+    }
+  ],
+  "ocenianie": [
+    {
+      "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
+      "tekst": "Czytam. Nie przeszkadzać."
+    },
+    {
+      "kto": "SEKRETARZ OKOŃ",
+      "tekst": "Podkreśliłem trzy rzeczy. Dwie na czerwono."
+    },
+    {
+      "kto": "CZŁONKINI Z URZĘDU",
+      "tekst": "Ten fragment o odrzucie mi się podoba. Reszta mniej."
+    },
+    {
+      "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
+      "tekst": "Sprawdzam wzory. Wzorów nie ma. Sprawdzam dalej."
+    },
+    {
+      "kto": "SEKRETARZ OKOŃ",
+      "tekst": "Zebry mają jetpacki. To akurat zgadza się z arkuszem."
+    },
+    {
+      "kto": "CZŁONKINI Z URZĘDU",
+      "tekst": "Głosujmy, bo mi się herbata kończy."
+    }
+  ],
+  "werdyktWysoki": [
+    {
+      "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
+      "tekst": "Dobrze. Nie doskonale, ale dobrze, a ja rzadko to mówię."
+    },
+    {
+      "kto": "SEKRETARZ OKOŃ",
+      "tekst": "Wpisuję wysoką notę. Ręka mi drży, bo to pierwszy raz w tym kwartale."
+    },
+    {
+      "kto": "CZŁONKINI Z URZĘDU",
+      "tekst": "Pieczątka idzie na środek. Zasłużyłeś."
+    },
+    {
+      "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
+      "tekst": "Słoń by cię zatrudnił."
+    },
+    {
+      "kto": "SEKRETARZ OKOŃ",
+      "tekst": "Zaznaczam w rejestrze gwiazdkę. Gwiazdka nic nie daje, ale ładnie wygląda."
+    },
+    {
+      "kto": "CZŁONKINI Z URZĘDU",
+      "tekst": "Przechodzisz dalej i ani słowa nikomu."
+    }
+  ],
+  "werdyktNiski": [
+    {
+      "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
+      "tekst": "Przeszło, ale bez entuzjazmu."
+    },
+    {
+      "kto": "SEKRETARZ OKOŃ",
+      "tekst": "Wpisuję. Nie pytaj ile."
+    },
+    {
+      "kto": "CZŁONKINI Z URZĘDU",
+      "tekst": "Brakowało mi liczb. Liczby robią wrażenie na komisji."
+    },
+    {
+      "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
+      "tekst": "Zebry by cię przeżyły o dwie minuty."
+    },
+    {
+      "kto": "SEKRETARZ OKOŃ",
+      "tekst": "W rejestrze będzie adnotacja. Adnotacji się nie usuwa."
+    },
+    {
+      "kto": "CZŁONKINI Z URZĘDU",
+      "tekst": "Idź dalej, zanim zmienię zdanie."
+    }
+  ],
+  "werdyktZero": [
+    {
+      "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
+      "tekst": "Pusta kartka to też odpowiedź. Zła."
+    },
+    {
+      "kto": "SEKRETARZ OKOŃ",
+      "tekst": "Zero. Wpisałem od razu, żeby nie przedłużać."
+    },
+    {
+      "kto": "CZŁONKINI Z URZĘDU",
+      "tekst": "Nawet zebra z akademii wojskowej coś by napisała."
+    },
+    {
+      "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
+      "tekst": "Komisja nie karze za głupotę. Karze za milczenie."
+    },
+    {
+      "kto": "SEKRETARZ OKOŃ",
+      "tekst": "Rejestr zapamięta. Rejestr zawsze pamięta."
+    },
+    {
+      "kto": "CZŁONKINI Z URZĘDU",
+      "tekst": "Możesz iść dalej. Punktów nie ma."
+    }
+  ],
+  "werdyktAwaryjny": [
+    {
+      "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
+      "tekst": "Łącze z komisją nadrzędną padło. Oceniam z pamięci i z doświadczenia."
+    },
+    {
+      "kto": "SEKRETARZ OKOŃ",
+      "tekst": "Maszyna licząca się zacięła. Wpisuję notę z tabeli awaryjnej."
+    },
+    {
+      "kto": "CZŁONKINI Z URZĘDU",
+      "tekst": "Nie mam dzisiaj dostępu do opinii biegłego. Decyduję sama."
+    },
+    {
+      "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
+      "tekst": "Prąd wrócił na chwilę i tyle zdążyłem przeczytać. Wystarczy."
+    },
+    {
+      "kto": "SEKRETARZ OKOŃ",
+      "tekst": "Protokół awaryjny numer 4. Kandydat dostaje punkty i nikt o tym nie mówi."
+    }
+  ]
+}

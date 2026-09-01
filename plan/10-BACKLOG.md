@@ -29,9 +29,10 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
   CZYTAJ: 01→B (Z3), 02→C4.
   AC: wstawienie testowe `color:#fff` do komponentu wywala `pnpm run check` (pokazać output); usunięcie -> zielony; negatywne: `translateX(3px)` NIE jest łapane, literał wewnątrz `url("data:...")` NIE jest łapany.
   DOWÓD: ✓ `components/_ProbaWalidatora.tsx` ze `style={{color:"#fff"}}` -> `pnpm run check` exit 1, output `KOMISJA ODRZUCA KOD. NARUSZEŃ: 1 / components/_ProbaWalidatora.tsx:2 literał koloru (hex)`; po usunięciu pliku exit 0 (`lint-tokens: czysto`); ✓ negatywne: plik z `translateX(3px)` i `url("data:image/svg+xml,...fill=%27#ffffff%27...")` -> exit 0; ✓ dodatkowo `fontSize:"18px"` i `gsap` w dependencies -> 2 naruszenia. Commit cef0ee2.
-- [ ] **F0-03** `dane` Dane kanoniczne: `data/egzamin.json` (02→C1), `data/quiz.json` (15 pytań 1:1 z plan/11-QUIZ-TRESC.md), `data/komisja.json` (min. 6 stanów kwestii + werdykt-awaryjny x5).
+- [x] **F0-03** `dane` Dane kanoniczne: `data/egzamin.json` (02→C1), `data/quiz.json` (15 pytań 1:1 z plan/11-QUIZ-TRESC.md), `data/komisja.json` (min. 6 stanów kwestii + werdykt-awaryjny x5).
   CZYTAJ: 02→C, 11 (cały), 01→A3 (głos).
   AC: `pnpm run check` przechodzi z aktywną walidacją danych (15 rekordów, id 1-15 ciągłe, abcd po 4 warianty, `poprawna` w {A,B,C,D}, signature unikalne, pyt. 14 ma `kluczOtwarte`); negatywne: emoji tylko w polu `emojiZrodlowe`.
+  DOWÓD: ✓ `pnpm run check` exit 0 z aktywną walidacją danych; `node -e` na quiz.json: 15 rekordów, id 1-15 ciągłe, 15 unikalnych signature, pyt. 14 `typ:otwarte` + `kluczOtwarte:[mohsa, skala mohsa]`; ✓ skrypt porównujący 71 linii treści z plan/11 z JSON-em: 0 niedopasowań (kopia 1:1); ✓ negatywne: doklejenie emoji do `pytanie` -> exit 1 `emoji w polu "pytanie" (Z4)`; podmiana id/signature/poprawna/wariantów -> exit 1 z 5 naruszeniami; ✓ `grep -c "—\|·"` na data/*.json = 0 (Z1, Z2).
 - [ ] **F0-04** `infra` Playwright: devDeps `@playwright/test` + `@axe-core/playwright`, `npx playwright install chromium`, `playwright.config.ts` (viewporty 1280x800 i 390x844, baseURL http://localhost:3000, webServer `pnpm dev`), `tests/smoke.spec.ts` (4 route'y odpowiadają 200 i mają `h1`).
   CZYTAJ: 02→E.
   AC: `npx playwright test` zielony; negatywne: zero innych nowych devDeps.

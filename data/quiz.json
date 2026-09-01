@@ -1,0 +1,240 @@
+[
+  {
+    "id": 1,
+    "kategoria": "Biologia",
+    "emojiZrodlowe": "🐙",
+    "typ": "abcd",
+    "pytanie": "Które z poniższych zdań jest prawdziwe?",
+    "warianty": {
+      "A": "Ośmiornice mają trzy serca, ale wszystkie trzy pracują bez przerwy podczas pływania.",
+      "B": "Ośmiornice mają trzy serca, z czego jedno przestaje bić podczas pływania.",
+      "C": "Ośmiornice mają dwa serca i dodatkowy narząd pełniący funkcję pompy krwi.",
+      "D": "Ośmiornice nie mają serc, ponieważ ich układ krążenia działa na zasadzie ciśnienia hydraulicznego."
+    },
+    "poprawna": "B",
+    "kluczOtwarte": null,
+    "signature": "osmiornica-trzy-serca"
+  },
+  {
+    "id": 2,
+    "kategoria": "Astronomia",
+    "emojiZrodlowe": "🌌",
+    "typ": "abcd",
+    "pytanie": "Co jest prawdą?",
+    "warianty": {
+      "A": "Na Wenus dzień trwa krócej niż rok, ale tylko dlatego, że planeta obraca się w przeciwnym kierunku niż większość planet.",
+      "B": "Na Wenus dzień trwa dokładnie 225 dni ziemskich, czyli tyle samo co jej rok.",
+      "C": "Na Wenus doba gwiazdowa trwa około 243 dni ziemskich, czyli dłużej niż jej rok trwający około 225 dni.",
+      "D": "Wenus obraca się tak szybko, że jej atmosfera wykonuje pełny obrót w ciągu kilku dni."
+    },
+    "poprawna": "C",
+    "kluczOtwarte": null,
+    "signature": "wenus-obraca-sie-zle"
+  },
+  {
+    "id": 3,
+    "kategoria": "Historia",
+    "emojiZrodlowe": "⚔️",
+    "typ": "abcd",
+    "pytanie": "Co naprawdę wydarzyło się podczas tzw. Wojny Emu w Australii w 1932 roku?",
+    "warianty": {
+      "A": "Australijskie wojsko prowadziło operację przeciwko dużej populacji emu niszczących uprawy.",
+      "B": "Australia wysłała żołnierzy przeciwko emu, ale operacja zakończyła się formalnym zawieszeniem broni.",
+      "C": "Emu zaatakowały gospodarstwa, co doprowadziło do krótkotrwałego użycia wojska i broni maszynowej.",
+      "D": "Australia wypowiedziała wojnę emu, po czym parlament wycofał deklarację po kilku dniach."
+    },
+    "poprawna": "A",
+    "kluczOtwarte": null,
+    "signature": "emu-marsz"
+  },
+  {
+    "id": 4,
+    "kategoria": "Fizyka",
+    "emojiZrodlowe": "🧲",
+    "typ": "abcd",
+    "pytanie": "Który fakt jest prawdziwy?",
+    "warianty": {
+      "A": "W próżni cięższy przedmiot spada szybciej, jeśli oba przedmioty mają taki sam kształt.",
+      "B": "W próżni piórko i młotek spadają z takim samym przyspieszeniem.",
+      "C": "W próżni cięższy przedmiot spada szybciej, ale różnica jest bardzo mała.",
+      "D": "Piórko zaczyna obracać się wokół młotka, ponieważ oba obiekty wzajemnie się przyciągają."
+    },
+    "poprawna": "B",
+    "kluczOtwarte": null,
+    "signature": "mlotek-i-piorko"
+  },
+  {
+    "id": 5,
+    "kategoria": "Zoologia",
+    "emojiZrodlowe": "🐌",
+    "typ": "abcd",
+    "pytanie": "Które zdanie jest prawdziwe?",
+    "warianty": {
+      "A": "Niektóre ślimaki mogą pozostawać w stanie uśpienia przez kilka lat, szczególnie w niesprzyjających warunkach.",
+      "B": "Niektóre gatunki ślimaków potrafią spać przez wiele miesięcy, ale kilkuletni sen jest u nich niemożliwy.",
+      "C": "Ślimaki zapadają w sen zimowy wyłącznie wtedy, gdy temperatura spada poniżej 0°C.",
+      "D": "Ślimaki śpią tylko w poniedziałki, ponieważ pozostałe dni tygodnia przeznaczają na migrację."
+    },
+    "poprawna": "A",
+    "kluczOtwarte": null,
+    "signature": "slimak-spi"
+  },
+  {
+    "id": 6,
+    "kategoria": "Geografia",
+    "emojiZrodlowe": "🗺️",
+    "typ": "abcd",
+    "pytanie": "Która ciekawostka jest prawdziwa?",
+    "warianty": {
+      "A": "Rosja rozciąga się przez 11 stref czasowych.",
+      "B": "Rosja obejmuje 11 stref czasowych, choć część z nich ma ten sam czas urzędowy w niektórych okresach.",
+      "C": "Rosja ma 12 stref czasowych, ale jedna z nich jest używana wyłącznie zimą.",
+      "D": "Rosja posiada osobną strefę czasową dla obszarów zamieszkanych przez niedźwiedzie."
+    },
+    "poprawna": "A",
+    "kluczOtwarte": null,
+    "signature": "rosja-strefy"
+  },
+  {
+    "id": 7,
+    "kategoria": "Chemia",
+    "emojiZrodlowe": "🧪",
+    "typ": "abcd",
+    "pytanie": "Co jest prawdą?",
+    "warianty": {
+      "A": "Gal zaczyna się topić w temperaturze niewiele wyższej od temperatury pokojowej, około 29,8°C.",
+      "B": "Gal topi się w dłoni, ponieważ temperatura ludzkiego ciała jest zawsze wyższa niż 30°C.",
+      "C": "Gal ma temperaturę topnienia niższą od temperatury pokojowej, dlatego w większości pomieszczeń powinien być ciekły.",
+      "D": "Gal staje się ciekły po kontakcie ze skórą, ponieważ reaguje chemicznie z ludzkim potem."
+    },
+    "poprawna": "A",
+    "kluczOtwarte": null,
+    "signature": "gal-topnieje"
+  },
+  {
+    "id": 8,
+    "kategoria": "Językoznawstwo",
+    "emojiZrodlowe": "🗣️",
+    "typ": "abcd",
+    "pytanie": "Jak brzmi prawdziwa ciekawostka?",
+    "warianty": {
+      "A": "„Sauna\" jest słowem pochodzenia fińskiego i zostało zapożyczone do wielu innych języków.",
+      "B": "Słowo „sauna\" pochodzi z języka fińskiego, ale pierwotnie oznaczało konkretny rodzaj drewnianej łaźni.",
+      "C": "W języku fińskim istnieje specjalna forma gramatyczna opisująca przebywanie w saunie.",
+      "D": "„Sauna\" pochodzi z języka fińskiego i pierwotnie oznaczała miejsce, w którym suszono ryby."
+    },
+    "poprawna": "A",
+    "kluczOtwarte": null,
+    "signature": "sauna-parowa"
+  },
+  {
+    "id": 9,
+    "kategoria": "Medycyna",
+    "emojiZrodlowe": "🦴",
+    "typ": "abcd",
+    "pytanie": "Które stwierdzenie jest prawdziwe?",
+    "warianty": {
+      "A": "Kość udowa jest jedną z najbardziej wytrzymałych kości ludzkiego ciała i może znosić bardzo duże obciążenia.",
+      "B": "Kość udowa jest najsilniejszą częścią ludzkiego szkieletu, niezależnie od kierunku przyłożenia siły.",
+      "C": "Kość udowa jest bardzo wytrzymała, ale jej odporność na złamanie zależy m.in. od kierunku działającej siły.",
+      "D": "Kość udowa jest tak mocna, że może bez problemu wytrzymać nacisk samochodu osobowego."
+    },
+    "poprawna": "A",
+    "kluczOtwarte": null,
+    "signature": "kosc-udowa"
+  },
+  {
+    "id": 10,
+    "kategoria": "Technologia",
+    "emojiZrodlowe": "💾",
+    "typ": "abcd",
+    "pytanie": "Co jest prawdą?",
+    "warianty": {
+      "A": "Pierwsza mysz komputerowa Douglasa Engelbarta miała drewnianą obudowę i powstała w 1964 roku.",
+      "B": "Pierwsza mysz komputerowa miała drewnianą obudowę, ale została zaprojektowana dopiero w latach 70.",
+      "C": "Pierwszy prototyp myszy miał metalową obudowę, a drewno pojawiło się dopiero w późniejszych wersjach.",
+      "D": "Pierwsza mysz komputerowa miała dwa metalowe koła i drewnianą obudowę, ale nie posiadała przycisków."
+    },
+    "poprawna": "A",
+    "kluczOtwarte": null,
+    "signature": "mysz-drewniana"
+  },
+  {
+    "id": 11,
+    "kategoria": "Oceanografia",
+    "emojiZrodlowe": "🦈",
+    "typ": "abcd",
+    "pytanie": "Która odpowiedź jest prawdziwa?",
+    "warianty": {
+      "A": "Rekiny pojawiły się na Ziemi wcześniej niż pierwsze drzewa.",
+      "B": "Rekiny są starsze od drzew jako grupa, ale najwcześniejsze rekiny pojawiły się dopiero po pierwszych lasach.",
+      "C": "Przodkowie rekinów pojawili się setki milionów lat temu, mniej więcej w tym samym okresie co pierwsze duże rośliny lądowe.",
+      "D": "Rekiny pojawiły się na lądzie wcześniej niż w oceanach, a dopiero później przystosowały się do życia w wodzie."
+    },
+    "poprawna": "A",
+    "kluczOtwarte": null,
+    "signature": "rekin-starszy-od-drzew"
+  },
+  {
+    "id": 12,
+    "kategoria": "Muzyka",
+    "emojiZrodlowe": "🎼",
+    "typ": "abcd",
+    "pytanie": "Który fakt jest prawdziwy?",
+    "warianty": {
+      "A": "Mozart skomponował kilka utworów o humorystycznych lub obscenicznych tytułach, w tym kanon „Leck mich im Arsch\".",
+      "B": "Mozart napisał „Leck mich im Arsch\", ale utwór przez długi czas przypisywano innemu kompozytorowi.",
+      "C": "„Leck mich im Arsch\" był jednym z prywatnych żartów Mozarta i nigdy nie został zapisany w formie muzycznej.",
+      "D": "Mozart skomponował ten utwór jako część większej opery komediowej, której rękopis zaginął."
+    },
+    "poprawna": "A",
+    "kluczOtwarte": null,
+    "signature": "mozart-kanon"
+  },
+  {
+    "id": 13,
+    "kategoria": "Entomologia",
+    "emojiZrodlowe": "🪲",
+    "typ": "abcd",
+    "pytanie": "Co jest prawdą?",
+    "warianty": {
+      "A": "Niektóre gatunki mrówek hodują mszyce i pobierają od nich spadź, zapewniając im w zamian ochronę.",
+      "B": "Mrówki mogą wykorzystywać mszyce jako źródło pożywienia, ale nie utrzymują ich przy życiu ani nie chronią przed drapieżnikami.",
+      "C": "Niektóre mrówki przenoszą mszyce do swoich gniazd, gdzie kontrolują ich liczebność i wykorzystują wydzielaną przez nie spadź.",
+      "D": "Mrówki i mszyce tworzą krótkotrwałe kolonie, ale ich współpraca kończy się zawsze wraz z nadejściem zimy."
+    },
+    "poprawna": "A",
+    "kluczOtwarte": null,
+    "signature": "mrowki-hodowcy"
+  },
+  {
+    "id": 14,
+    "kategoria": "Geologia",
+    "emojiZrodlowe": "🌋",
+    "typ": "otwarte",
+    "pytanie": "Jak nazywa się skala używana do pomiaru twardości minerałów?",
+    "warianty": null,
+    "poprawna": null,
+    "kluczOtwarte": [
+      "mohsa",
+      "skala mohsa"
+    ],
+    "signature": "skala-twardosci"
+  },
+  {
+    "id": 15,
+    "kategoria": "Totalnie normalna wiedza",
+    "emojiZrodlowe": "🧠",
+    "typ": "abcd",
+    "pytanie": "Co naprawdę jest prawdą?",
+    "warianty": {
+      "A": "Wombaty produkują kał w kształcie kostek.",
+      "B": "Wombaty produkują kał w kształcie kostek głównie dzięki specjalnej budowie końcowego odcinka jelita.",
+      "C": "Wombaty produkują kał w kształcie kul, który dopiero po wyschnięciu rozpada się na charakterystyczne fragmenty.",
+      "D": "Wombaty produkują kostki kału, ponieważ ich układ trawienny wykorzystuje regularne skurcze przypominające działanie prasy."
+    },
+    "poprawna": "A",
+    "kluczOtwarte": null,
+    "signature": "wombat-kostka"
+  }
+]
