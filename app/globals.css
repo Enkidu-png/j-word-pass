@@ -16,9 +16,176 @@ button, input, textarea, select { font: inherit; color: inherit; }
 a { color: var(--urzad); }
 :focus-visible { outline: 3px dashed var(--alarm); outline-offset: 2px; }
 
-.pasek-krawedzi {}
-.formularz-F7 {}
-.pieczatka {}
+.formularz-F7 {
+  border: var(--ramka);
+  background: var(--papier);
+  box-shadow: var(--cien-x) var(--cien-y) 0 var(--cien);  /* cien twardy, bez rozmycia */
+  padding: 12px;
+}
+
+/* == KURSOR KOMISJI ==
+   Literały kolorów wewnątrz `data:` URI to wyjątek Z3(c) - var() tam nie działa.
+   Użyte wartości mają swoje tokeny: okrąg = --urzad, krzyżyk celowniczy = --atrament
+   (wartości wypisane w app/tokens.css; tu nie powtarzam ich zapisem hex, bo
+   walidator słusznie skanuje także komentarze). Hotspot 4 4. */
+html {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='%23b3241a' stroke-width='3'/%3E%3Cpath d='M16 2v28M2 16h28' stroke='%231a1447' stroke-width='2'/%3E%3C/svg%3E") 4 4, auto;
+}
+a, button, [role="button"], summary {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cg transform='rotate(20 16 16)'%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='%23b3241a' stroke-width='3'/%3E%3Cpath d='M16 2v28M2 16h28' stroke='%231a1447' stroke-width='2'/%3E%3C/g%3E%3C/svg%3E") 4 4, pointer;
+}
+/* skok bez transition - element wskakuje, nie plynie (anty-spec 01 D6) */
+a:hover, button:hover { transform: translate(-2px, -2px); }
+a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
+
+.tylko-dla-czytnika {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* == PASEK KRAWEDZI == */
+.pasek-krawedzi {
+  --kafel: 48px;
+  position: relative;
+  height: 44px;
+  overflow: hidden;
+  border-bottom: var(--ramka);
+  /* proporczyki: trojkaty z conic + podklad w pasy */
+  background-color: var(--kosmos);
+  background-image:
+    repeating-conic-gradient(from 45deg at 50% 0, var(--chrom-b) 0 25%, transparent 0 50%),
+    repeating-linear-gradient(90deg, var(--chrom-a) 0 24px, var(--chrom-c) 24px 48px);
+  background-size: 48px 44px, 48px 44px;
+}
+.pasek-krawedzi__marquee {
+  display: flex;
+  gap: 40px;
+  white-space: nowrap;
+  font-family: var(--font-krzyk);
+  color: var(--papier);
+  line-height: 44px;
+  text-shadow: var(--cien-x) var(--cien-y) 0 var(--cien);
+  /* Rwany przesuw: DUZO krokow, dlugi czas - patrz DECISIONS #4 (odstepstwo od Z7). */
+  animation-name: jwp-marquee;
+  animation-duration: 3800ms;
+  animation-timing-function: steps(24);
+  animation-iteration-count: infinite;
+}
+@keyframes jwp-marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Z10: marquee stoi na poczatku napisu, tresc nadal czytelna */
+  .pasek-krawedzi__marquee { animation: none !important; }
+}
+
+/* == PASS-O-METR == */
+.pass-o-metr {
+  position: fixed;
+  top: 56px;
+  right: 12px;
+  z-index: 40;
+  border: var(--ramka);
+  background: var(--papier);
+  box-shadow: var(--cien-x) var(--cien-y) 0 var(--cien);
+  padding: 6px;
+}
+.pass-o-metr__naglowek { margin: 0 0 4px; font-size: var(--rozmiar-drobny); }
+.pass-o-metr__segmenty {
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* Awaria co 45 s: pasek cofa sie o 10% i wraca. Czysto wizualna. */
+.pass-o-metr__segmenty--awaria {
+  animation-name: jwp-awaria;
+  animation-duration: 800ms;
+  animation-timing-function: steps(3);
+  animation-iteration-count: 1;
+}
+@keyframes jwp-awaria {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(-10%); }
+  100% { transform: translateX(0); }
+}
+.pass-o-metr__segment {
+  border: 2px outset var(--atrament);   /* wytloczenie zamiast paska akcentu (Z5) */
+  background: var(--papier);
+  padding: 2px 6px;
+  font-size: var(--rozmiar-drobny);
+}
+.pass-o-metr__segment[data-stan="ukonczony"] {
+  background-color: var(--jad);
+  background-image:
+    repeating-linear-gradient(0deg, var(--atrament) 0 1px, transparent 1px 6px),
+    repeating-linear-gradient(90deg, var(--atrament) 0 1px, transparent 1px 6px);
+}
+.pass-o-metr__segment[data-stan="zablokowany"] { color: var(--urzad); }
+.pass-o-metr__dymek {
+  margin: 4px 0 0;
+  border: var(--ramka);
+  background: var(--alarm);
+  color: var(--papier);
+  font-size: var(--rozmiar-drobny);
+  padding: 2px 6px;
+}
+
+/* == STRAZ ETAPU == */
+.straz-etapu {
+  position: fixed;
+  left: 50%;
+  top: 96px;
+  transform: translateX(-50%);
+  z-index: 50;
+  max-width: 90vw;
+  text-align: center;
+}
+.straz-etapu__druk { font-family: var(--font-krzyk); margin: 0 0 8px; }
+
+/* == WEBRING STOPKI == */
+.webring-stopki {
+  border-top: var(--ramka);
+  margin-top: 32px;
+  padding: 12px;
+  font-size: var(--rozmiar-drobny);
+  text-align: center;
+}
+.webring-stopki__dol { display: flex; gap: 16px; align-items: center; justify-content: center; }
+.webring-stopki__odznaka { width: 88px; height: 31px; }
+.webring-stopki__odznaka-tlo { fill: var(--atrament); }
+.webring-stopki__odznaka-ramka { fill: none; stroke: var(--chrom-b); }
+.webring-stopki__odznaka-tekst {
+  fill: var(--chrom-b);
+  font-family: var(--font-urzad);
+  font-size: var(--rozmiar-drobny);
+}
+
+/* Mobile: pasek chudszy, PassOMetr schodzi z rogu na pelnej szerokosci nad stopke. */
+@media (max-width: 767px) {
+  .pasek-krawedzi { height: 32px; }
+  .pasek-krawedzi__marquee { line-height: 32px; }
+  /* Kolejnosc DOM zostaje wg plan/04 A (PassOMetr wysoko, zaraz po pasku),
+     ale wizualnie metr zjezdza NA DOL, tuz nad stopke. `order` przestawia
+     tylko obraz, wiec czytnik ekranu i Tab nadal ida kolejnoscia z DOM. */
+  body { display: flex; flex-direction: column; min-height: 100vh; }
+  .pass-o-metr { order: 2; }
+  .webring-stopki { order: 3; margin-top: 0; }
+  .pass-o-metr {
+    position: static;
+    width: 100%;
+    margin-top: auto;
+    box-shadow: none;
+  }
+  .pass-o-metr__segmenty { justify-content: space-between; }
+}
+
 
 /* == DEKORACJE: gif-less (Z7, Z8) == */
 /* Baza. Warianty ustawiaja WYLACZNIE longhandy - skrot `animation:` nadpisalby
