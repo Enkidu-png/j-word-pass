@@ -270,3 +270,18 @@ i liczenie po CALYM dokumencie sa kruche na playgroundzie, ktory rosnie
 z kazdym issue. Plonacy napis dolozyl kilkanascie kopii ozdoby `ogien`
 i dwa testy z F1-01 oraz jeden z F1-02 zaczely mierzyc co innego niz
 mierzyly wczoraj. Selektory zawezone do konkretnej sekcji i do `aria-label`.
+
+## #17 - podmiana klatki na reduced-motion musi byc synchroniczna
+
+Znalezisko z F1-05, zlapane testem na 390 px (nie z kodu). Pierwsza wersja
+`uzyjKlatki` startowala od `useState(pozycja.plik)` i poprawiala zrodlo dopiero
+w `useEffect`. Dla komponentow montowanych PO hydracji - plomieni plonacego
+napisu, ktore powstaja dopiero po zmierzeniu szerokosci przez ResizeObserver -
+zostawialo to widoczna klatke ruchomego GIF-a mimo wlaczonego reduced motion.
+Na 1280 px test tego nie lapal, na 390 px lapal.
+
+Naprawa u zrodla, nie w tescie: `useSyncExternalStore` z `matchMedia`. Klient
+dostaje prawidlowa wartosc juz przy PIERWSZYM renderze kazdego komponentu,
+niezaleznie od tego, kiedy ten komponent powstal, a serwer zawsze wersje
+animowana, wiec strona bez JS nadal sie rusza. Krocej niz wersja na efekcie
+i bez okna, w ktorym Z11 jest lamane.

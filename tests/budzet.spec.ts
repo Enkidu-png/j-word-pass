@@ -20,11 +20,38 @@ export async function zmierzObrazki(page: Page, sciezka: string): Promise<number
   return suma;
 }
 
-// Na razie mierzymy tylko brame. Realna walidacja progu wchodzi w F1-05
-// (playground /dev/scena z kompletem assetow) i w F6-02 (cztery widoki) -
-// w F0 strony sa stubami bez obrazkow i prog niczego by nie zlapal.
-test("/ miesci sie w budzecie obrazkow (Z18)", async ({ page }) => {
-  const suma = await zmierzObrazki(page, "/");
-  console.log(`budzet / : ${suma} B (${(suma / 1024).toFixed(1)} KB), prog ${PROG_BAJTOW} B`);
-  expect(suma).toBeLessThanOrEqual(PROG_BAJTOW);
+// F1-05: realna walidacja progu. /dev/scena sciaga KOMPLET biblioteki, wiec to
+// najciezsza strona, jaka projekt kiedykolwiek wystawi - jesli miesci sie tutaj,
+// zmiesci sie na kazdym widoku. Cztery widoki produkcyjne dochodza w F6-02.
+for (const sciezka of ["/", "/dev/scena"]) {
+  test(`${sciezka} miesci sie w budzecie obrazkow (Z18)`, async ({ page }) => {
+    const suma = await zmierzObrazki(page, sciezka);
+    console.log(
+      `budzet ${sciezka} : ${suma} B (${(suma / 1024).toFixed(1)} KB), prog ${PROG_BAJTOW} B`,
+    );
+    expect(suma).toBeLessThanOrEqual(PROG_BAJTOW);
+  });
+}
+
+// Anty-spec silnika K5 i budzet L1: ruch robia GIF-y i CSS, wiec watek glowny
+// ma stac. Long task powyzej 50 ms w bezczynnosci znaczy, ze cos kreci petle.
+test("/dev/scena nie ma long taska > 50 ms w 5 s bezczynnosci", async ({ page }) => {
+  test.setTimeout(30_000);
+  await page.goto("/dev/scena", { waitUntil: "networkidle" });
+  const dlugie = await page.evaluate(
+    () =>
+      new Promise<number[]>((gotowe) => {
+        const zebrane: number[] = [];
+        const obs = new PerformanceObserver((lista) => {
+          for (const w of lista.getEntries()) zebrane.push(Math.round(w.duration));
+        });
+        obs.observe({ type: "longtask", buffered: false });
+        setTimeout(() => {
+          obs.disconnect();
+          gotowe(zebrane);
+        }, 5000);
+      }),
+  );
+  console.log(`long taski na /dev/scena w 5 s: ${dlugie.length ? dlugie.join(", ") : "brak"}`);
+  expect(dlugie.filter((d) => d > 50)).toEqual([]);
 });

@@ -1,3 +1,16 @@
+/* KURSOR KOMISJI (plan/04 I). Hotspot podany jawnie, inaczej przegladarka
+   trafia obok. Kursor NIE animuje sie - Chrome i Safari renderuja pierwsza
+   klatke GIF-a ustawionego jako `cursor`. To ograniczenie przegladarki,
+   nie regresja; referencja zachowuje sie tak samo. */
+html {
+  cursor: url("/assets/kursor.gif") 4 2, auto;
+}
+a,
+button,
+[role="button"] {
+  cursor: url("/assets/kursor-rece.gif") 8 2, pointer;
+}
+
 /* Style silnika sceny (plan/04). Ekran ladowania ma WLASNY plik
    app/style/ladowanie.css, bo tylko tam wolno obracac (Z6b) i walidator
    z F0-02 trzyma allowliste rotacji wlasnie na tamtej sciezce. */
