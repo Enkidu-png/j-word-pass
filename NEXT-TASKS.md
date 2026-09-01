@@ -1,81 +1,93 @@
 # NEXT-TASKS - stan sztafety
 
 ## Następne issue
-**F5-01** `ui` Scena ogniska + formularz OGN-3/TAJ (3 pola z kiczem: stopka-miarka,
-suwmiarka ucha) + walidacja kliencka ze stemplami + klauzula śmierci + checkbox.
-`CZYTAJ: 07→A,C; 02→F (kopiowanie); 01→B (Z13,Z14)`.
-Potem po kolei: F5-02 (`/api/zgloszenie` + Vercel Blob), F5-03 (⚠ HARD, ceremonia
-spalenia + list w butelce - na początek paczki, świeże okno).
+**F8-01** `deploy` ⏳ **STOP-GATE - NIE WYKONYWAĆ BEZ ZGODY USERA.** Backlog nie ma już
+żadnego innego otwartego `[ ]` poza `F7-04` (też decyzja usera). Fazy F0-F6 zamknięte
+z DoD. Kolejny worker NIE ma co budować: ma poprowadzić bramkę F8 albo dostać nowy zakres.
 
-`/proba-ognia` to dziś stub z samym `<h1>`. Wejście na niego jest już realną ścieżką:
-quiz kończy się przejściem `podanie-do-ognia`, które robi `router.push("/proba-ognia")`.
+Co należy do bramki F8 (plan/10 linia ~378):
+1. Pokazać userowi URL preview + `WERYFIKACJA.md` i zapytać o zgodę na `vercel --prod`.
+2. Dopiero po zgodzie: produkcyjny URL, test-curl `/api/ocena`, rate limit (6 żądań,
+   szóste = 429), jeden wpis testowy do Bloba i jego usunięcie.
+3. Przy okazji rozstrzygnąć **F7-04** (Deployment Protection): dziś anonimowy `curl`
+   dostaje 302 na `vercel.com/sso-api`, więc publiczny link nie zadziała dla nikogo
+   spoza zespołu Vercela.
+
+`WERYFIKACJA.md` NIE ISTNIEJE w repo - jeśli bramka F8 ma go pokazać userowi, ktoś musi
+go najpierw napisać (pakiet planistyczny zapowiada go jako listę checkboxów dla usera).
 
 ## Zrobione w tej zmianie
-F7-05 (widżet radia zasłaniał przyciski - naprawione u źródła), F4-01, F4-02a, F4-02b,
-F4-02c, F4-03 + DoD całej fazy F4. Nowe znalezisko F7-08 znalezione I zamknięte.
-Commity: `52b69b4`, `fb860d4`, `32472d0`, `d668479`, `ddc9617`, `a6b5742`.
+Cała faza **F5** (F5-01 ognisko + druk OGN-3/TAJ, F5-02 `/api/zgloszenie` + Vercel Blob,
+F5-03 ceremonia spalenia + list w butelce + pergamin) z DoD, cała faza **F6** (F6-01
+audyt a11y, F6-02 budżety perf, F6-03 404 + OG + favicon) z DoD, plus domknięte
+znaleziska **F7-01** (pomiarem) i **F7-02** (naprawą, osobny commit).
+Commity: `b61e6d2`, `bffe61b`, `3da5ff4`, `b33bc34`, `d6d3380`, `2e4e017`, `53a0fcb`,
+`39375ed`, `cb72eab`.
 
 ## Blokady wymagające użytkownika
-1. **Bramka F8 przekroczona przez PLATFORMĘ** - pierwszy `vercel deploy` bez `--prod`
-   wylądował na produkcji (DECISIONS #7). W tej paczce NIC nie deployowano.
-2. **Deployment Protection (Vercel Authentication) WŁĄCZONA** - anonimowy `curl` dostaje
-   302 na `vercel.com/sso-api`. Decyzja na F8-01 (znalezisko F7-04).
-3. Hook uprawnień odrzuca komendy dotykające `.env.local`. Nie blokuje pracy.
-4. **F7-02 nadal otwarte i nadal blokuje pierwszy vendoring** (`scripts/lint-tokens.mjs`
-   skanuje komentarze CSS, więc nagłówek licencyjny z hexem wywali `pnpm run check`).
-   F4 nic nie vendorował, ale F5-01/F5-03 mogą chcieć (płomienie, pergamin).
+1. **Bramka F8** - deploy produkcyjny czeka na zgodę. W tej paczce NIC nie deployowano
+   (obowiązywał twardy zakaz; wszystkie pomiary perf robione na lokalnym `next start`).
+2. **F7-04 Deployment Protection WŁĄCZONA** - decyzja przy F8-01.
+3. **DECISIONS #7** - pierwszy deploy wylądował na produkcji mimo braku `--prod`.
+4. Hook uprawnień odrzuca komendy dotykające `.env.local`. Nie blokuje pracy.
+5. **D1-D4 z `plan/README.md`** nadal nietknięte (D2 - font pikselowy - był dozwolony
+   w F5/F6 i świadomie NIE został wzięty: żadna binarka nie weszła do repo).
 
 ## Pułapki środowiskowe
-- **`pnpm build` PSUJE działający `pnpm dev`** - build nadpisuje `.next`, po czym serwer
-  dev oddaje 500 (`ENOENT .next/server/pages/_document.js`) albo 404 na chunkach, a strona
-  wygląda jak zahydrowana, tylko kliknięcia nic nie robią. Zmierzone dwa razy w tej zmianie
-  (fałszywe "failed" w f4-02b/c). Kolejność: testy -> build -> restart dev.
-- **Dodanie NOWEGO pliku komponentu przy działającym `pnpm dev`** daje ten sam objaw
-  (404 chunku, brak hydracji). Lekarstwo to samo: ubić port, `rm -rf .next`, `pnpm dev`.
-- **Pierwszy przebieg tuż po restarcie dev bywa wolny** (Next kompiluje route na żądanie) -
-  test `f2-03 ceremonia wejscia <= 2 s` padł raz z tego powodu, dwa kolejne pełne przebiegi
-  czyste. Przed serią pomiarów czasu zrób jedno "rozgrzewkowe" wejście na każdy route.
-- **`page.addInitScript` odpala się TAKŻE przy `reload()`** - skrypt, który bezwarunkowo
-  wpisuje `jwp.v1`, kasuje to, co test właśnie sprawdza. Wzorzec: `if (getItem) return;`.
-- **`animation-play-state: paused` NIE pozwala nadpisać transformu z keyframes** - żeby
-  reguła CSS przestawiła element (uśmiech nutek w signature 12), trzeba `animation-name: none`.
-- **Pieczątka wbija się 350 ms** - zrzut zaraz po pojawieniu się łapie klatkę pośrednią
-  (stempel wielki i przezroczysty). Przed screenshotem `waitForTimeout(400)`.
-- **`--jad` i `--chrom-b` jako KOLOR TEKSTU na papierze są nieczytelne** - używać ich jako
-  tła (tak zrobione w podpisie werdyktu maszyny).
-- **Natywne radio schowane w `.tylko-dla-czytnika` nie da się kliknąć przez `check()`**
-  (Playwright celuje w pudełko SVG). W testach klikać etykietę `[data-wariant-etykieta]`.
-- Zastane i nadal aktualne: TypeScript przypięty do `^5.9.3`, konfiguracja to
-  `next.config.mjs`, Playwright MCP na kanale `chrome` nie działa, `route.ts` nie może
-  eksportować nic poza handlerami (łapie dopiero `pnpm build`), `reuseExistingServer: true`
-  potrafi serwować starą stronę: `for p in 3000 3001 3002; do lsof -ti tcp:$p | xargs -r kill -9; done`.
-- `bash ~/.claude/agent-context.sh` w podagencie zwraca `NO-TRANSCRIPT` przez całą zmianę.
-  Wg zasady: pracować dalej, nie wymyślać procentu.
-- Kółko z literą "N" w lewym dolnym rogu zrzutów to WSKAŹNIK DEV NEXT.JS, nie element
-  aplikacji (kosztowało 15 minut śledztwa - w produkcji go nie ma).
+- **`pnpm build` PSUJE działający `pnpm dev`** (nadpisuje `.next`). Zmierzone znowu w tej
+  zmianie: po buildzie `npx playwright test` wywala `Timed out waiting 120000ms from
+  config.webServer`. Kolejność zawsze: testy -> build -> `kill` portu + `rm -rf .next` +
+  `pnpm dev`.
+- **Pierwszy pełny przebieg suite po restarcie dev bywa czerwony** (Next kompiluje trasy
+  na żądanie, 4 workery walą naraz). W tej zmianie `f4-03` padł raz z tego powodu i
+  przeszedł natychmiast po rozgrzaniu. Przed traktowaniem czerwieni jako regresji:
+  uruchom sam ten plik jeszcze raz.
+- **`steps(N)` (czyli `jump-end`) NIGDY nie dochodzi do ostatniej klatki keyframes.**
+  Kosztowało to błysk ceremonii, który zostawał na 45 % krycia przez cały krok zamiast
+  zgasnąć po 80 ms. Do animacji, która MA dojechać do wartości końcowej: `steps(N, jump-none)`.
+- **`.pieczatka` ma własną szerokość 120 px, a jej opakowanie `.pieczatka-drgniecie` jest
+  inline** - `width: 100%` na kontenerze nie zwęża pieczęci, a `width: 100%` na niej samej
+  zeruje ją do niewidzialności. Trzeba `display: block` na opakowaniu. Asercja na
+  `aria-label` przechodzi mimo zerowej szerokości - sprawdzaj `boundingBox()`.
+- **`next/og` (satori) NIE parsuje skrótów typu `border: 24px double #...`** - odpowiedź
+  leci 500 `failed to pipe response`. Podwójna ramka = dwa prostokąty `solid`. Satori nie
+  zna też `var()`, dlatego `app/opengraph-image.tsx` jest wpisany w wyjątki Z3 walidatora.
+- **Lighthouse CLI nie znajduje przeglądarki** - trzeba wskazać binarkę Playwrighta:
+  `CHROME_PATH="$(node -e "console.log(require('@playwright/test').chromium.executablePath())")"`.
+- **`vercel blob list` nie działa w tym repo** - CLI sam wstrzykuje `VERCEL_OIDC_TOKEN` i
+  wymaga do pary `BLOB_STORE_ID`, którego ustawienie z powłoki nie pomaga. Listing Bloba
+  robi się przez SDK z poziomu serwera dev (tymczasowy route + `list()`, plik kasowany
+  po pomiarze). `vercel blob list-stores` działa i pokazuje `store_SXqnky9LZsRHchFX`.
+- **Pole remontowane przez zmianę `key` traci fokus ustawiony w handlerze** - `focus()`
+  musi iść z `useEffect` po renderze (naprawione w kwestionariuszu OGN-3/TAJ).
+- Zastane i nadal aktualne: TypeScript `^5.9.3`, konfiguracja `next.config.mjs`, Playwright
+  MCP na kanale `chrome` nie działa, `route.ts` nie może eksportować nic poza handlerami,
+  `zapiszStan` ma debounce 400 ms (do werdyktów `zapiszTeraz()`), kółko z literą N w rogu
+  zrzutów to WSKAŹNIK DEV NEXT.JS, nie element aplikacji.
+- `bash ~/.claude/agent-context.sh` w podagencie zwracał `NO-TRANSCRIPT` przez całą zmianę.
 
 ## Stan środowiska
-node v26.7.0, pnpm 11.12.0, next 15.5.24, react 19.2.8, typescript 5.9.3.
-`pnpm run check` zielony. `pnpm build` zielony (`/quiz` 11,4 kB, first load 113 kB).
-`npx playwright test` = **150 passed + 12 skipped + 0 failed** (dwa przebiegi pod rząd).
-Deploy: bez zmian (nic nie wypychano, obowiązuje zakaz).
+node v26.7.0, pnpm 11.12.0, next 15.5.24, react 19.2.8, typescript 5.9.3,
+**@vercel/blob 2.8.0** (doszedł w F5-02, jest na allowliście Z6).
+`pnpm run check` zielony (`samotest: czysto` + `lint-tokens: czysto` + tsc).
+`pnpm build` zielony: `/` 104 kB, `/egzamin` 110 kB, `/proba-ognia` 108 kB, `/quiz` 113 kB.
+`npx playwright test` = **217 passed + 17 skipped + 0 failed**.
+Deploy: bez zmian, nic nie wypychano.
 
-## Nowe znaleziska tej zmiany
-- **F7-08** `silnik` (ZAMKNIĘTE) - `zapiszStan` z debounce 400 ms gubił werdykt etapu przy
-  szybkim F5. Naprawione u źródła: `lib/stan.ts` ma `zapiszTeraz()`, użyte dla werdyktów
-  quizu I egzaminu (ten sam błąd siedział w `app/egzamin/Plansza.tsx`).
-- **F7-05** ZAMKNIĘTE - `RadioKomisji` przestał być `position: fixed` i wrócił do przepływu
-  nad stopką (DECISIONS #8: świadome odstępstwo od plan/04 A pkt 4).
-- **DECISIONS #9** - `steps(60)` i `steps(12)` z tabeli 06 D łamią Z7 (2-8 klatek), oba
-  zjechały na `steps(8)`.
-- F7-01, F7-02, F7-04 nadal otwarte. Otwarte D1-D4 z `plan/README.md` nadal nietknięte.
+## Nowe decyzje tej zmiany
+- **DECISIONS #10** - pętla dryfu butelki ma 1200 ms zamiast 2,4 s z tabeli 07 B; Z7
+  (300-1400 ms dla dekoracji) wygrywa z tabelą, sześć pozycji zostaje.
+- **Token `--alarm` zmieniony** z `#ff2079` na `#cc0060` (F6-01): stary miał 3,02:1 na
+  papierze i tyle samo jako tło pod papierem. Zrzuty z faz F2-F4 pokazują jeszcze starą,
+  jaśniejszą magentę - to nie regres, tylko starsze zrzuty.
+- **Vendoring ODBLOKOWANY** (F7-02 naprawione). `app/vendor/` nadal puste - do dziś nic
+  nie było warte wklejki, ale następny worker nie musi już nic obchodzić.
 
-## Świadome uproszczenia do ewentualnego dobrania w F6
-- Krok 1 ceremonii z 05→B (arkusz składa się w samolocik na `clip-path`) nie istnieje -
-  arkusz po prostu schodzi z ekranu (`ponytail:` w `app/egzamin/Plansza.tsx`).
+## Świadome uproszczenia
+- Krok 1 ceremonii z 05→B (arkusz składa się w samolocik) - arkusz po prostu schodzi
+  z ekranu (`ponytail:` w `app/egzamin/Plansza.tsx`).
 - Próg werdyktu wysoki/niski egzaminu = 9 punktów (`ponytail:` w `app/egzamin/Narada.tsx`).
-- Krok 1 maszyny prawdy ("stos teczek zjeżdża do środka") jest uproszczony do podmiany
-  panelu: zakładki zostają, teczka ustępuje miejsca maszynie. Reszta harmonogramu 06 B
-  zaimplementowana co do milisekundy.
-- Signature 9 (kość) nie ma pętli dekoracyjnej - rusza się wyłącznie po kliknięciu, bo Z8
-  zabrania być naraz dekoracją i ceremonią.
+- Krok 1 maszyny prawdy uproszczony do podmiany panelu.
+- Signature 9 (kość) nie ma pętli dekoracyjnej (Z8).
+- `tests/f6-02.spec.ts` pomija się sam, gdy na porcie 3100 nie stoi build produkcyjny -
+  pomiar long tasków wymaga ręcznego `pnpm build && npx next start -p 3100`.
