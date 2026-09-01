@@ -36,10 +36,14 @@ curl -s "https://gifcities.org/search?q=spaceship&offset=0&page_size=200" \
   | sort -u > /tmp/kandydaci.txt
 
 # 2. Pobranie kandydata
-curl -s -o public/assets/statek.gif "$(head -1 /tmp/kandydaci.txt)"
+curl -sL -o public/assets/statek.gif "$(head -1 /tmp/kandydaci.txt)"
 
 # 3. Sprawdzenie, co sie realnie pobralo (wymiary decyduja o przydatnosci)
-file public/assets/statek.gif    # -> GIF image data, version 89a, 640 x 170
+file public/assets/statek.gif                       # -> GIF image data, version 89a, 640 x 170
+sips -g pixelWidth -g pixelHeight public/assets/statek.gif   # wymiary do manifestu
+
+# 4. Klatka statyczna dla reduced-motion (plan/03 E). `sips` bierze pierwsza klatke.
+sips -s format png public/assets/statek.gif --out public/assets/statyczne/statek.png
 ```
 
 **Wynik weryfikacji:** zapytanie `spaceship` zwróciło kilkanaście unikalnych adresów,
@@ -89,12 +93,32 @@ wrzuceniem do repo, nie w CSS.
 | `kafel-ogien.png` | 100-150 kw. | próba ognia | ciepły, pomarańczowo-czarny |
 | `kafel-404.png` | 100-150 kw. | 404 | dowolny, byle inny niż pozostałe |
 
-### B3. Stwory rogowe - minimum 8 różnych, zdobyć w F0-03
+### B3. Pełna lista pozycji (kanoniczna, 43 sztuki)
 
-Motywy do znalezienia (każdy 60-160 px wysokości): delfin lub ryba, hot dog lub inne
-jedzenie, kot, kula ziemska wirująca, koperta lecąca, dyskietka, telefon, gwiazdka
-migająca, ręka wskazująca, klepsydra. Minimum 8 z tej listy, im więcej tym lepiej.
-Nazwy: `stwor-<motyw>.gif`.
+Tabela w sekcji D jest jedynym źródłem prawdy o `id`. Ta lista mówi tylko, ile czego
+trzeba zdobyć, żeby pakiet się domknął. Liczby są wyliczone z realnego zapotrzebowania
+pozostałych plików, nie wzięte z sufitu:
+
+| Grupa | Ile | Skąd wynika |
+|---|---|---|
+| rdzeń, rola `ozdoba` | 6 | `statek`, `statek-wir`, `ogien`, `planeta`, `strzalka-dol`, `nowe` |
+| ozdoby quizu | 13 | tabela `07 B` wymaga 15 RÓŻNYCH, z czego `planeta` i `ogien` są już w rdzeniu |
+| ozdoby interfejsu | 7 | `stwor-koperta` (stopka), `stwor-klodka` (PassOMetr), `stwor-strzalka` (lista założeń), `stwor-kot`, `stwor-but`, `stwor-ucho`, `stwor-butelka` (próba ognia) |
+| stwory rogowe | 4 | `stwor-delfin`, `stwor-hotdog`, `stwor-reka`, `stwor-klepsydra` - po 2 na widok, z rotacją między widokami |
+| pasy, rola `pas` | 3 | `pas-budowa` (45 px), `pas-balony` (43 px), `pas-cienki` (15 px) |
+| kafle, rola `kafel` | 5 | po jednym na bramę, egzamin, quiz, próbę ognia i 404 (Z9) |
+| plakietki, rola `plakietka` | 3 | stopka, format 88x31 |
+| kursory, rola `kursor` | 2 | `kursor`, `kursor-rece` |
+| **razem** | **43** | z czego **30 o roli `ozdoba`** |
+
+Sześcian ekranu ładowania (`04` F) NIE potrzebuje nowych plików - używa sześciu już
+policzonych: `statek`, `planeta`, `ogien`, `stwor-dyskietka`, `stwor-kula-ziemska`,
+`stwor-gwiazdka`.
+
+**Motyw nie do znalezienia w archiwum:** wolno podstawić inny GIF, ale `id` zostaje
+z tabeli D, a w `ATTRIBUTION.md` idzie dopisek `podstawienie: <czego szukano>`.
+Twardy warunek, którego nie wolno obejść: **15 ozdób quizu musi być 15 różnymi
+plikami** (test na rozmiar zbioru w F4-02).
 
 ### B4. Napisy-obrazki - generowane u nas w F1-03
 
@@ -114,9 +138,13 @@ klasyczny format przycisku 88x31 z lat 90.). Źródło: GifCities, hasło „88x
 
 ## C. OPTYMALIZACJA I BUDŻET (Z18)
 
-- Plik powyżej **300 KB** nie wchodzi do repo bez przepuszczenia przez `gifsicle -O3
-  --lossy=60` (lub równoważnik). Jeśli po optymalizacji nadal przekracza 300 KB,
-  szukamy innego pliku.
+- **Na tej maszynie NIE MA `gifsicle`, `magick` ani `ffmpeg`** (sprawdzone, `plan/02 G`
+  punkt 6). Nie da się więc ani zoptymalizować, ani przeskalować animowanego GIF-a
+  bez spłaszczenia go do jednej klatki. Dlatego zamiast optymalizacji obowiązuje
+  **twardy filtr: plik powyżej 300 KB odrzucamy i bierzemy następnego kandydata
+  z listy**. Archiwum zwraca kilkadziesiąt wyników na hasło, więc to nie jest problem.
+- Rozmiar wyświetlania ustawiają atrybuty `width` i `height` na `<img>` (wartości
+  z manifestu), NIE przeskalowany plik. Plik zostaje w oryginalnej rozdzielczości.
 - **Budżet widoku: suma assetów pobieranych na jednym ekranie <= 2,5 MB.**
   Pomiar: `npx playwright test tests/budzet.spec.ts`, który sumuje `transferSize`
   wszystkich odpowiedzi typu `image/*` na danej stronie i porównuje z progiem.
@@ -145,10 +173,39 @@ Struktura, walidowana przez `scripts/lint-tokens.mjs`:
 }
 ```
 
+### D1. KANONICZNA TABELA `id` (jedyne źródło prawdy, reszta plików tylko ją cytuje)
+
+`ozdoba`: `statek`, `statek-wir`, `ogien`, `planeta`, `strzalka-dol`, `nowe`,
+`stwor-osmiornica`, `stwor-ptak`, `stwor-mlotek`, `stwor-slimak`, `stwor-zegar`,
+`stwor-kropla`, `stwor-kosc`, `stwor-mysz`, `stwor-dyskietka`, `stwor-nuta`,
+`stwor-kula-ziemska`, `stwor-krysztal`, `stwor-gwiazdka`, `stwor-koperta`,
+`stwor-klodka`, `stwor-strzalka`, `stwor-kot`, `stwor-but`, `stwor-ucho`,
+`stwor-butelka`, `stwor-delfin`, `stwor-hotdog`, `stwor-reka`, `stwor-klepsydra` (30)
+
+`pas`: `pas-budowa`, `pas-balony`, `pas-cienki` (3)
+
+`kafel`: `kafel-brama`, `kafel-egzamin`, `kafel-quiz`, `kafel-ogien`, `kafel-404` (5)
+
+`plakietka`: `plakietka-html`, `plakietka-css`, `plakietka-przegladarka` (3)
+
+`kursor`: `kursor`, `kursor-rece` (2)
+
+**Zakaz wymyślania `id` spoza tej listy.** Potrzeba nowego motywu w trakcie budowy ->
+najpierw dopisz go tutaj, potem użyj.
+
+### D2. POLA
+
 Pola: `id` (unikalne, kebab-case), `plik`, `szerokosc`, `wysokosc`, `opis`
 (polski, trafia do `alt`), `rola` (`ozdoba` | `kafel` | `pas` | `kursor` | `plakietka`),
-`klatka-statyczna` (ścieżka do pierwszej klatki jako PNG, wymagana dla `rola:
-"ozdoba"` i `"pas"` - potrzebna do Z11).
+`klatka-statyczna` (ścieżka do pierwszej klatki jako PNG, wymagana dla ról `ozdoba`
+i `pas` - potrzebna do Z11).
+
+**Kafle muszą być plikami PNG, nie GIF-ami.** Animowanego tła nie da się zatrzymać
+przy `prefers-reduced-motion`, a Z11 nie ma wyjątków. Walidator odrzuca pozycję
+o roli `kafel` z rozszerzeniem `.gif`.
+
+**Kursor jest wyjątkiem od Z11** i nie ma `klatka-statyczna` - przeglądarki i tak
+renderują tylko pierwszą klatkę pliku ustawionego jako `cursor` (`04` I).
 
 **Zakaz wpisywania ścieżek do plików wprost w komponentach.** Komponent bierze pozycję
 z manifestu po `id`. Złamanie: `<img src="/assets/statek.gif">` w JSX.

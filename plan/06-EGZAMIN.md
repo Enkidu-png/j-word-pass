@@ -9,13 +9,16 @@ W v1 „karty dowodowe" przeciągało się myszą do slotów. **Ta mechanika zni
 
 Co konkretnie:
 - Kasujemy komponent kart, sloty, obsługę pointer events, ścieżkę klawiaturową
-  i pieczątkę `ZAŁ.`, oraz pole `zalaczniki` w payloadzie do `/api/ocena`.
+  i pieczątkę `ZAŁ.`, oraz pole **`zalaczoneDowody`** w payloadzie do `/api/ocena`
+  (to jest realna nazwa pola w kodzie, `app/api/ocena/route.ts` i `tests/f3-01.spec.ts`).
 - Sześć założeń, które były na kartach, staje się **listą punktowaną w treści zadania**,
   wyświetloną jako `DANE DO ZADANIA` na osobnym druku.
 - Prompt systemowy w `/api/ocena` traci zdanie o liczbie załączników; punktacja
   zależy wyłącznie od treści odpowiedzi.
 
-Źródło treści założeń: `data/egzamin.json`, pole `zalozenia` (tablica stringów).
+Źródło treści założeń: `data/egzamin.json`, pole `zalozenia` - **tablica sześciu
+obiektów `{ id, tekst }`**, nie stringów (`plan/02 E`). Struktury nie zmieniamy,
+`scripts/lint-tokens.mjs` sprawdza unikalność `id`.
 Zakaz powtarzania tej treści w komponencie (Z3-analog dla danych).
 
 ## B. KOMPOZYCJA
@@ -33,7 +36,7 @@ Zakaz powtarzania tej treści w komponencie (Z3-analog dla danych).
    - scena jest **wyłącznie dekoracją**, zero interakcji, `pointer-events: none`
 6. **Druk `DANE DO ZADANIA`** - blok na `--papier`, ramka `4px ridge`, lista `<ul>`
    z sześcioma założeniami z `data/egzamin.json`. Każda pozycja poprzedzona
-   `Ozdoba id="stwor-strzalka"` szerokości 24 px.
+   `Ozdoba id="stwor-strzalka"` szerokości 24 px (id z tabeli `03` D1).
 7. **Druk `TREŚĆ PYTANIA`** - tekst pytania z `data/egzamin.json`, na `--papier`,
    stopień `--stopien-h2`.
 8. **Druk odpowiedzi** - `<textarea>` minimum 10 wierszy, tło `--druk-tlo`, ramka

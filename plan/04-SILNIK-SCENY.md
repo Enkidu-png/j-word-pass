@@ -16,7 +16,10 @@ components/scena/
   EkranLadowania.tsx - pelnoekranowy ekran startowy 3D (sekcja F)
   PasGoniec.tsx      - przewijajacy sie tekst (sekcja H)
 lib/assety.ts        - czytanie manifestu, typ Pozycja, funkcja assetPo(id)
-app/style/scena.css  - style wszystkich powyzszych
+app/style/scena.css     - style wszystkich powyzszych POZA ekranem ladowania
+app/style/ladowanie.css - WYLACZNIE style EkranLadowania; osobny plik, bo to
+                          jedyne miejsce z dozwolonym obrotem (Z6b), a walidator
+                          z F0-02 trzyma allowliste rotacji wlasnie na tej sciezce
 ```
 
 ## B. STWÓR ROGOWY (wzorzec ROGI)
@@ -72,16 +75,17 @@ Algorytm rysowania (wariant `chrom`):
 ```
 1. viewBox = "0 0 <10*len(tekst)> 120", preserveAspectRatio="xMidYMid meet"
 2. <defs><linearGradient id="chrom" x1="0" y1="0" x2="0" y2="1">
-     stop 0%   #ffffff
-     stop 35%  #dcdcdc
-     stop 50%  #6e6e6e
-     stop 51%  #303030
-     stop 70%  #b0b0b0
-     stop 100% #f0f0f0
+     stop 0%   var(--chrom-1)
+     stop 35%  var(--chrom-2)
+     stop 50%  var(--chrom-3)
+     stop 51%  var(--chrom-4)
+     stop 70%  var(--chrom-5)
+     stop 100% var(--chrom-6)
+   (tokeny z plan/02 D - Z3 nie dopuszcza surowych hexow w components/**)
    </linearGradient></defs>
 3. <text> font-family: var(--font-czytany), font-weight 900,
    font-size 96, letter-spacing 2, fill url(#chrom),
-   stroke #101010, stroke-width 3, paint-order stroke
+   stroke var(--tusz), stroke-width 3, paint-order stroke
 4. x = 50% , y = 96 , text-anchor="middle" , dominant-baseline="alphabetic"
 5. Zero rotacji, zero skew (Z6). Napis stoi prosto.
 ```
@@ -102,11 +106,11 @@ warstwa 3 (przod):  <Ozdoba id="ogien"> x N, N = ceil(szerokosc_napisu / 60),
                     kazdy z animation-delay = i * 90 ms (desynchronizacja),
                     mix-blend-mode: screen
 warstwa 2 (napis):  <NapisObrazek tekst="EGZAMIN JASIU" wariant="chrom">
-                    z filtrem: drop-shadow(0 0 12px #ff6a00)
+                    z filtrem: drop-shadow(0 0 12px var(--zar))
                     animacja "zar": opacity 1 -> .82 -> 1, 900 ms, steps(3), infinite
 warstwa 1 (poswiata): div o wysokosci 40% napisu, przyklejony do dolu,
                     background: radial-gradient(ellipse at 50% 100%,
-                      rgba(255,106,0,.55) 0%, rgba(255,106,0,0) 70%)
+                      var(--zar-poswiata) 0%, var(--zar-poswiata-zero) 70%)
                     animacja "oddech": transform: scaleY(1) -> scaleY(1.12) -> scaleY(1),
                     1300 ms, steps(4), infinite
 ```
@@ -149,10 +153,16 @@ Pod sześcianem: `PasGoniec` z tekstem `KOMISJA PRZYGOTOWUJE AKTA DLA ALEKSANDRY
 oraz pasek postępu zbudowany z powtarzanego znaku `#` (10 pozycji, dopełniane co
 `czas_calkowity / 10`).
 
-**Kontrakt czasu:** ekran-ladowania trwa **minimum 1200 ms, maksimum 2600 ms**.
-Znika, gdy spełnione OBA warunki: minęło 1200 ms ORAZ `document.fonts.ready`
-i wszystkie obrazki pierwszego ekranu mają `complete === true`. Twardy timeout 2600 ms
-zdejmuje go niezależnie od stanu ładowania.
+**Kontrakt czasu - DWA WARIANTY, nie mylić ich:**
+
+| Wariant | Gdzie | Minimum | Maksimum | Warunek zniknięcia |
+|---|---|---|---|---|
+| `start` | wejście na bramę, przejścia między etapami | 1200 ms | 2600 ms | minęło 1200 ms ORAZ `document.fonts.ready` i obrazki pierwszego ekranu mają `complete === true`; twardy timeout 2600 ms zdejmuje niezależnie od stanu |
+| `narada` | ceremonia oceny egzaminu (`06` C) | 3500 ms | 16000 ms | minęło 3500 ms ORAZ przyszła odpowiedź z `/api/ocena`; twardy timeout 16000 ms pokazuje werdykt awaryjny |
+
+Wariant `narada` dokłada dymki Komisji i NIE ma limitu 2600 ms - ocena przez model
+trwa dłużej niż ładowanie strony. Mylenie tych dwóch kontraktów było wychwycone
+w krytyce planu jako sprzeczność, więc tabela jest wiążąca.
 
 **Klawiatura:** `Escape` zdejmuje ekran natychmiast. Fokus po zdjęciu ląduje na `h1`
 strony docelowej.
@@ -204,6 +214,10 @@ a, button, [role="button"] { cursor: url("/assets/kursor-rece.gif") 8 2, pointer
 
 Hotspot podany jawnie (`4 2`), inaczej przeglądarka trafia obok. Rozmiar pliku
 kursora **maksymalnie 32x32** - większe kursory są w Chrome ignorowane.
+
+**Kursor NIE animuje się** - Chrome i Safari renderują pierwszą klatkę GIF-a
+ustawionego jako `cursor`. To ograniczenie przeglądarki, nie błąd implementacji.
+Referencja ma dokładnie ten sam efekt. Nie zgłaszać tego jako regresji.
 
 Wariant brzegowy: przy `(pointer: coarse)` (dotyk) kursor nie ma znaczenia, ale
 regułę zostawiamy, bo nic nie kosztuje.

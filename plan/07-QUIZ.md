@@ -36,7 +36,7 @@ z manifestu** plus jedna reakcja na hover wariantu. Tabela wiążąca:
 | 5 | `stwor-slimak` | wariant D: ozdoba dostaje `filter: invert(1)` |
 | 6 | `stwor-zegar` | brak |
 | 7 | `stwor-kropla` | wariant A: `animation-duration` skrócone do 400 ms |
-| 8 | `stwor-ogien` | brak |
+| 8 | `ogien` | brak |
 | 9 | `stwor-kosc` | wariant C: ozdoba dostaje ramkę `3px dashed var(--magenta)` |
 | 10 | `stwor-mysz` | brak |
 | 11 | `stwor-dyskietka` | brak |
@@ -45,8 +45,10 @@ z manifestu** plus jedna reakcja na hover wariantu. Tabela wiążąca:
 | 14 | `stwor-krysztal` | poprawny wpis: ozdoba błyska (`opacity` 1/0.3, `steps(2)`, 300 ms) |
 | 15 | `stwor-gwiazdka` | brak |
 
-Jeśli któregoś motywu nie ma w archiwum, wolno podstawić inny GIF z biblioteki -
-**warunek: 15 pozycji musi być RÓŻNYCH**, sprawdzane testem (zbiór `id` ma 15 elementów).
+Wszystkie `id` pochodzą z kanonicznej tabeli `03` D1. Jeśli któregoś MOTYWU nie ma
+w archiwum, wolno podstawić inny obrazek pod tym samym `id` (z dopiskiem w
+`ATTRIBUTION.md`), ale **`id` musi zostać 15 RÓŻNYCH** - sprawdzane testem
+w F4-02 (zbiór `id` ma dokładnie 15 elementów).
 
 ## C. MASZYNA PRAWDY (ceremonia wyniku)
 

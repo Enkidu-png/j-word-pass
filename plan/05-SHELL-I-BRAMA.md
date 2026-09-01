@@ -23,12 +23,18 @@ Zawartość pola: numer etapu, nazwa, stan.
 
 | Stan | Wygląd | Klikalne |
 |---|---|---|
-| `zamkniety` | tło `--chrom-b`, tekst przekreślony, kłódka jako `Ozdoba` | nie, `aria-disabled="true"` |
+| `zamkniety` | tło `--chrom-b`, tekst przekreślony, `Ozdoba id="stwor-klodka"` | nie, `aria-disabled="true"` |
 | `otwarty` | tło `--papier`, ramka `--jad`, obok `Ozdoba id="nowe"` (migające NOWE) | tak, `<a>` |
 | `zdany` | tło `--papier`, wynik `N/10` albo `N/15`, obok `Ozdoba id="stwor-gwiazdka"` | tak, wraca do podglądu |
 
 Awaria co 45 s: jedno losowe pole na 700 ms zmienia tekst na `BŁĄD ODCZYTU AKT`
 i wraca. Efekt zrobiony `setInterval` w `useEffect` z czyszczeniem.
+
+**Awaria jest WYŁĄCZONA pod automatem** (`navigator.webdriver === true`). Losowa
+mutacja DOM co 45 s wchodziłaby w każdy test trwający dłużej niż to (ceremonia quizu
+ma budżet 9 s, ale narada plus fallback API sięgają 16 s, a całe scenariusze
+end-to-end idą dłużej) i dawałaby fałszywe faile nie do odtworzenia. Do weryfikacji
+ręcznej służy atrybut `data-awaria` na PassOMetr plus funkcja wywoływana z konsoli.
 
 Mobile 390 px: pola układają się w kolumnę, PassOMetr ląduje NAD stopką, nie na górze
 (w v1 błędnie lądował na górze i to było łapane dopiero na zrzucie).
@@ -44,6 +50,10 @@ Ten sam wzorzec dla `/proba-ognia` bez quizu.
 Zawiera, w tej kolejności: pas cienki (`Pas id="pas-cienki"`), licznik odwiedzin
 (patrz niżej), trzy plakietki 88x31 z `03` B5, tekst `STRONA WYKONANA RĘCZNIE DLA
 ALEKSANDRY`, oraz `Ozdoba id="stwor-koperta"`.
+
+**Miejsce na radio:** między plakietkami a tekstem stopki stoi pusty
+`<div data-radio-slot>`. Wypełnia go `RadioTinyDesk` dopiero w F5-03 - shell powstaje
+w F2, radio w F5, więc slot jest kontraktem między fazami.
 
 **Licznik odwiedzin:** zero usług zewnętrznych (referencja używa cutercounter, my nie).
 Licznik jest lokalny: `localStorage` klucz `jwp.odwiedziny`, inkrementowany raz na

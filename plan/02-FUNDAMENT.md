@@ -20,10 +20,12 @@ i działają na produkcji, przepisywanie ich to czysta strata:
 | `app/api/zgloszenie/route.ts` | zapis do Vercel Blob, walidacja, limit 3/min, tryb dev-log | tylko komunikaty błędów (zwrot do Aleksandry) |
 | `lib/limit.ts` | wspólny limiter z pulą per route | brak |
 | `lib/stan.ts` | stan w `sessionStorage` pod `jwp.v1`, `zapiszStan` z debounce 400 ms, `zapiszTeraz` | brak |
+| `lib/quiz.ts` | `normalizuj`, `ocenPytanie`, `policzQuiz`, dopasowanie odpowiedzi otwartej z pytania 14 | brak |
 | `data/egzamin.json`, `data/quiz.json`, `data/komisja.json` | treść kanoniczna | treść tak, struktura nie |
 | `scripts/lint-tokens.mjs` | walidator Z3, Z6-allowlist, kanon Z1/Z2/Z5, walidacja danych | rozszerzenie o Z6-zakaz-obrotu i Z9 |
 | `playwright.config.ts` | dwa viewporty 1280x800 i 390x844 | brak |
-| `tests/f3-01.spec.ts`, `tests/f5-02.spec.ts` | testy kontraktów API | brak |
+| `tests/f5-02.spec.ts` | test kontraktu `/api/zgloszenie` | brak |
+| `tests/f3-01.spec.ts` | test kontraktu `/api/ocena` | TAK: aktualizacja payloadu po usunięciu `zalaczoneDowody` (F3-01) |
 
 ## C. CO LECI DO KOSZA (usunięte w F0-02, bez litości)
 
@@ -31,13 +33,19 @@ Cała warstwa wizualna v1. Kasujemy pliki, nie komentujemy ich „na wszelki wyp
 
 - `app/globals.css` i `app/tokens.css` - przepisywane od zera
 - `app/page.tsx`, `app/egzamin/**`, `app/quiz/**`, `app/proba-ognia/**` - wszystkie widoki
-- `components/**` - wszystkie komponenty wizualne (`Pieczatka`, `PasekKrawedzi`,
-  `PassOMetr`, `KometaKursora`, `RadioKomisji`, `WebringStopki`, `StrazEtapu`,
-  segregator quizu, 15 plików signature, scena egzaminu, karty dowodowe)
-- `app/dev/animacje` - playground silnika v1
+- `components/**` - WSZYSTKIE osiem plików, wypisane z `git ls-files`:
+  `KometaKursora.tsx`, `LicznikMechaniczny.tsx`, `PasekKrawedzi.tsx`, `PassOMetr.tsx`,
+  `Pieczatka.tsx`, `RadioKomisji.tsx`, `StrazEtapu.tsx`, `WebringStopki.tsx`.
+  Po czystce katalog `components/` jest PUSTY.
+- `lib/animacje.ts` - silnik animacji v1, po czystce nikt go nie importuje
+- `app/dev/**` (playground v1 razem z `layout.tsx`), `app/not-found.tsx`,
+  `app/opengraph-image.tsx`, `app/icon.svg` - trzy ostatnie odtwarzane w F6-03
 - `tests/f1-*.spec.ts`, `tests/f2-*.spec.ts`, `tests/f4-*.spec.ts`, `tests/f6-*.spec.ts`,
   `tests/f7-*.spec.ts` - testy nieistniejących już komponentów
 - `screenshots/F1..F7/**` - dowody z poprzedniego buildu
+- `NEXT-TASKS.md` i `WERYFIKACJA.md` - pochodzą z buildu v1 i KŁAMIĄ o stanie
+  (mówią „fazy F0-F6 zamknięte"). Worker czyta `NEXT-TASKS.md` na starcie, więc
+  zostawienie ich to gwarantowane zamieszanie. Kasujemy w F0-01.
 
 `StrazEtapu` (blokada wejścia na etap bez ukończenia poprzedniego) i `PassOMetr`
 odtwarzamy od zera w nowej skórze - logika była dobra, wygląd nie.
@@ -61,6 +69,20 @@ w druku i jaskrawa w ozdobnikach. Wartości startowe, kontrast zmierzony:
   --cyjan: #00fff2;         /* akcent 3, TYLKO ozdobniki */
   --alarm: #cc0060;         /* błędy, kontrast 5,9:1 na --papier */
   --zloto: #ffd400;         /* wyróżnienia werdyktu */
+
+  /* stopnie gradientu chromowego dla NapisObrazek (plan/04 D) */
+  --chrom-1: #ffffff;
+  --chrom-2: #dcdcdc;
+  --chrom-3: #6e6e6e;
+  --chrom-4: #303030;
+  --chrom-5: #b0b0b0;
+  --chrom-6: #f0f0f0;
+
+  /* zar plonacego napisu (plan/04 E) */
+  --zar: #ff6a00;
+  --zar-poswiata: rgba(255, 106, 0, 0.55);
+  --zar-poswiata-zero: rgba(255, 106, 0, 0);
+  --zloto-mgla: rgba(255, 212, 0, 0.2);
 
   /* chrom i ramki */
   --chrom-a: #dcdcdc;
@@ -94,8 +116,29 @@ dotyczy też zewnętrznych zasobów blokujących render).
 Bez zmian strukturalnych względem v1. `data/egzamin.json`, `data/quiz.json`
 (15 pytań), `data/komisja.json` (stany dymków + werdykty awaryjne).
 
+**Kształt `data/egzamin.json` -> `zalozenia`** (sprawdzone w repo, NIE zmieniać):
+tablica SZEŚCIU OBIEKTÓW `{ "id": "kosmos", "tekst": "Pojedynek odbywa się w kosmosie." }`.
+`scripts/lint-tokens.mjs` sprawdza unikalność pola `id`. Kto zamieni to na tablicę
+stringów, wywali `pnpm run check`.
+
 **Nowy plik: `data/assety.json`** - manifest biblioteki assetów, jedyne źródło prawdy
 o tym, co gdzie leży. Kontrakt w `03-BIBLIOTEKA-ASSETOW.md` sekcja D.
+
+### E1. PROGI ZDANIA ETAPU (definicja, bez której `StrazEtapu` nie ma sensu)
+
+`/api/ocena` klampuje punkty do przedziału 6-10, więc etapu 1 nie da się oblać
+merytorycznie. To jest CELOWE: Komisja jest pompatyczna, ale łaskawa dla Aleksandry.
+Definicja wiążąca:
+
+| Etap | Zdany gdy | `NIEZDANE` pojawia się gdy |
+|---|---|---|
+| 1 egzamin | `punkty >= 6` | wyłącznie przy pustej odpowiedzi (werdykt 0/10) |
+| 2 quiz | zawsze po oddaniu arkusza | nigdy; wynik `N/15` jest informacją, nie bramką |
+| 3 próba ognia | po poprawnym wysłaniu druku | nie dotyczy |
+
+`StrazEtapu` przepuszcza na `/quiz`, gdy w `sessionStorage` jest werdykt etapu 1
+z `punkty >= 6`; na `/proba-ognia`, gdy jest wynik quizu (dowolny). Pusta odpowiedź
+w etapie 1 zostawia bramkę zamkniętą i to jest jedyny sposób, żeby utknąć.
 
 **Zmiana treści (nie struktury):** wszystkie stringi widoczne dla Aleksandry
 przechodzą na zwrot bezpośredni (Z16). To dotyczy `data/komisja.json`,
@@ -128,5 +171,13 @@ walidacji w `/api/zgloszenie`.
    zrzutów używać `npx playwright test` albo `chrome-headless-shell`.
 5. Komendy `vercel blob` wymagają jawnego `--rw-token` (token z `vercel env pull`
    do pliku tymczasowego). Sama zmienna `VERCEL_OIDC_TOKEN` nie wystarcza.
-6. Poza produkcją `/api/zgloszenie` NIE pisze do Bloba (inaczej każdy przebieg testów
+6. **Narzędzia graficzne, stan zmierzony na tej maszynie 2026-09-02:** `gifsicle`
+   BRAK, `magick`/`convert` BRAK, `ffmpeg` BRAK. Dostępne: `curl`, `sips`, `python3`,
+   `jq`. `sips` czyta wymiary (`sips -g pixelWidth -g pixelHeight`) i robi klatkę
+   statyczną z GIF-a (`sips -s format png`), ale **nie umie przeskalować ani
+   zoptymalizować animowanego GIF-a bez spłaszczenia go do jednej klatki**.
+   Konsekwencja dla `plan/03`: nie skalujemy animowanych plików, tylko odrzucamy
+   te za duże i szukamy innych. Zakaz instalowania czegokolwiek przez `brew`
+   bez zgody Aleksandry (to jej maszyna, nie środowisko CI).
+7. Poza produkcją `/api/zgloszenie` NIE pisze do Bloba (inaczej każdy przebieg testów
    zaśmieca płatny store - w v1 uzbierało się 332 pliki).

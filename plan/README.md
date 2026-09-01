@@ -36,7 +36,7 @@ Poprzedni pakiet leży w `plan-v1/` - do wglądu, nie do wykonywania.
 | `08-PROBA-OGNIA.md` | etap 3, druk OGN-3/TAJ, walidacja stemplami, spalenie, list w butelce |
 | `09-RADIO.md` | odtwarzacz koncertu Post Malone Tiny Desk, kontrakt YouTube IFrame API |
 | `10-MASTER-PROMPT.md` | kontrakt orkiestratora TIME (zasady 1-10, pętla /loop, kick-starter) plus uwagi operacyjne |
-| `11-BACKLOG.md` | fazy F0-F8, 25 issues z AC, `CZYTAJ:` i dowodami; F7-ZNALEZISKA; bramka F8 |
+| `11-BACKLOG.md` | fazy F0-F8, 33 issues z AC, `CZYTAJ:` i dowodami; F7-ZNALEZISKA; bramka F8 |
 
 ## Jak wystartować (TL;DR)
 
@@ -68,3 +68,15 @@ Poprzedni pakiet leży w `plan-v1/` - do wglądu, nie do wykonywania.
   ich w żadnym archiwum. To jedyny dozwolony wyjątek od Z7, `03` B4.
 - **D6. Produkcja z wersji 1 zostaje na żywo do bramki F8.** Cały build v2 idzie
   na preview. Podmiana dopiero za zgodą Aleksandry.
+- **D7. Nie instalujemy narzędzi graficznych.** Na maszynie nie ma `gifsicle`,
+  `magick` ani `ffmpeg`, a `~/.claude` i środowisko to prywatny sprzęt Aleksandry.
+  Zamiast optymalizować i skalować GIF-y, odrzucamy pliki powyżej 300 KB i bierzemy
+  następnego kandydata z archiwum. Klatki statyczne robi `sips`, który jest w systemie.
+- **D8. Odtwarzacz YouTube jest WIDOCZNY, minimum 200x200 px.** Pierwsza wersja planu
+  kazała go ukryć pod obudową radia, co łamie regulamin YouTube API Services -
+  ten sam, którym uzasadniamy wybór osadzonego odtwarzacza. Sprzeczność wychwycona
+  w krytyce planu, poprawiona w `09` A.
+- **D9. Progi zdania etapu zdefiniowane w `02` E1.** `/api/ocena` klampuje punkty
+  do 6-10, więc egzaminu nie da się oblać merytorycznie i to jest celowe. `NIEZDANE`
+  pojawia się wyłącznie przy pustej odpowiedzi. Bez tej definicji `StrazEtapu`
+  nie miał czego pilnować.
