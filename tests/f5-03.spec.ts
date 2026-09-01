@@ -153,3 +153,12 @@ test("OD NOWA czysci stan i odsyla do bramy", async ({ page }) => {
   await expect(page).toHaveURL(/\/$/);
   expect(await page.evaluate(() => sessionStorage.getItem("jwp.v1"))).toBeNull();
 });
+
+test("anty-spec 07 D1: potwierdzeniem jest list, nie toast", async ({ page }) => {
+  await page.addInitScript(WPUSC);
+  await page.goto("/proba-ognia");
+  await wypelnijIWyslij(page);
+  await expect(page.locator("[data-butelka]")).toBeVisible({ timeout: 9000 });
+  await expect(page.getByText(/wysłano|wysłane|pomyślnie|sukces/i)).toHaveCount(0);
+  await expect(page.locator("[data-dymek]")).toHaveText("KLIKNIJ");
+});

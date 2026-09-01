@@ -251,6 +251,16 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
   UWAGA (kopiowanie, 02→F.4): nic nie zvendorowano. Ceremonia to 7 kroków `odprawCeremonie` i 6 keyframes; gotowe kolekcje (animate.css, css-loaders) nie mają ani składania druku, ani morfozy dymu w butelkę, a każdy clip-art butelki CC0 trzeba by przemapować na tokeny i tak. F7-02 nadal otwarte.
   ODSTĘPSTWO: pętla dryfu butelki ma 1200 ms zamiast 2,4 s z tabeli 07 B - Z7 zamyka dekorację w 300-1400 ms i wygrywa z tabelą (DECISIONS #10, precedens #9). Sześć pozycji z tabeli zostaje.
 
+## DoD FAZY F5 (odhaczone 2026-09-01)
+- ✓ `pnpm run check` zielony (`lint-tokens: czysto`, `tsc --noEmit` bez błędów; `@vercel/blob` przechodzi allowlistę Z6 jako zatwierdzony wyjątek z DECISIONS #1).
+- ✓ `pnpm build` zielony: `/proba-ognia` 6,35 kB / first load 108 kB, `/api/zgloszenie` 129 B, shared 102 kB.
+- ✓ `npx playwright test` = **192 passed + 12 skipped + 0 failed**.
+- ✓ Screenshoty stanu fazy w `screenshots/F5/`: `F5-01-ognisko-{desktop,mobile}.png`, `F5-01-stempel-{desktop,mobile}.png` oraz cztery fazy ceremonii `F5-03-{krok1-skladanie,krok2-spalanie,krok3-dym,krok5-butelka,krok6-pergamin}-{desktop,mobile}.png`.
+- ✓ Zero znalezisk bez issue: trzy błędy wyłapane oględzinami zrzutów (błysk `steps(2)` bez ostatniej klatki, pieczątka na adresie, pieczątka zwężona do zera) naprawione W TYM SAMYM issue u źródła, więc nie są długiem; odstępstwo pętli dryfu od tabeli 07 B opisane w DECISIONS #10.
+- ✓ `app/vendor/` nietknięte - w całej fazie F5 nic nie vendorowano (uzasadnienia przy F5-01 i F5-03), więc warunki vendorowe DoD nie mają zastosowania. F7-02 nadal otwarte i nadal blokuje pierwszą wklejkę.
+- ✓ Anty-spec 07 D: (D1) zero toasta "Wysłano pomyślnie" - test szuka `/wysłano|pomyślnie|sukces/i` na scenie po wysyłce i znajduje 0 trafień, potwierdzeniem jest wyłącznie list w butelce; (D2) zero podwójnego POST - licznik żądań = 1 po submicie i po `reload()`, CTA znika po sukcesie; (D3) zero steppera 1-2-3 - brak `<ol>` w druku i brak tekstu `KROK n Z m`; (D4) klauzula śmierci to jawny absurd - `par. 44 ust. 0 Regulaminu Komisji` plus mrugające `ŚMIERCIĄ`, checkbox `PRZYJMUJĘ Z POKORĄ` w pełnej pisowni (Z13).
+- ✓ Zgłoszenia trafiają do PRYWATNEGO store'u (DECISIONS #6): `put(..., { access: "private" })`, listing SDK pokazał 6 plików `zgloszenia/<ISO>-<losowe6>.json`.
+
 ## F6 - POLISH
 
 - [ ] **F6-01** `a11y` Audyt dostępności całości: fokus-ścieżka przez 3 etapy samą klawiaturą, kontrasty tokenów (poprawić wartości w tokens.css jeśli < 4.5:1 dla tekstu treści; nagłówki dekoracyjne ≥ 3:1), aria-labels na SVG interaktywnych, `role="button"` na butelce.

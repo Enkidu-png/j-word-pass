@@ -144,3 +144,12 @@ test("Z10: reduced-motion gasi trzesienie, stempel zostaje", async ({ page }) =>
   expect(await page.locator("[data-luk='0']").evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
   expect(await page.locator(".ognisko__plomien").first().evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
 });
+
+test("anty-spec 07 D4: klauzula smierci jest absurdem, nie straszakiem", async ({ page }) => {
+  await wejdz(page);
+  const klauzula = page.locator("[data-klauzula]");
+  await expect(klauzula).toContainText("par. 44 ust. 0");        // paragraf, ktorego nie ma
+  await expect(klauzula.locator(".gif-less--blink")).toHaveText("ŚMIERCIĄ");
+  await expect(page.locator("[data-pokora]")).toBeVisible();
+  await expect(page.getByText("PRZYJMUJĘ Z POKORĄ")).toBeVisible();  // Z13: pelna pisownia
+});
