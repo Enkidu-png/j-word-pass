@@ -353,6 +353,30 @@
       "opis": "Klepsydra w zdobionej ramie",
       "rola": "ozdoba",
       "klatka-statyczna": "/assets/statyczne/stwor-klepsydra.png"
+    },
+    {
+      "id": "plakietka-html",
+      "plik": "/assets/plakietka-html.gif",
+      "szerokosc": 88,
+      "wysokosc": 31,
+      "opis": "Plakietka 88x31 z napisem I HTML",
+      "rola": "plakietka"
+    },
+    {
+      "id": "plakietka-css",
+      "plik": "/assets/plakietka-css.gif",
+      "szerokosc": 88,
+      "wysokosc": 31,
+      "opis": "Plakietka 88x31 W3C CSS z ptaszkiem",
+      "rola": "plakietka"
+    },
+    {
+      "id": "plakietka-przegladarka",
+      "plik": "/assets/plakietka-przegladarka.gif",
+      "szerokosc": 88,
+      "wysokosc": 31,
+      "opis": "Plakietka 88x31 NETSCAPE Now",
+      "rola": "plakietka"
     }
   ]
 }

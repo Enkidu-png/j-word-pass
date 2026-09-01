@@ -57,3 +57,6 @@ stwor-slimak.gif | https://blob.gifcities.org/gifcities/XM6WAXANCL7B7X36KDPGPY6V
 stwor-strzalka.gif | https://blob.gifcities.org/gifcities/KUCKCMUQTLUZRTGWFFWL6TZQGZJXDWUH.gif | GeoCities archive (Internet Archive), public domain-ish | 2026-09-02 | haslo: arrow bullet
 stwor-ucho.gif | https://blob.gifcities.org/gifcities/653TDIBIDW3SUCDOM6O56BOLGFVF43JR.gif | GeoCities archive (Internet Archive), public domain-ish | 2026-09-02 | haslo: ear | podstawienie: archiwum nie ma czystego ucha, wziete najblizsze ksztaltem
 stwor-zegar.gif | https://blob.gifcities.org/gifcities/5F7THBEHNDLP262BDD55U2AKOM4WPT4Z.gif | GeoCities archive (Internet Archive), public domain-ish | 2026-09-02 | haslo: clock
+plakietka-html.gif | https://blob.gifcities.org/gifcities/YTQW3GVYDPVL2PCPDZYVSFWD255OBQJY.gif | GeoCities archive (Internet Archive), public domain-ish | 2026-09-02 | haslo: valid html
+plakietka-css.gif | https://blob.gifcities.org/gifcities/JSSRMAUVR7I3GABBLH2ZQUBPLQBL36LO.gif | GeoCities archive (Internet Archive), public domain-ish | 2026-09-02 | haslo: made with css
+plakietka-przegladarka.gif | https://blob.gifcities.org/gifcities/2RPJGXKVKDB7LXANJPZQJ4MOCCTLK2RC.gif | GeoCities archive (Internet Archive), public domain-ish | 2026-09-02 | haslo: netscape now
