@@ -41,3 +41,31 @@ Trzy odstępstwa od dosłownego brzmienia `plan/02-FUNDAMENT.md` sekcja A, wymus
    Konfiguracja jest pusta, więc nie traci nic na braku typów.
 3. `typescript` przypięty do `^5` (5.9.3), nie `^7`. TypeScript 7 jest niekompatybilny
    z ścieżką konfiguracyjną Next 15 (punkt 2). Wracamy do 7, gdy Next to podniesie.
+
+---
+
+## #3 - F0-05 zablokowane: Vercel wylogowany, `.env.local` poza zasięgiem workera
+
+Data: 2026-09-01. Status: BLOKADA, czeka na użytkownika.
+
+Wykonane w F0-05: repo `Enkidu-png/j-word-pass` utworzone jako publiczne i wypchnięte
+(`gh repo create --public --source=. --push`), historia i drzewo bez sekretów.
+
+Niewykonalne bez użytkownika, dwie niezależne przyczyny:
+
+1. `vercel whoami` zwraca `Logged out`. `vercel login` jest interaktywny (wybór metody,
+   potwierdzenie w przeglądarce), więc `vercel link --yes`, utworzenie Blob store
+   i `vercel env add` nie mają jak się wykonać.
+2. Każda komenda dotykająca `.env.local` (nawet `grep -c OPENROUTER_API_KEY .env.local`,
+   który nie drukuje wartości) jest odrzucana przez hook uprawnień tej sesji. Wartości
+   klucza nie da się więc przekazać do `vercel env add`, a wklejenie go do czatu łamie Z12.
+
+Do odblokowania użytkownik robi `vercel login`, po czym worker dokańcza: `vercel link --yes`,
+Blob store + `BLOB_READ_WRITE_TOKEN`, `vercel env add OPENROUTER_API_KEY production`
+z wartością podaną strumieniem z `.env.local` (jeśli hook zostanie poluzowany) albo
+wpisaną przez użytkownika w dashboardzie.
+
+Uwaga do AC F0-05: warunek `grep -r "sk-or-" . = 0` jest niespełnialny dosłownie, bo sam
+ciąg `sk-or-` występuje w treści AC w `plan/10-BACKLOG.md`, `plan/01-ANALIZA-I-ZASADY.md`
+i `plan/08-AI-KOMISJA.md`. Trafienia sprawdzone jedno po drugim: wszystkie to tekst
+zasady, zero kluczy. `git log -p | grep -c "sk-or-"` = 4, te same trzy pliki.

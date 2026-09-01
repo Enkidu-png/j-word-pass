@@ -37,12 +37,14 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
   CZYTAJ: 02→E.
   AC: `npx playwright test` zielony; negatywne: zero innych nowych devDeps.
   DOWÓD: ✓ `npx playwright test` = 8 passed (4 route'y x 2 projekty: desktop 1280x800, mobile 390x844), webServer `pnpm dev`; ✓ devDeps po issue: `@axe-core/playwright`, `@playwright/test` + zastane `@types/*`, `typescript` - zero innych nowych; ✓ `pnpm run check` exit 0.
-- [ ] **F0-05** `infra` Git + GitHub + Vercel + env: repo `Enkidu-png/j-word-pass` (public) wypchnięte, projekt Vercel podpięty (`vercel link --yes`), Blob store utworzony + `BLOB_READ_WRITE_TOKEN` w env, `OPENROUTER_API_KEY` w Vercel env (wartość czytana z ISTNIEJĄCEGO `.env.local` przez grep - NIE z promptu; klucz nie przechodzi przez czat).
+- [~] **F0-05** ⛔ BLOKADA `infra` Git + GitHub + Vercel + env: repo `Enkidu-png/j-word-pass` (public) wypchnięte, projekt Vercel podpięty (`vercel link --yes`), Blob store utworzony + `BLOB_READ_WRITE_TOKEN` w env, `OPENROUTER_API_KEY` w Vercel env (wartość czytana z ISTNIEJĄCEGO `.env.local` przez grep - NIE z promptu; klucz nie przechodzi przez czat).
   CZYTAJ: 02→A, 02→D, 08→E.
   AC: `gh repo view Enkidu-png/j-word-pass` działa; `vercel env ls` pokazuje oba klucze; wszystkie komendy CLI z flagami nieinteraktywnymi (`--yes`); negatywne: `grep -r "sk-or-" . --exclude-dir=node_modules --exclude-dir=.git --exclude=.env.local` = 0; `git log -p | grep -c "sk-or-"` = 0.
-- [ ] **F0-06** `infra` Weryfikacja pomiarów kontekstu (bez modyfikacji plików w ~/.claude - to prywatne repo usera).
+  STAN: częściowo. ✓ `gh repo create Enkidu-png/j-word-pass --public --source=. --push` wykonane, `gh repo view` zwraca PUBLIC/main, listing zdalny bez `.env.local`; ✓ `git ls-files | grep -c .env` = 0. ⛔ BLOKADA na resztę (vercel link, Blob store, `vercel env add`): `vercel whoami` = `Logged out`, a `vercel login` jest interaktywny; dodatkowo hook uprawnień sesji odrzuca każdą komendę czytającą `.env.local`, więc klucza nie da się podać nie łamiąc Z12. Szczegóły i ścieżka odblokowania: DECISIONS.md #3. UWAGA do AC: `grep -r "sk-or-"` = 3 trafienia, wszystkie to tekst samej zasady w plan/01, plan/08, plan/10 (zero kluczy).
+- [x] **F0-06** `infra` Weryfikacja pomiarów kontekstu (bez modyfikacji plików w ~/.claude - to prywatne repo usera).
   CZYTAJ: 09→START.
   AC: `bash ~/.claude/agent-context.sh` zwraca liczbę lub NO-AGENT-TRANSCRIPT; `cat ~/.claude/context-usage.txt` zwraca liczbę albo pliku brak (wtedy odnotować w raporcie - orkiestrator pracuje wg zasady 9 "brak pliku = pracuj dalej").
+  DOWÓD: ✓ `bash ~/.claude/agent-context.sh` -> `NO-TRANSCRIPT` (exit 1) - wartość dopuszczona przez AC, worker pracuje dalej i nie zgaduje procentu; ✓ `cat ~/.claude/context-usage.txt` -> `11` (liczba, plik istnieje). Zero modyfikacji w ~/.claude.
 
 ## F1 - SILNIK ANIMACJI (przekrojowy, test-first z playgroundem)
 
