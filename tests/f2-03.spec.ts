@@ -38,6 +38,8 @@ test("WOLĘ NIE ucieka dokladnie 3 razy, potem kapituluje", async ({ page }, inf
 
   const pozycje: string[] = [];
   for (let i = 0; i < 3; i++) {
+    // kursor musi opuscic przycisk, inaczej przeskok pod sam wskaznik nie da mouseenter
+    await page.mouse.move(0, 0);
     await uciekinier.hover({ force: true });
     await expect(uciekinier).toHaveAttribute("data-ucieczki", String(i + 1));
     pozycje.push(await uciekinier.evaluate((el) => `${(el as HTMLElement).style.top}`));
@@ -45,6 +47,7 @@ test("WOLĘ NIE ucieka dokladnie 3 razy, potem kapituluje", async ({ page }, inf
   await expect(uciekinier).toHaveText("DOBRA, I TAK MUSISZ");
 
   // czwarty hover juz nic nie zmienia
+  await page.mouse.move(0, 0);
   await uciekinier.hover({ force: true });
   await expect(uciekinier).toHaveAttribute("data-ucieczki", "3");
   expect(pozycje.filter(Boolean).length).toBe(3); // faktycznie sie przestawial

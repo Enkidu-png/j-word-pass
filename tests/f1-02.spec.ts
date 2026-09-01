@@ -90,26 +90,27 @@ test("negatywne: kometa nie generuje rAF gdy karta jest ukryta", async ({ page }
 
 test("licznik mechaniczny: 0 -> 42 krec sie nie dluzej niz 900 ms", async ({ page }) => {
   await page.goto("/dev/animacje");
-  const licznik = page.locator("[data-licznik]");
+  const demo = page.locator("[data-licznik-demo]");
+  const licznik = demo.locator("[data-licznik]");
   await expect(licznik).toHaveAttribute("data-licznik", "0");
 
   await page.locator("[data-na42]").click();
   await expect(licznik).toHaveAttribute("data-licznik", "42");
 
-  const czasy = await page.locator(".licznik-mechaniczny__tasma").evaluateAll((els) =>
+  const czasy = await demo.locator(".licznik-mechaniczny__tasma").evaluateAll((els) =>
     els.map((el) => parseFloat(getComputedStyle(el).transitionDuration) * 1000),
   );
   expect(czasy).toHaveLength(4);
   expect(Math.max(...czasy)).toBeLessThanOrEqual(900);
   // bebny przeskakuja, nie plyna (Z7)
-  const timing = await page
+  const timing = await demo
     .locator(".licznik-mechaniczny__tasma")
     .first()
     .evaluate((el) => getComputedStyle(el).transitionTimingFunction);
   expect(timing).toMatch(/^steps\(10(, end)?\)$/);
 
   // kolumny stoja na cyfrach 0,0,4,2
-  const pozycje = await page.locator(".licznik-mechaniczny__tasma").evaluateAll((els) =>
+  const pozycje = await demo.locator(".licznik-mechaniczny__tasma").evaluateAll((els) =>
     els.map((el) => (el as HTMLElement).style.transform),
   );
   // przegladarka normalizuje -0% do 0%

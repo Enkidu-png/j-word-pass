@@ -168,10 +168,20 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
   OBEJŚCIE ZASTOSOWANE W F2-01: komentarz nazywa tokeny (`--urzad`, `--atrament`) zamiast powtarzać hex. Działa, ale nie skaluje się na vendor.
   AC: walidator pomija treść komentarzy CSS (`/* ... */`) przy szukaniu literałów kolorów i rozmiarów czcionki, zachowując wykrywanie w kodzie; test negatywny: `color:#fff` w KODZIE nadal wywala check (exit 1), a ten sam literał w komentarzu przechodzi (exit 0); test na `app/vendor/x.css` z nagłówkiem licencyjnym zawierającym hex -> exit 0.
 
-- [ ] **F7-03** `test` `tests/f1-02.spec.ts` (licznik mechaniczny) pada na strict-mode violation: `[data-licznik]` znajduje 2 elementy na `/dev/animacje`.
+- [x] **F7-03** `test` `tests/f1-02.spec.ts` (licznik mechaniczny) pada na strict-mode violation: `[data-licznik]` znajduje 2 elementy na `/dev/animacje`.
   ZNALEZIONE W: F2-04 (pełny przebieg `npx playwright test` = 2 failed / 58 passed / 4 skipped).
   PRZYCZYNA: F2-01 dołożył `WebringStopki` do layoutu ROOT, a stopka renderuje własny `LicznikMechaniczny` (licznik odwiedzin, `data-licznik="1545013"`). Test z F1-02 zakłada, że na stronie jest tylko jeden licznik. Regresja testu, nie kodu - komponent działa poprawnie w obu miejscach.
   AC: `npx playwright test tests/f1-02.spec.ts` zielony na obu projektach bez rozluźniania asercji - locator zawężony do demo playgroundu (`[data-licznik-demo] [data-licznik]`); pełny przebieg `npx playwright test` = 0 failed.
+  ✓ D1 `npx playwright test tests/f1-02.spec.ts` = **12 passed** (desktop + mobile). Zmiana wyłącznie w teście: `const demo = page.locator("[data-licznik-demo]")` i wszystkie trzy locatory (`[data-licznik]`, `.licznik-mechaniczny__tasma` x2) zawężone do `demo`. Asercje bez zmian (nadal 4 taśmy, `steps(10)`, pozycje 0/0/-40%/-20%).
+  ✓ D2 pełny `npx playwright test` = **64 passed + 8 skipped + 0 failed**, powtórzone 3x pod rząd. Wymagało też naprawy F7-06 (patrz niżej).
+  ✓ D3 `pnpm run check` zielony (`lint-tokens: czysto` + `tsc --noEmit` bez błędów).
+
+- [x] **F7-06** `test` `tests/f2-03.spec.ts` („WOLĘ NIE ucieka dokładnie 3 razy") pada w PEŁNYM przebiegu suite, a przechodzi uruchomiony pojedynczo - `data-ucieczki` zatrzymuje się na `2` zamiast `3`.
+  ZNALEZIONE W: F7-03 (weryfikacja AC „pełny przebieg = 0 failed"; poprzedni worker zapisał to w NEXT-TASKS jako „flake timingowy", pomiar pokazał że to nie flake - w pełnym przebiegu pada powtarzalnie).
+  PRZYCZYNA: uciekinier po hoverze przeskakuje na nową pozycję. Gdy nowa pozycja trafi POD aktualny wskaźnik myszy, kolejny `locator.hover()` nie rusza kursora, więc przeglądarka nie wysyła nowego `mouseenter` i licznik nie rośnie. Losowość pozycji sprawia, że przy innym przeplocie (pełna suite, 4 workery) trafienie zdarza się częściej. Kod komponentu jest poprawny - `mouseenter` z definicji nie powtarza się bez opuszczenia elementu.
+  AC: `npx playwright test` = 0 failed w trzech przebiegach pod rząd, bez rozluźniania asercji (nadal wymagane dokładnie 3 ucieczki i kapitulacja).
+  ✓ D1 fix: `await page.mouse.move(0, 0)` przed każdym `hover({force:true})` w pętli i przed hoverem czwartym - kursor opuszcza przycisk, więc każdy hover jest prawdziwym wejściem. Asercje nietknięte.
+  ✓ D2 `npx playwright test` uruchomione 3x pod rząd: **64 passed + 8 skipped + 0 failed** za każdym razem.
 
 - [ ] **F7-04** `deploy` Projekt ma włączoną Deployment Protection (Vercel Authentication) - anonimowy `curl` na URL deployu dostaje 302 na `vercel.com/sso-api`.
   ZNALEZIONE W: F2-04 (weryfikacja AC „URL preview działa"; obejście: `vercel curl <url>`, które dokłada token).
