@@ -132,9 +132,22 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
   UWAGA 3: pieczątka bazowa ma sztywne `width: 120px`, więc na fiszce dostaje override na 46 px plus powiększony tekst po łuku - przy samym zmniejszeniu szerokości napis `ZAŁ.` był nieczytelny (oględziny wycinka screenshotu, nie asercja).
   UWAGA 4: zrzuty pieczątek WYMAGAJĄ odczekania po kliknięciu. `jwp-wbicie` trwa 350 ms i w połowie stempel jest wielki i półprzezroczysty - pierwszy screenshot złapał właśnie tę klatkę i wyglądał jak błąd renderowania.
   UWAGA 5 (mobile): rolka kart siedzi na dole sceny i zasłaniała słonia. Scena na < 768 px urosła do 440 px, a słoń wszedł nad rolkę (`bottom: 132px`).
-- [ ] **F3-04** `ui` Ceremonia narada-komisji + werdykt + pusta odpowiedź 0/10 + fallback awaryjny + przejście do quizu.
+- [x] **F3-04** `ui` Ceremonia narada-komisji + werdykt + pusta odpowiedź 0/10 + fallback awaryjny + przejście do quizu.
   CZYTAJ: 05→B; 03→E; dane komisja.json.
   AC: pusta odpowiedź: 0/10 bez requestu do API (assert network); niepusta: min 3,5 s teatru, dymki losują się, gwiazdki wypełniają do N, pieczątka N/10, komentarz AI na druku; Esc skip do werdyktu; wyłączony klucz (env unset w dev) -> werdykt awaryjny ≤ 16 s; po powrocie na /egzamin: readonly + werdykt z sessionStorage; screenshot werdyktu.
+  ✓ D1 pusta odpowiedź: licznik requestów na `/api/ocena` = **0**, `data-werdykt="0"`, pieczątka `0/10 - PUSTKA` z podpisem `PUSTKA INTELEKTUALNA - 0 PKT`. Test `tests/f3-04.spec.ts`.
+  ✓ D2 niepusta: od kliknięcia CTA do werdyktu **>= 3500 ms** (pomiar `Date.now()`), dymki w trakcie teatru mają teksty z `data/komisja.json` -> `ocenianie` i w oknie 3 s pojawiają się >= 2 różne (losowanie nigdy nie powtarza poprzedniej kwestii).
+  ✓ D3 werdykt: `data-gwiazdki="8"`, dokładnie 8 gwiazdek `data-pelna="tak"`, `LicznikMechaniczny` na 08, pieczątka `8/10 - ZDANO` (ton `jad`), komentarz AI w `[data-komentarz]` na druku `formularz-F7` z podpisami trzech głów. Fokus po ceremonii ląduje na `[data-do-quizu]` (Z9).
+  ✓ D4 Esc: werdykt na ekranie w **< 2000 ms** od naciśnięcia, bez czekania na pełne 3,5 s.
+  ✓ D5 padnięta Komisja (`/api/ocena` -> 502): werdykt awaryjny w **< 16 s**, punkty = `6 + (dlugosc % 5)` (zweryfikowane liczbowo), komentarz z puli `werdyktAwaryjny`, na ekranie migający `PROTOKÓŁ AWARYJNY`. Uwaga: symulacja przez `page.route`, bo hook uprawnień nie pozwala ruszać `.env.local`; wariant „klucz odpięty" dał ten sam 502 w F3-01 D4.
+  ✓ D6 powrót na `/egzamin` po ocenie: werdykt i komentarz odtworzone z `sessionStorage`, `textarea.readOnly === true`, ZERO przycisków w arkuszu (drugiego submitu nie ma).
+  ✓ D7 `[data-do-quizu]` prowadzi na `/quiz` (roleta `steps(8)` 900 ms + `router.push`), a `StrazEtapu` już nie blokuje (`[data-straz]` = 0 elementów).
+  ✓ D8 screenshoty werdyktu: `screenshots/F3/F3-04-werdykt-desktop.png` i `-mobile.png`. Pełna suite = **96 passed + 12 skipped + 0 failed**, `pnpm run check` i `pnpm build` zielone.
+  UWAGA 1 (naprawa wspólnego komponentu): tekst po łuku w `components/Pieczatka.tsx` szedł DO GÓRY NOGAMI (łuk biegł w odwrotną stronę) i dłuższy napis owijał się poza koniec ścieżki. Poprawione: łuk `M 14,44 A 65,65 0 0 0 86,44` plus `textLength="70" lengthAdjust="spacingAndGlyphs"`, więc dowolnie długi napis mieści się w kole i czyta się normalnie. Widoczne WYŁĄCZNIE na screenshocie - `tests/f1-02.spec.ts` sprawdzał tylko treść i `aria-label` i był zielony przez cały czas.
+  UWAGA 2: gwiazdki werdyktu miały wypełnienie `--chrom-b` na papierze `--papier` - praktycznie niewidoczne. Zmienione na `--urzad`. Ta sama klasa błędu co pieczątka: asercja `data-pelna="tak"` przechodziła, obrazek nie.
+  UWAGA 3 (naprawiony błąd hydracji): tekst wpisany do arkusza PRZED hydracją ginął, bo `useEffect` nadpisywał stan zapisem z `sessionStorage`. Teraz wartość z DOM ma pierwszeństwo, a CTA jest `disabled` do czasu hydracji (bez tego submit szedł natywnym GET-em i wypychał odpowiedź do adresu). Znalezione, bo test padał tylko w pełnym równoległym przebiegu.
+  UWAGA 4 (świadome uproszczenie): krok 1 z 05→B (arkusz składa się w samolocik na `clip-path`) NIE jest zaimplementowany - arkusz po prostu schodzi z ekranu. Czysta dekoracja bez AC, oznaczona `ponytail:` w `app/egzamin/Plansza.tsx`.
+  UWAGA 5: `PUSTKA INTELEKTUALNA - 0 PKT` (28 znaków) na łuku pieczątki byłoby nieczytelne nawet po naprawie, więc pieczęć nosi `0/10 - PUSTKA`, a pełne zdanie stoi pod nią jako podpis pieczęci (Z14 spełnione - komunikat siedzi w motywie pieczątki).
 
 ## F4 - QUIZ
 
@@ -214,6 +227,7 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
 - [ ] **F7-05** `ui` Na 390 px widżet RadioKomisji (lewy dolny róg) NAKŁADA SIĘ na treść `WebringStopki` - zasłania wiersz „ostatnia aktualizacja / projekt" i etykietę licznika odwiedzin.
   ZNALEZIONE W: F2-04 (oględziny screenshotu DoD `screenshots/F2/F2-DoD-egzamin-mobile.png`; testy tego nie łapią, bo asercje sprawdzają istnienie elementów, nie kolizję prostokątów).
   AC: na 390x844 prostokąt widżetu radia nie przecina żadnego prostokąta tekstu stopki (Playwright: `getBoundingClientRect()` obu, assert brak przecięcia) - np. przez dolny padding stopki równy wysokości widżetu; screenshot mobile w `screenshots/F7/`; desktop 1280x800 bez zmian wizualnych.
+  ROZSZERZENIE (F3-04): widżet nie zasłania już tylko stopki. Na `screenshots/F3/F3-04-werdykt-mobile.png` przykrywa PRZYCISK `PRZYJMUJĘ WERDYKT, ŻĄDAM QUIZU`, a na `F3-04-werdykt-desktop.png` wchodzi na scenę egzaminu. To samo zjawisko, ale trafia już w element interaktywny, więc AC obejmuje też: na obu viewportach prostokąt widżetu nie przecina prostokąta ŻADNEGO elementu klikalnego (`button`, `a`, `[role="button"]`).
 
 ## F8 - BRAMKA DECYZYJNA: PRODUKCJA
 

@@ -13,19 +13,29 @@ export default function Arkusz({
   celSlotu,
   naSlot,
   ciagniona,
-  zalaczone,
+  naOcene,
+  zablokowany,
 }: {
   sloty: React.ReactNode[];
   celSlotu: number;      // slot wskazany klawiatura, -1 = nic nie jest podniesione
   naSlot: (i: number) => void;
   ciagniona: boolean;    // trwa przeciaganie: sloty swieca krata --jad
-  zalaczone: number;
+  naOcene: (odpowiedz: string) => void;
+  zablokowany: boolean;   // po werdykcie arkusz jest tylko do czytania (05 C)
 }) {
   const [odpowiedz, ustawOdpowiedz] = useState("");
+  // dopoki React nie przejmie formularza, submit poszedlby natywnym GET-em
+  // i wypchnal odpowiedz kandydata do adresu - CTA czeka na hydracje
+  const [gotowy, ustawGotowy] = useState(false);
   const pole = useRef<HTMLTextAreaElement>(null);
 
+  useEffect(() => ustawGotowy(true), []);
+
   useEffect(() => {
-    ustawOdpowiedz(czytajStan()?.egzamin?.odpowiedz ?? "");
+    // to, co kandydat zdazyl wpisac PRZED hydracja, jest wazniejsze niz zapis -
+    // inaczej React nadpisalby swiezy tekst stanem z sessionStorage
+    const zPola = pole.current?.value ?? "";
+    ustawOdpowiedz(zPola || (czytajStan()?.egzamin?.odpowiedz ?? ""));
   }, []);
 
   // autosize: pole rosnie z trescia, sufit 60vh pilnuje CSS
@@ -42,14 +52,7 @@ export default function Arkusz({
       data-arkusz=""
       onSubmit={(e) => {
         e.preventDefault();
-        // ponytail: sam wniosek do Komisji. Ceremonia narada-komisji i werdykt
-        // na ekranie dokłada F3-04 - tutaj liczy sie kontrakt payloadu (05 A3:
-        // liczba zalaczonych dowodow idzie do AI).
-        void fetch("/api/ocena", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ odpowiedz, zalaczoneDowody: zalaczone }),
-        });
+        naOcene(odpowiedz);
       }}
     >
       {/* chromowy gradient czyta sie dopiero na ciemnym pasku - na papierze ginie */}
@@ -87,6 +90,7 @@ export default function Arkusz({
           className="arkusz__textarea kafel-tla kafel--urzad"
           rows={6}
           placeholder="Tu wpisz wywód. Komisja czyta WSZYSTKO. Serio."
+          readOnly={zablokowany}
           value={odpowiedz}
           onChange={(e) => {
             ustawOdpowiedz(e.target.value);
@@ -103,9 +107,11 @@ export default function Arkusz({
         </span>
       </div>
 
-      <button className="arkusz__cta" type="submit">
-        ODDAJĘ WYWÓD POD OSĄD KOMISJI
-      </button>
+      {!zablokowany && (
+        <button className="arkusz__cta" type="submit" disabled={!gotowy}>
+          ODDAJĘ WYWÓD POD OSĄD KOMISJI
+        </button>
+      )}
     </form>
   );
 }

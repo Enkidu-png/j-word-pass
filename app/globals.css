@@ -276,6 +276,15 @@ a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
   100% { background-position-x: 100%; }
 }
 
+/* kartka krazy miedzy glowami komisji po trojkacie */
+.gif-less--trojkat { --klatki: 6; animation-name: jwp-trojkat; animation-duration: 1200ms; }
+@keyframes jwp-trojkat {
+  0% { transform: translate(0, 0); }
+  33% { transform: translate(90px, 26px); }
+  66% { transform: translate(46px, -30px); }
+  100% { transform: translate(0, 0); }
+}
+
 .gif-less--tancz { --klatki: 2; animation-name: jwp-tancz; animation-duration: 600ms; }
 @keyframes jwp-tancz {
   0% { transform: scaleX(1); }
@@ -528,6 +537,95 @@ a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
     transform: rotate(var(--obrot, 0deg));
   }
 }
+/* -- ETAP 1 (plan/05 B, C): ceremonie sceny, kart i werdyktu -- */
+
+/* odrzut: slon odskakuje o 8 px w tyl i wraca, skokowo (Z7 dotyczy dekoracji,
+   ale ceremonia tez ma tu byc twarda - to zart z zalozenia `odrzut`) */
+.slon__odrzut {
+  display: block;
+  animation-name: jwp-odrzut;
+  animation-duration: 400ms;
+  animation-timing-function: steps(5, end);
+  animation-iteration-count: 1;
+}
+@keyframes jwp-odrzut {
+  0% { transform: translateX(0); }
+  40% { transform: translateX(8px); }
+  100% { transform: translateX(0); }
+}
+
+.slon__pocisk {
+  position: absolute;
+  right: 0;
+  width: 9px;
+  height: 9px;
+  background: var(--chrom-b);
+  border: 2px solid var(--atrament);
+  animation-name: jwp-pocisk;
+  animation-duration: 400ms;
+  animation-timing-function: steps(5, end);
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+@keyframes jwp-pocisk {
+  0% { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(-220px); opacity: 0; }
+}
+
+/* beczka: pelny obrot raz, 500 ms, steps(4) - plan/05 C */
+.zebra__beczka {
+  display: block;
+  animation-name: jwp-beczka;
+  animation-duration: 500ms;
+  animation-timing-function: steps(4, end);
+  animation-iteration-count: 1;
+}
+@keyframes jwp-beczka {
+  0% { transform: rotate(0); }
+  100% { transform: rotate(360deg); }
+}
+
+.arkusz__znaki--mruga {
+  animation-name: jwp-mrug-zachety;
+  animation-duration: 600ms;
+  animation-timing-function: steps(3, end);
+  animation-iteration-count: 1;
+}
+@keyframes jwp-mrug-zachety {
+  0% { transform: rotate(-6deg) scale(1); }
+  50% { transform: rotate(-6deg) scale(1.25); }
+  100% { transform: rotate(-6deg) scale(1); }
+}
+
+.karta-dowodowa--powrot {
+  animation-name: jwp-powrot;
+  animation-duration: 240ms;
+  animation-timing-function: steps(3, end);
+  animation-iteration-count: 1;
+}
+@keyframes jwp-powrot {
+  0% { transform: rotate(var(--przechyl, 0deg)) translate(24px, -24px); }
+  100% { transform: rotate(var(--przechyl, 0deg)) translate(0, 0); }
+}
+
+/* roleta: kosmos zwija sie do gory w 8 klatkach i oddaje ekran quizowi */
+.egzamin__narada--roleta {
+  animation-name: jwp-roleta;
+  animation-duration: 900ms;
+  animation-timing-function: steps(8, end);
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+@keyframes jwp-roleta {
+  0% { clip-path: inset(0 0 0 0); }
+  100% { clip-path: inset(0 0 100% 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slon__odrzut, .slon__pocisk, .zebra__beczka, .arkusz__znaki--mruga,
+  .karta-dowodowa--powrot, .egzamin__narada--roleta { animation: none !important; }
+}
+
 /* == CEREMONIE END == */
 
 /* == ETAP 1: SCENA EGZAMINU (plan/05 A1) == */
@@ -583,38 +681,9 @@ a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
 .slon__karabin { fill: var(--atrament); stroke: var(--atrament); stroke-width: 3; }
 .slon__lufa { fill: var(--chrom-b); stroke: var(--atrament); stroke-width: 2; }
 
-/* odrzut: slon odskakuje o 8 px w tyl i wraca, skokowo (Z7 dotyczy dekoracji,
-   ale ceremonia tez ma tu byc twarda - to zart z zalozenia `odrzut`) */
-.slon__odrzut {
-  display: block;
-  animation-name: jwp-odrzut;
-  animation-duration: 400ms;
-  animation-timing-function: steps(5, end);
-  animation-iteration-count: 1;
-}
-@keyframes jwp-odrzut {
-  0% { transform: translateX(0); }
-  40% { transform: translateX(8px); }
-  100% { transform: translateX(0); }
-}
 
-.slon__pocisk {
-  position: absolute;
-  right: 0;
-  width: 9px;
-  height: 9px;
-  background: var(--chrom-b);
-  border: 2px solid var(--atrament);
-  animation-name: jwp-pocisk;
-  animation-duration: 400ms;
-  animation-timing-function: steps(5, end);
-  animation-iteration-count: 1;
-  animation-fill-mode: forwards;
-}
-@keyframes jwp-pocisk {
-  0% { transform: translateX(0); opacity: 1; }
-  100% { transform: translateX(-220px); opacity: 0; }
-}
+
+
 
 /* -- STADO ZEBR -- */
 .scena__stado { list-style: none; margin: 0; padding: 0; }
@@ -631,18 +700,7 @@ a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
 .zebra__czapka { fill: var(--urzad); stroke: var(--atrament); stroke-width: 3; }
 .zebra__dyplom { fill: var(--papier); stroke: var(--atrament); stroke-width: 3; }
 
-/* beczka: pelny obrot raz, 500 ms, steps(4) - plan/05 C */
-.zebra__beczka {
-  display: block;
-  animation-name: jwp-beczka;
-  animation-duration: 500ms;
-  animation-timing-function: steps(4, end);
-  animation-iteration-count: 1;
-}
-@keyframes jwp-beczka {
-  0% { transform: rotate(0); }
-  100% { transform: rotate(360deg); }
-}
+
 
 /* == ETAP 1: ARKUSZ formularz-F7 (plan/05 A2) == */
 .arkusz { display: block; }
@@ -690,17 +748,7 @@ a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
   transform: rotate(-6deg);
   background: var(--papier);
 }
-.arkusz__znaki--mruga {
-  animation-name: jwp-mrug-zachety;
-  animation-duration: 600ms;
-  animation-timing-function: steps(3, end);
-  animation-iteration-count: 1;
-}
-@keyframes jwp-mrug-zachety {
-  0% { transform: rotate(-6deg) scale(1); }
-  50% { transform: rotate(-6deg) scale(1.25); }
-  100% { transform: rotate(-6deg) scale(1); }
-}
+
 
 .arkusz__cta {
   display: block;
@@ -710,10 +758,6 @@ a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
   border: var(--ramka);
   background: var(--chrom-b);
   box-shadow: var(--cien-x) var(--cien-y) 0 var(--cien);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .slon__odrzut, .slon__pocisk, .zebra__beczka, .arkusz__znaki--mruga { animation: none !important; }
 }
 
 /* mobile: kolumna, scena nad arkuszem, 5 zeber zamiast 12 (plan/05 C) */
@@ -766,16 +810,7 @@ a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
    skalowany w gore, inaczej ZAL. na 46 px jest nie do odczytania. */
 .karta-dowodowa__stempel .pieczatka { width: 46px; }
 .karta-dowodowa__stempel .pieczatka__tekst { font-size: calc(var(--rozmiar-pieczatka) * 1.7); }
-.karta-dowodowa--powrot {
-  animation-name: jwp-powrot;
-  animation-duration: 240ms;
-  animation-timing-function: steps(3, end);
-  animation-iteration-count: 1;
-}
-@keyframes jwp-powrot {
-  0% { transform: rotate(var(--przechyl, 0deg)) translate(24px, -24px); }
-  100% { transform: rotate(var(--przechyl, 0deg)) translate(0, 0); }
-}
+
 
 /* slot czeka na dowod: kratka --jad zapala sie na czas przeciagania albo
    na slocie wskazanym klawiatura */
@@ -788,10 +823,6 @@ a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
     repeating-linear-gradient(90deg, var(--jad) 0 1px, transparent 1px 12px);
 }
 .arkusz__slot { position: relative; padding: 4px; }
-
-@media (prefers-reduced-motion: reduce) {
-  .karta-dowodowa--powrot { animation: none !important; }
-}
 
 /* mobile: karty jako pozioma rolka nad arkuszem, przeciaganie zastapione tap-tap */
 @media (max-width: 767px) {
@@ -813,4 +844,63 @@ a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
     min-width: 0;
     width: auto;
   }
+}
+
+/* po werdykcie arkusz i karty sa juz tylko dokumentem, nie interfejsem */
+.egzamin__plansza[data-zablokowany="tak"] .karty,
+.egzamin__plansza[data-zablokowany="tak"] .arkusz__slot { pointer-events: none; }
+
+/* == ETAP 1: NARADA KOMISJI I WERDYKT (plan/05 B) == */
+.egzamin__narada { padding: 16px; }
+.narada { position: relative; padding: 16px; }
+.narada__stol {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  display: flex;
+  justify-content: space-around;
+  gap: 12px;
+}
+.narada__miejsce { text-align: center; max-width: 200px; }
+.narada__glowa { display: block; width: 84px; margin: 0 auto; transform-origin: top center; }
+.narada__czacha { fill: var(--chrom-c); stroke: var(--atrament); stroke-width: 3; }
+.narada__oko { fill: var(--atrament); }
+.narada__usta { fill: none; stroke: var(--atrament); stroke-width: 3; }
+.narada__kto { display: block; font-size: var(--rozmiar-drobny); }
+
+.narada__dymek {
+  max-width: 460px;
+  margin: 0 auto;
+  border: var(--ramka);
+  background: var(--papier);
+  padding: 8px 12px;
+  text-align: center;
+  font-family: var(--font-glos);
+}
+.narada__kartka {
+  display: block;
+  width: 22px;
+  height: 28px;
+  margin: 12px auto 0;
+  border: 3px solid var(--atrament);
+  background: var(--papier);
+}
+
+.narada__gwiazdki { list-style: none; margin: 0; padding: 0; display: flex; gap: 4px; justify-content: center; }
+.narada__gwiazdka { width: 26px; line-height: 0; }
+.narada__gwiazdka svg { fill: none; stroke: var(--atrament); stroke-width: 2; }
+/* --chrom-b na papierze bylby niewidoczny: gwiazdka musi kontrastowac */
+.narada__gwiazdka[data-pelna="tak"] svg { fill: var(--urzad); stroke: var(--urzad); }
+.narada__punkty { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 12px 0; }
+.narada__na10 { font-family: var(--font-krzyk); }
+.narada__pieczec { display: block; text-align: center; }
+.narada__podpis-pieczeci { display: block; font-family: var(--font-krzyk); letter-spacing: 1px; }
+.narada__druk { margin-top: 12px; padding: 12px; }
+.narada__komentarz { font-family: var(--font-glos); margin-bottom: 12px; }
+.narada__podpisy { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 8px; }
+.narada__cytat { display: block; font-size: var(--rozmiar-drobny); font-family: var(--font-glos); }
+.narada__awaria { color: var(--alarm); font-size: var(--rozmiar-drobny); margin: 0; }
+
+@media (min-width: 768px) {
+  .narada__podpisy { grid-template-columns: repeat(3, 1fr); }
 }

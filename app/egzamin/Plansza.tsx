@@ -1,10 +1,14 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import komisja from "@/data/komisja.json";
 import egzamin from "@/data/egzamin.json";
+import { chceRedukcjiRuchu } from "@/lib/animacje";
 import { czytajStan, zapiszStan } from "@/lib/stan";
 import Arkusz from "./Arkusz";
 import KartaDowodowa from "./KartaDowodowa";
+import Narada, { type Werdykt } from "./Narada";
 import Scena from "./Scena";
 
 // Wlasciciel stanu etapu 1: karty dowodowe wedruja ze sceny (lewa polowa) do
@@ -13,10 +17,49 @@ import Scena from "./Scena";
 // DnD jest nietestowalny przez Playwright dragTo).
 
 const SLOTY = 6;
+const TEATR_MS = 3500;   // minimum narady, nawet gdy API odpowie od razu (05 B)
+const CIERPLIWOSC_MS = 15_000;  // po tylu sekundach werdykt awaryjny
+const SKIP_MS = 600;     // Esc: tyle jeszcze czekamy na API, potem awaryjnie
 const ZALOZENIA = egzamin.zalozenia;
 const PUSTE: (string | null)[] = Array.from({ length: SLOTY }, () => null);
 
+function czekaj(ms: number): Promise<void> {
+  return new Promise((spelnij) => setTimeout(spelnij, ms));
+}
+
+function werdyktAwaryjny(odpowiedz: string): Werdykt {
+  // 05 B: punkty z dlugosci odpowiedzi, komentarz z puli zapasowej
+  const pula = komisja.werdyktAwaryjny;
+  console.warn("Komisja nieosiagalna - werdykt awaryjny");
+  return {
+    punkty: 6 + (odpowiedz.length % 5),
+    komentarz: pula[Math.floor(Math.random() * pula.length)].tekst,
+    awaryjny: true,
+  };
+}
+
+async function zapytajKomisje(odpowiedz: string, dowody: number): Promise<Werdykt> {
+  try {
+    const res = await fetch("/api/ocena", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ odpowiedz, zalaczoneDowody: dowody }),
+      signal: AbortSignal.timeout(CIERPLIWOSC_MS),
+    });
+    const dane = await res.json();
+    if (!res.ok || typeof dane?.punkty !== "number") return werdyktAwaryjny(odpowiedz);
+    return { punkty: dane.punkty, komentarz: dane.komentarz, awaryjny: false };
+  } catch {
+    return werdyktAwaryjny(odpowiedz);
+  }
+}
+
 export default function Plansza() {
+  const router = useRouter();
+  const [faza, ustawFaze] = useState<"arkusz" | "narada" | "werdykt">("arkusz");
+  const [werdykt, ustawWerdykt] = useState<Werdykt | null>(null);
+  const [roleta, ustawRolete] = useState(false);
+  const pominiecie = useRef<(() => void) | null>(null);
   const [sloty, ustawSloty] = useState<(string | null)[]>(PUSTE);
   const [podniesiona, ustawPodniesiona] = useState<string | null>(null);
   const [celSlotu, ustawCelSlotu] = useState(0);
@@ -26,10 +69,67 @@ export default function Plansza() {
   const przeciagnieto = useRef(false);
 
   useEffect(() => {
-    const zapisane = czytajStan()?.egzamin?.zalaczone;
-    if (!zapisane?.length) return;
-    ustawSloty(PUSTE.map((_, i) => zapisane[i] ?? null));
+    const zapisany = czytajStan()?.egzamin;
+    if (zapisany?.zalaczone?.length) {
+      ustawSloty(PUSTE.map((_, i) => zapisany.zalaczone[i] ?? null));
+    }
+    // powrot na strone po ocenie: arkusz zablokowany, werdykt z sessionStorage
+    if (zapisany?.punkty != null) {
+      ustawWerdykt({ punkty: zapisany.punkty, komentarz: zapisany.komentarz ?? "", awaryjny: false });
+      ustawFaze("werdykt");
+    }
   }, []);
+
+  // Esc pomija teatr i skacze do werdyktu (Z8/Z9)
+  useEffect(() => {
+    if (faza !== "narada") return;
+    const naKlawisz = (e: KeyboardEvent) => {
+      if (e.key === "Escape") pominiecie.current?.();
+    };
+    window.addEventListener("keydown", naKlawisz);
+    return () => window.removeEventListener("keydown", naKlawisz);
+  }, [faza]);
+
+  function zakoncz(wynik: Werdykt) {
+    ustawWerdykt(wynik);
+    ustawFaze("werdykt");
+    zapiszStan({ egzamin: { punkty: wynik.punkty, komentarz: wynik.komentarz } });
+  }
+
+  async function oceniaj(odpowiedz: string) {
+    if (faza !== "arkusz") return;
+    ustawFaze("narada");
+    // pustka: 0/10 BEZ pytania AI (05 B) - ceremonia skrocona do jednego kroku
+    if (odpowiedz.trim() === "") {
+      await czekaj(chceRedukcjiRuchu() ? 300 : 900);
+      zakoncz({ punkty: egzamin.punktyPuste, komentarz: "PUSTKA INTELEKTUALNA.", awaryjny: false });
+      return;
+    }
+    const wynik = zapytajKomisje(odpowiedz, sloty.filter(Boolean).length);
+    let pominieto = false;
+    await Promise.race([
+      czekaj(chceRedukcjiRuchu() ? 400 : TEATR_MS),
+      new Promise<void>((spelnij) => {
+        pominiecie.current = () => {
+          pominieto = true;
+          spelnij();
+        };
+      }),
+    ]);
+    pominiecie.current = null;
+    // po Esc nie trzymamy kandydata w nieskonczonosc - albo API zdazy, albo awaryjnie
+    zakoncz(
+      pominieto
+        ? await Promise.race([wynik, czekaj(SKIP_MS).then(() => werdyktAwaryjny(odpowiedz))])
+        : await wynik,
+    );
+  }
+
+  function doQuizu() {
+    ustawRolete(true);
+    // roleta zwija kosmos do gory, 900 ms, potem przejscie (05 B krok 6)
+    setTimeout(() => router.push("/quiz"), chceRedukcjiRuchu() ? 300 : 900);
+  }
 
   function zapiszSloty(nowe: (string | null)[]) {
     ustawSloty(nowe);
@@ -146,8 +246,25 @@ export default function Plansza() {
 
   const luzne = ZALOZENIA.map((z, i) => [z, i] as const).filter(([z]) => !sloty.includes(z.id));
 
+  if (faza === "narada") {
+    // ponytail: arkusz po prostu schodzi z ekranu. Krok 1 z 05 B (skladanie
+    // w samolocik na clip-path) to czysta dekoracja bez AC - do dolozenia w F6,
+    // gdyby zostal budzet.
+    return (
+      <div className="egzamin__narada">
+        <Narada faza="narada" werdykt={null} naQuiz={doQuizu} />
+      </div>
+    );
+  }
+
   return (
-    <div className="egzamin__plansza">
+    <div className={roleta ? "egzamin__narada--roleta ceremonia" : ""}>
+      {faza === "werdykt" && (
+        <div className="egzamin__narada">
+          <Narada faza="werdykt" werdykt={werdykt} naQuiz={doQuizu} />
+        </div>
+      )}
+      <div className="egzamin__plansza" data-zablokowany={faza === "werdykt" ? "tak" : "nie"}>
       <Scena>
         <ul className="karty" data-karty="">
           {luzne.map(([z, i]) => (
@@ -167,8 +284,10 @@ export default function Plansza() {
           if (podniesiona) upusc(podniesiona, i);
         }}
         ciagniona={ciagniona !== null}
-        zalaczone={sloty.filter(Boolean).length}
+        naOcene={oceniaj}
+        zablokowany={faza === "werdykt"}
       />
+      </div>
     </div>
   );
 }

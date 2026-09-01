@@ -34,13 +34,23 @@ export default function Pieczatka({
       >
         <svg viewBox="0 0 100 100" role="img" aria-label={tekst}>
           <defs>
-            <path id={luk} d="M 20,54 A 30,30 0 1 1 80,54" fill="none" />
+            {/* luk biegnie od LEWEJ do PRAWEJ gora - odwrotny kierunek stawial
+                caly napis do gory nogami (widoczne dopiero na zrzucie) */}
+            <path id={luk} d="M 14,44 A 65,65 0 0 0 86,44" fill="none" />
           </defs>
           {/* szum krawedzi: przerywany obrys udaje nierowno odbita gume */}
           <circle cx="50" cy="50" r="45" className="pieczatka__obrys" />
           <circle cx="50" cy="50" r="38" className="pieczatka__obrys-wewnetrzny" />
           <text className="pieczatka__tekst">
-            <textPath href={`#${luk}`} startOffset="50%" textAnchor="middle">
+            {/* dowolnie dlugi napis ma zmiescic sie na luku, a nie owinac sie
+                dookola i zniknac za koncem sciezki */}
+            <textPath
+              href={`#${luk}`}
+              startOffset="50%"
+              textAnchor="middle"
+              textLength="70"
+              lengthAdjust="spacingAndGlyphs"
+            >
               {tekst}
             </textPath>
           </text>
