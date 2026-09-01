@@ -94,3 +94,95 @@
   border: 3px ridge var(--chrom-b);
   background: var(--papier);
 }
+
+/* NAPIS-OBRAZEK (plan/04 D). Zero rotacji i skosu - napis stoi prosto (Z6). */
+.napis {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.napis__tekst {
+  font-family: var(--font-czytany);
+  font-size: var(--stopien-napis);
+  font-weight: 900;
+  letter-spacing: 2px;
+  stroke-width: 3;
+  paint-order: stroke;
+}
+.napis--neon .napis__tekst {
+  filter: drop-shadow(0 0 6px var(--jad));
+  animation: napis-puls 600ms steps(2) infinite;
+}
+@keyframes napis-puls {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.55;
+  }
+}
+
+/* PAS-GONIEC (plan/04 H) */
+.pas-goniec {
+  overflow: hidden;
+  white-space: nowrap;
+  background: var(--tusz);
+  color: var(--jad);
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-tresc);
+  border-top: 3px ridge var(--chrom-b);
+  border-bottom: 3px ridge var(--chrom-b);
+}
+.pas-goniec__tresc {
+  display: inline-block;
+  padding-left: 100%;
+  animation-name: goniec;
+  animation-timing-function: steps(60);
+  animation-iteration-count: infinite;
+}
+@keyframes goniec {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+.pas-goniec--odbijany .pas-goniec__tresc {
+  padding-left: 0;
+  animation-name: goniec-odbijany;
+  animation-direction: alternate;
+}
+@keyframes goniec-odbijany {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(100vw - 100%));
+  }
+}
+
+/* Z11: ruch stoi, tekst zostaje czytelny i wysrodkowany. */
+@media (prefers-reduced-motion: reduce) {
+  .pas-goniec__tresc {
+    animation-name: none;
+    padding-left: 0;
+    display: block;
+    text-align: center;
+  }
+  .napis--neon .napis__tekst {
+    animation-name: none;
+  }
+}
+
+.playground-napisy {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.playground-napis {
+  width: 48%;
+  background: var(--kosmos);
+  border: 2px outset var(--chrom-a);
+  color: var(--jad);
+}

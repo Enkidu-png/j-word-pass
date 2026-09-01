@@ -45,4 +45,5 @@
   --stopien-h2: 32px;
   --stopien-tresc: 18px;
   --stopien-drobny: 14px;
+  --stopien-napis: 96px;   /* stopien pisma w NapisObrazek, jednostki viewBox */
 }

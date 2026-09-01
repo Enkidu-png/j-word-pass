@@ -235,3 +235,21 @@ NIE naprawiamy tego po cichu: `~/.claude` to prywatne repo z hookiem
 auto-commit i pushem na druga maszyne (F0-06 jest jawnie „tylko odczyt").
 Do decyzji Aleksandry, wariant rekomendowany: worker konczy paczke na
 granicy fazy albo na ustalonej liczbie issues, zamiast na procencie okna.
+
+## #15 - viewBox NapisObrazek: odstepstwo od plan/04 D punkt 1
+
+Plan podaje `viewBox = "0 0 <10*len(tekst)> 120"` przy `font-size: 96`. Te dwie
+liczby sie wykluczaja: jedenascie znakow `PRÓBA OGNIA` zajmuje przy tym stopniu
+okolo 700 jednostek, a viewBox mialby 110. Zewnetrzny `<svg>` ma domyslnie
+`overflow: hidden`, wiec napis zostalby obciety do dwoch liter.
+
+Zmiana: szerokosc `62 * len + 40`, plus `textLength` z
+`lengthAdjust="spacingAndGlyphs"`. Drugi zapis wpasowuje glify w zadana
+szerokosc niezaleznie od metryk fontu, wiec obciecie w poziomie jest niemozliwe
+z definicji, a nie z pomiaru na jednej maszynie.
+
+Druga poprawka, znaleziona dopiero testem `getBBox` (nie z kodu): przy linii
+pisma `y=96` kreska nad `Ó` wychodzila NAD `viewBox` i byla scinana. Wysokosc
+podniesiona do 130, linia pisma do 104. Test w `tests/f1-02.spec.ts` porownuje
+teraz wszystkie cztery krawedzie bbox napisu z viewBox, wiec kazdy nastepny
+napis z diakrytykiem obroni sie sam.

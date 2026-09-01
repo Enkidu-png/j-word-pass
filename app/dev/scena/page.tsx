@@ -1,4 +1,6 @@
+import NapisObrazek from "@/components/scena/NapisObrazek";
 import Ozdoba from "@/components/scena/Ozdoba";
+import PasGoniec from "@/components/scena/PasGoniec";
 import Pas from "@/components/scena/Pas";
 import StworRogowy from "@/components/scena/StworRogowy";
 import { POZYCJE, pozycjeRoli } from "@/lib/assety";
@@ -17,6 +19,24 @@ export default function Playground() {
         Pozycji w manifescie: {POZYCJE.length}, w tym ozdob: {ozdoby.length},
         pasow: {pasy.length}.
       </p>
+
+      <h2>NAPISY-OBRAZKI</h2>
+      <div className="playground-napisy">
+        {["J-WORD PASS", "PRÓBA OGNIA", "ZDANE"].map((t) => (
+          <div key={t} className="playground-napis">
+            <code>chrom: {t}</code>
+            <NapisObrazek tekst={t} wariant="chrom" />
+          </div>
+        ))}
+        <div className="playground-napis">
+          <code>neon: ALEKSANDRO</code>
+          <NapisObrazek tekst="ALEKSANDRO" wariant="neon" />
+        </div>
+      </div>
+
+      <h2>PAS-GONIEC</h2>
+      <PasGoniec tekst="KOMISJA CZUWA, ALEKSANDRO. ETAP PIERWSZY OTWARTY." />
+      <PasGoniec tekst="WARIANT ODBIJANY" wariant="odbijany" />
 
       <h2>OZDOBY ({ozdoby.length})</h2>
       <ul className="playground-siatka">
