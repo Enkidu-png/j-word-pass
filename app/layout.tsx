@@ -3,6 +3,7 @@ import "./globals.css";
 import KometaKursora from "@/components/KometaKursora";
 import PasekKrawedzi from "@/components/PasekKrawedzi";
 import PassOMetr from "@/components/PassOMetr";
+import RadioKomisji from "@/components/RadioKomisji";
 import StrazEtapu from "@/components/StrazEtapu";
 import WebringStopki from "@/components/WebringStopki";
 
@@ -21,6 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <PassOMetr />
         <StrazEtapu />
         {children}
+        <RadioKomisji />
         <WebringStopki />
         <KometaKursora />
       </body>

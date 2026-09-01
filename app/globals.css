@@ -149,6 +149,26 @@ a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
 }
 .straz-etapu__druk { font-family: var(--font-krzyk); margin: 0 0 8px; }
 
+/* == RADIO KOMISJI == */
+.radio-komisji {
+  position: fixed;
+  left: 12px;
+  bottom: 12px;
+  z-index: 40;
+  border: var(--ramka);
+  background: var(--papier);
+  box-shadow: var(--cien-x) var(--cien-y) 0 var(--cien);
+  padding: 6px;
+  max-width: 200px;
+}
+.radio-komisji__obudowa { width: 90px; height: 50px; display: block; }
+.radio-komisji__pudlo { fill: var(--atrament); stroke: var(--cien); }
+.radio-komisji__kratka { stroke: var(--chrom-b); stroke-width: 1; }
+.radio-komisji__galka { fill: var(--papier); stroke: var(--urzad); stroke-width: 2; }
+.radio-komisji__wskaznik { stroke: var(--urzad); stroke-width: 2; }
+.radio-komisji__notka { margin: 4px 0 0; font-size: var(--rozmiar-drobny); }
+.radio-komisji button { font-size: var(--rozmiar-drobny); border: 2px outset var(--atrament); background: var(--papier); }
+
 /* == WEBRING STOPKI == */
 .webring-stopki {
   border-top: var(--ramka);
@@ -184,6 +204,9 @@ a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
     box-shadow: none;
   }
   .pass-o-metr__segmenty { justify-content: space-between; }
+  /* radio zostaje takze na mobile (plan/04 A), tylko chudsze */
+  .radio-komisji { max-width: 150px; }
+  .radio-komisji__obudowa { width: 60px; height: 34px; }
 }
 
 
