@@ -84,17 +84,25 @@ test("reduced-motion zatrzymuje wszystkie dekoracje", async ({ page }, info) => 
 test("budzet: 5 s idle na scianie 20 dekoracji bez long taskow > 50 ms", async ({ page }) => {
   test.setTimeout(30_000);
   await page.goto("/dev/animacje");
-  await page.evaluate(() => {
-    (window as unknown as { __dlugie: number[] }).__dlugie = [];
+  // AC mierzy 5 s IDLE, wiec liczy sie tylko to, co dzieje sie po ustabilizowaniu
+  // strony. `buffered: true` dociaga tez zadania sprzed obserwacji (w dev-serwerze
+  // hydracja to jedno zadanie ~116 ms przy starcie) - odsiewamy je po `startTime`.
+  const odKiedy = await page.evaluate(() => {
+    const okno = window as unknown as { __dlugie: { d: number; s: number }[] };
+    okno.__dlugie = [];
+    const start = performance.now();
     new PerformanceObserver((lista) => {
-      for (const w of lista.getEntries()) {
-        (window as unknown as { __dlugie: number[] }).__dlugie.push(w.duration);
-      }
+      for (const w of lista.getEntries()) okno.__dlugie.push({ d: w.duration, s: w.startTime });
     }).observe({ type: "longtask", buffered: true });
+    return start;
   });
   await page.waitForTimeout(5000);
   const dlugie = await page.evaluate(
-    () => (window as unknown as { __dlugie: number[] }).__dlugie.filter((d) => d > 50),
+    (od) =>
+      (window as unknown as { __dlugie: { d: number; s: number }[] }).__dlugie
+        .filter((w) => w.s >= od && w.d > 50)
+        .map((w) => Math.round(w.d)),
+    odKiedy,
   );
   expect(dlugie).toEqual([]);
 });

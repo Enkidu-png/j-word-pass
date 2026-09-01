@@ -21,6 +21,7 @@
   --rozmiar-krzyk: clamp(44px, 8vw, 96px);
   --rozmiar-tekst: 18px;
   --rozmiar-drobny: 13px;
+  --rozmiar-pieczatka: 15px;  /* tekst po luku w SVG pieczatki (jednostki viewBox) */
   /* geometria */
   --cien-x: 4px;
   --cien-y: 4px;                   /* twardy offset cienia (anty-spec D3) */

@@ -138,7 +138,100 @@ a { color: var(--urzad); }
   background-size: 48px 48px;
 }
 
+/* == KOMETA KURSORA == */
+.kometa-kursora { position: fixed; inset: 0; pointer-events: none; z-index: 9999; }
+.kometa-kursora__kwadrat {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border: 1px solid var(--cien);
+}
+.kometa-kursora__kwadrat[data-barwa="0"] { background: var(--chrom-a); }
+.kometa-kursora__kwadrat[data-barwa="1"] { background: var(--chrom-b); }
+.kometa-kursora__kwadrat[data-barwa="2"] { background: var(--chrom-c); }
+
+/* == LICZNIK MECHANICZNY == */
+.licznik-mechaniczny { display: inline-flex; gap: 2px; font-family: var(--font-urzad); }
+.licznik-mechaniczny__okno {
+  overflow: hidden;
+  height: 1.4em;
+  width: 0.9em;
+  border: 1px solid var(--atrament);
+  background: var(--kosmos);
+  color: var(--jad);
+}
+.licznik-mechaniczny__tasma {
+  display: block;
+  transition-property: transform;
+  transition-timing-function: steps(10);
+}
+.licznik-mechaniczny__cyfra {
+  display: block;
+  height: 1.4em;
+  line-height: 1.4em;
+  text-align: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  .licznik-mechaniczny__tasma { transition-duration: 0s !important; }
+}
+
+/* == PIECZATKA == */
+.pieczatka { display: inline-block; width: 120px; line-height: 0; }
+.pieczatka svg { display: block; overflow: visible; }
+.pieczatka__obrys {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3;
+  stroke-dasharray: 9 3 5 2;   /* szum krawedzi: guma odbila sie nierowno */
+}
+.pieczatka__obrys-wewnetrzny { fill: none; stroke: currentColor; stroke-width: 1; }
+.pieczatka__tekst {
+  fill: currentColor;
+  font-family: var(--font-krzyk);
+  font-size: var(--rozmiar-pieczatka);
+  letter-spacing: 1px;
+}
+.pieczatka[data-ton="urzad"] { color: var(--urzad); }
+.pieczatka[data-ton="alarm"] { color: var(--alarm); }
+.pieczatka[data-ton="jad"] { color: var(--jad); }
+
 /* == CEREMONIE START == */
-/* Jedyne miejsce w projekcie, gdzie wolno easing inny niz steps() (Z7). */
+/* Jedyny blok, w ktorym wolno easing inny niz steps() (Z7). Ruch klasy
+   `ceremonia`: jednorazowy, wyzwolony, zawsze do pominiecia (Z8). */
 .ceremonia { animation-timing-function: ease-in-out; }
+
+/* Wbicie pieczatki: 350 ms, steps(4) - stempel laduje w czterech klatkach. */
+.pieczatka.ceremonia {
+  animation-name: jwp-wbicie;
+  animation-duration: 350ms;
+  animation-timing-function: steps(4);
+  animation-fill-mode: both;
+}
+@keyframes jwp-wbicie {
+  0% { transform: scale(3) rotate(-14deg); opacity: 0; }
+  100% { transform: scale(1) rotate(var(--obrot, 0deg)); opacity: 1; }
+}
+.pieczatka-drgniecie {
+  display: inline-block;
+  animation-name: jwp-drgniecie;
+  animation-duration: 350ms;
+  animation-timing-function: steps(2);
+  animation-iteration-count: 1;
+}
+@keyframes jwp-drgniecie {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(2px, 2px); }
+  100% { transform: translate(0, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Z10: ceremonia skraca sie do stanu koncowego, nic nie znika z ekranu. */
+  .pieczatka-drgniecie { animation: none !important; }
+  .pieczatka.ceremonia {
+    animation: none !important;
+    transform: rotate(var(--obrot, 0deg));
+  }
+}
 /* == CEREMONIE END == */
