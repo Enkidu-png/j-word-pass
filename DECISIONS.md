@@ -145,3 +145,15 @@ lewym dolnym rogu STRONY, tylko nie nakłada się na nic. Ten sam wzorzec ma ju�
 `PassOMetr` na mobile (`position: static` + `margin-top: auto`), więc shell
 zostaje spójny. AC F7-05 (zero kolizji z elementami klikalnymi) ma pierwszeństwo
 nad literalnym "fixed" z plan/04.
+
+## #9 - Z7 wygrywa z `steps(60)` i `steps(12)` z tabeli signature (plan/06 D)
+
+Tabela 06 D podaje dla signature 6 (`rosja-strefy`) ruch wskazówek `steps(60)`,
+a dla signature 10 (`mysz-drewniana`) jazdę `steps(12)`. Z7 z plan/01 dopuszcza
+w dekoracjach wyłącznie `steps(N)` dla N od 2 do 8 i jest zasadą twardą
+("złamanie = issue niezaliczone"), a tabela signature to opis efektu.
+
+Decyzja: obie dekoracje jadą na `steps(8)`. Wskazówka skacze 8 razy na obrót,
+wózek myszy pokonuje trasę w 8 skokach z `animation-direction: alternate`.
+Efekt "rwanego GIF-a" zostaje, liczba klatek mieści się w budżecie Z7. Gdyby
+user chciał dosłownie 60 klatek, trzeba najpierw zmienić Z7 - nie odwrotnie.

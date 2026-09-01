@@ -172,9 +172,17 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
   ✓ budżet linii (`node -e` po `app/quiz/signature/`): EmuMarsz 17, MlotekIPiorko 18, OsmiornicaTrzySerca 20, SlimakSpi 29, WenusObracaSieZle 17 - wszystkie <= 30 (rejestr `index.ts` 16 linii, to nie signature).
   ✓ negatywne: regex po zakresach emoji na wyrenderowanym HTML każdej z 5 teczek = 0 trafień.
   ✓ `pnpm run check` zielony; `pnpm build` zielony (`/quiz` 6,29 kB); pełny `npx playwright test` = 122 passed + 12 skipped + 0 failed.
-- [ ] **F4-02b** `ui` Signature pytań 6-10 z tabeli 06→D.
+- [x] **F4-02b** `ui` Signature pytań 6-10 z tabeli 06→D.
   CZYTAJ: 06→D (wiersze 6-10); 03→B.
   AC: jak F4-02a dla pytań 6-10; signature 7 reaguje na hover wariantu A (kropla kapie szybciej - zmiana `animation-duration`, assert w Playwright).
+  DOWÓD: ✓ `npx playwright test tests/f4-02b.spec.ts` = 8 passed (2 viewporty). Pytania 6-10 mają w slocie nazwy z tabeli 06 D (`rosja-strefy`, `gal-topnieje`, `sauna-parowa`, `kosc-udowa`, `mysz-drewniana`), każdy slot z jednym `.sig`, 5 różnych `innerHTML`.
+  ✓ signature 7 na hover wariantu A: `animationDuration` kropli 0.9s -> 0.3s -> 0.9s po zejściu na wariant D (czysty CSS `:has()`).
+  ✓ signature 9: klik ustawia `data-cwiczy="tak"`, `animationName` kości = `jwp-wyciskanie`, po 1,6 s wraca `nie`.
+  ✓ Z7 dla wszystkich `.gif-less` w slotach 6, 7, 8, 10: `steps(2..8)`, 300-1400 ms. Slot 9 nie ma pętli z założenia (kość rusza się WYŁĄCZNIE po kliknięciu - Z8 zabrania mieszania dekoracji z ceremonią), test tego pilnuje asercją `toBe(0)`.
+  ✓ ODSTĘPSTWO od tabeli 06 D zapisane w DECISIONS #9: `steps(60)` (zegary) i `steps(12)` (mysz) łamią Z7 (dozwolone 2-8), więc oba idą na `steps(8)`; mysz dostaje `animation-direction: alternate`, żeby jeździć tam i z powrotem bez teleportacji.
+  ✓ budżet linii: RosjaStrefy 20, GalTopnieje 13, SaunaParowa 13, KoscUdowa 27, MyszDrewniana 16 - wszystkie <= 30.
+  ✓ screenshots/F4/F4-02b-sig-{6..10}-{desktop,mobile}.png - obejrzane; po oględzinach poprawione trzy rzeczy niewidoczne w asercjach: kropla galu wisiała OBOK łyżeczki (teraz pod jej końcem), kłęby pary startowały pod dolną krawędzią slotu i były przycinane, wózek myszy wjeżdżał na podpis (tor dostał stałe 140 px).
+  ✓ negatywne: zero emoji w wyrenderowanym HTML teczek 6-10; `pnpm run check` zielony, `pnpm build` zielony, pełny `npx playwright test` = 130 passed + 12 skipped + 0 failed.
 - [ ] **F4-02c** `ui` Signature pytań 11-15 z tabeli 06→D.
   CZYTAJ: 06→D (wiersze 11-15); 03→B.
   AC: jak F4-02a dla pytań 11-15; signature 12 reaguje na hover wariantu A (nutki w uśmiech); signature 14 błyska przy poprawnym wpisie.

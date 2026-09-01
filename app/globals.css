@@ -1159,3 +1159,104 @@ a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
   animation-duration: 900ms;
 }
 .sig--slimak[data-obudzony="tak"] .sig__zzz { visibility: hidden; animation-name: none; }
+
+/* 6. rosja-strefy */
+.sig--strefy { flex-wrap: wrap; gap: 4px; }
+.sig__zegar { width: 24px; height: 24px; }
+/* Spec 06 D chce `steps(60)`, ale Z7 dopuszcza tylko 2-8 klatek. Wygrywa Z7:
+   wskazowka skacze osmiokrotnie na obrot (DECISIONS #9). */
+.sig__wskazowka {
+  transform-origin: 12px 12px;
+  --klatki: 8;
+  animation-name: jwp-wskazowka;
+  animation-duration: 1400ms;
+}
+@keyframes jwp-wskazowka {
+  0% { rotate: 0deg; }
+  100% { rotate: 360deg; }
+}
+
+/* 7. gal-topnieje */
+.sig--gal { position: relative; }
+.sig__lyzeczka { width: 34px; height: 34px; }
+/* kropla wisi POD koncem lyzeczki, nie obok niej */
+.sig__kropla {
+  position: absolute;
+  left: 26px;
+  top: 16px;
+  width: 8px;
+  height: 10px;
+  background: var(--chrom-a);
+  border: 1px solid var(--atrament);
+  border-radius: 0 50% 50% 50%;
+  --klatki: 3;
+  animation-name: jwp-kropla;
+  animation-duration: 900ms;
+}
+@keyframes jwp-kropla {
+  0% { transform: translateY(-10px); opacity: 1; }
+  100% { transform: translateY(14px); opacity: 0; }
+}
+/* hover wariantu A: kapie szybciej (06 D wiersz 7) */
+.teczka__warianty:has([data-wariant-etykieta="A"]:hover) ~ .teczka__signature .sig__kropla {
+  animation-duration: 300ms;
+}
+
+/* 8. sauna-parowa */
+.sig--sauna { align-items: flex-end; min-height: 56px; }
+.sig__para-blok { display: flex; gap: 6px; align-items: flex-end; height: 44px; padding-top: 14px; }
+.sig__para {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--atrament);
+  background: var(--papier);
+  border-radius: 50% 50% 50% 0;
+  --klatki: 4;
+  animation-name: jwp-para;
+  animation-duration: 1200ms;
+}
+@keyframes jwp-para {
+  /* para startuje na dole swojego pudelka i idzie w gore - nigdy pod nie */
+  0% { transform: translateY(0) scale(0.6); opacity: 1; }
+  100% { transform: translateY(-24px) scale(1.4); opacity: 0.2; }
+}
+
+/* 9. kosc-udowa */
+.sig--kosc { border: 0; background: none; padding: 4px 0; }
+.sig__kosc { width: 70px; height: 28px; }
+.sig--kosc[data-cwiczy="tak"] .sig__kosc {
+  animation-name: jwp-wyciskanie;
+  animation-duration: 400ms;
+  animation-timing-function: steps(2, end);
+  animation-iteration-count: 4;
+}
+@keyframes jwp-wyciskanie {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
+.sig__metka {
+  border: 2px solid var(--atrament);
+  background: var(--chrom-b);
+  padding: 0 4px;
+  transform: rotate(-4deg);
+  white-space: nowrap;
+}
+
+/* 10. mysz-drewniana */
+.sig--mysz { overflow: hidden; width: 100%; }
+.sig__tor {
+  /* tor szerszy niz mysz + przejazd (56 + 72 px): wozek nie wjezdza na podpis */
+  width: 140px;
+  flex: none;
+  --klatki: 8;
+  animation-name: jwp-mysz;
+  animation-duration: 1400ms;
+  animation-direction: alternate;   /* tam i z powrotem, bez teleportacji */
+}
+@keyframes jwp-mysz {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(72px); }
+}
+.sig__mysz { width: 56px; height: 28px; }
+.sig__mysz path:first-child { fill: var(--krata); }
