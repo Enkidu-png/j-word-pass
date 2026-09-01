@@ -1,82 +1,81 @@
 # NEXT-TASKS - stan sztafety
 
 ## Następne issue
-**F4-01** `ui` ⚠ **HARD** - Segregator quizu: stos 15 teczek, zakładki, nawigacja
-klik/strzałki, wybór wariantów, pytanie 14 otwarte, stemple WYPEŁNIONO, zapis stanu.
-BACKLOG: `⚠ HARD` = na początku paczki, ŚWIEŻE OKNO. `CZYTAJ: 06→A,E; 02→C2; 02→F`.
+**F5-01** `ui` Scena ogniska + formularz OGN-3/TAJ (3 pola z kiczem: stopka-miarka,
+suwmiarka ucha) + walidacja kliencka ze stemplami + klauzula śmierci + checkbox.
+`CZYTAJ: 07→A,C; 02→F (kopiowanie); 01→B (Z13,Z14)`.
+Potem po kolei: F5-02 (`/api/zgloszenie` + Vercel Blob), F5-03 (⚠ HARD, ceremonia
+spalenia + list w butelce - na początek paczki, świeże okno).
 
-UWAGA przed startem F4: orkiestrator ma po fazie F3 zrobić `/code-review`. Jeśli
-review zostawi poprawki, idą PRZED F4-01.
-
-Uwaga do F4-01: `data/quiz.json` i `plan/11-QUIZ-TRESC.md` są jeszcze nieczytane
-przez żadnego workera. Pytanie 14 jest otwarte (normalizacja `mohsa`/`Mohsa`/
-`skala Mohsa`), reszta wariantowa. Anty-spec: zero emoji w DOM (grep po zakresach
-emoji na wyrenderowanym HTML) i zero natychmiastowego feedbacku poprawności.
+`/proba-ognia` to dziś stub z samym `<h1>`. Wejście na niego jest już realną ścieżką:
+quiz kończy się przejściem `podanie-do-ognia`, które robi `router.push("/proba-ognia")`.
 
 ## Zrobione w tej zmianie
-F7-03, F7-06 (nowe), F3-02, F3-03, F3-04, F7-07 (nowe), DoD fazy F3. Każde
-odhaczone w `plan/10-BACKLOG.md` z dowodami, jeden commit per issue
-(`8b650ed`, `f35eea2`, `1e93fa5`, `1abdb5e`, `5b6bd25`).
+F7-05 (widżet radia zasłaniał przyciski - naprawione u źródła), F4-01, F4-02a, F4-02b,
+F4-02c, F4-03 + DoD całej fazy F4. Nowe znalezisko F7-08 znalezione I zamknięte.
+Commity: `52b69b4`, `fb860d4`, `32472d0`, `d668479`, `ddc9617`, `a6b5742`.
 
 ## Blokady wymagające użytkownika
-1. **Bramka F8 przekroczona przez PLATFORMĘ, nie decyzję** - pierwszy `vercel deploy`
-   bez `--prod` wylądował na produkcji (DECISIONS #7). Aliasy: `j-word-pass.vercel.app`.
-   W tej paczce NIC nie deployowano (zakaz w promptcie).
+1. **Bramka F8 przekroczona przez PLATFORMĘ** - pierwszy `vercel deploy` bez `--prod`
+   wylądował na produkcji (DECISIONS #7). W tej paczce NIC nie deployowano.
 2. **Deployment Protection (Vercel Authentication) WŁĄCZONA** - anonimowy `curl` dostaje
-   302 na `vercel.com/sso-api`. Do weryfikacji URL-i `vercel curl <url>`. Decyzja na F8-01
-   (znalezisko F7-04).
-3. Hook uprawnień odrzuca komendy dotykające `.env.local`. NIE blokuje pracy: `pnpm dev`
-   sam ładuje ten plik. Skutek dla testów: scenariusz „klucz odpięty" symuluje się przez
-   `page.route(... 502)`, nie przez zmianę env (tak zrobione w F3-04 D5).
+   302 na `vercel.com/sso-api`. Decyzja na F8-01 (znalezisko F7-04).
+3. Hook uprawnień odrzuca komendy dotykające `.env.local`. Nie blokuje pracy.
+4. **F7-02 nadal otwarte i nadal blokuje pierwszy vendoring** (`scripts/lint-tokens.mjs`
+   skanuje komentarze CSS, więc nagłówek licencyjny z hexem wywali `pnpm run check`).
+   F4 nic nie vendorował, ale F5-01/F5-03 mogą chcieć (płomienie, pergamin).
 
 ## Pułapki środowiskowe
-- **`reuseExistingServer: true`** - przed każdą serią testów:
-  `for p in 3000 3001 3002; do lsof -ti tcp:$p | xargs -r kill -9; done`.
-- **Fail TYLKO w pełnym równoległym przebiegu = zwykle wyścig z hydracją, nie flake.**
-  Zmierzone w F3-04: `fill()` na polu przed hydracją wpisuje tekst do DOM, ale React
-  go nie widzi, a `useEffect` czytający `sessionStorage` go NADPISUJE. Objaw: werdykt
-  „PUSTKA" mimo wypełnionego pola. Lekcja ogólna: każdy `useEffect`, który przy montażu
-  ustawia stan pola z zapisu, musi najpierw sprawdzić, co jest w DOM.
-- **Formularz bez ochrony robi natywny GET-submit przed hydracją** i wypycha treść do
-  adresu. Wzorzec zastosowany w `app/egzamin/Arkusz.tsx`: `disabled` na CTA do czasu
-  `useEffect`. Playwright sam czeka na aktywny przycisk, więc to też stabilizuje testy.
-- **Hover na elemencie, który się rusza albo jest remontowany, wyzwala mouseenter SERIAMI.**
-  W F3-02 słoń strzelał ~30 razy na sekundę. Lekarstwo: `pointer-events: none` na CAŁEJ
-  zawartości elementu (celem hoveru zostaje stabilny kontener) plus `z-index`, żeby nic
-  nie przelatywało nad nim. W teście: `page.mouse.move(0,0)` przed każdym `hover()`.
-- **Elementy z `gif-less--blink` mają `visibility: hidden` przez pół cyklu** - `toBeVisible()`
-  na nich jest losowe. Asertować `toHaveCount(1)`.
-- **`steps(N)` na ceremonii + zrzut ekranu = klatka pośrednia.** Pieczątka w połowie
-  `jwp-wbicie` jest wielka i półprzezroczysta. Przed screenshotem `waitForTimeout(400+)`.
-- **Kierunek łuku SVG (`sweep-flag`) ustalać empirycznie na zrzucie, nie rozumowaniem** -
-  w F7-07 dwie „oczywiste" wersje dały tekst do góry nogami.
+- **`pnpm build` PSUJE działający `pnpm dev`** - build nadpisuje `.next`, po czym serwer
+  dev oddaje 500 (`ENOENT .next/server/pages/_document.js`) albo 404 na chunkach, a strona
+  wygląda jak zahydrowana, tylko kliknięcia nic nie robią. Zmierzone dwa razy w tej zmianie
+  (fałszywe "failed" w f4-02b/c). Kolejność: testy -> build -> restart dev.
+- **Dodanie NOWEGO pliku komponentu przy działającym `pnpm dev`** daje ten sam objaw
+  (404 chunku, brak hydracji). Lekarstwo to samo: ubić port, `rm -rf .next`, `pnpm dev`.
+- **Pierwszy przebieg tuż po restarcie dev bywa wolny** (Next kompiluje route na żądanie) -
+  test `f2-03 ceremonia wejscia <= 2 s` padł raz z tego powodu, dwa kolejne pełne przebiegi
+  czyste. Przed serią pomiarów czasu zrób jedno "rozgrzewkowe" wejście na każdy route.
+- **`page.addInitScript` odpala się TAKŻE przy `reload()`** - skrypt, który bezwarunkowo
+  wpisuje `jwp.v1`, kasuje to, co test właśnie sprawdza. Wzorzec: `if (getItem) return;`.
+- **`animation-play-state: paused` NIE pozwala nadpisać transformu z keyframes** - żeby
+  reguła CSS przestawiła element (uśmiech nutek w signature 12), trzeba `animation-name: none`.
+- **Pieczątka wbija się 350 ms** - zrzut zaraz po pojawieniu się łapie klatkę pośrednią
+  (stempel wielki i przezroczysty). Przed screenshotem `waitForTimeout(400)`.
+- **`--jad` i `--chrom-b` jako KOLOR TEKSTU na papierze są nieczytelne** - używać ich jako
+  tła (tak zrobione w podpisie werdyktu maszyny).
+- **Natywne radio schowane w `.tylko-dla-czytnika` nie da się kliknąć przez `check()`**
+  (Playwright celuje w pudełko SVG). W testach klikać etykietę `[data-wariant-etykieta]`.
 - Zastane i nadal aktualne: TypeScript przypięty do `^5.9.3`, konfiguracja to
-  `next.config.mjs`, Playwright MCP na kanale `chrome` nie działa (używać `npx playwright test`),
-  `getComputedStyle` serializuje `steps(N, end)` jako `steps(N)`, React nie słucha surowego
-  `dispatchEvent("mouseenter")`, `route.ts` nie może eksportować nic poza handlerami
-  (łapie to dopiero `pnpm build`), `lint-tokens` skanuje komentarze CSS (F7-02 - naprawić
-  PRZED pierwszym vendoringiem).
+  `next.config.mjs`, Playwright MCP na kanale `chrome` nie działa, `route.ts` nie może
+  eksportować nic poza handlerami (łapie dopiero `pnpm build`), `reuseExistingServer: true`
+  potrafi serwować starą stronę: `for p in 3000 3001 3002; do lsof -ti tcp:$p | xargs -r kill -9; done`.
 - `bash ~/.claude/agent-context.sh` w podagencie zwraca `NO-TRANSCRIPT` przez całą zmianę.
   Wg zasady: pracować dalej, nie wymyślać procentu.
+- Kółko z literą "N" w lewym dolnym rogu zrzutów to WSKAŹNIK DEV NEXT.JS, nie element
+  aplikacji (kosztowało 15 minut śledztwa - w produkcji go nie ma).
 
 ## Stan środowiska
 node v26.7.0, pnpm 11.12.0, next 15.5.24, react 19.2.8, typescript 5.9.3.
-`pnpm run check` zielony. `pnpm build` zielony (`/egzamin` 8,13 kB, first load 110 kB).
-`npx playwright test` = **96 passed + 12 skipped + 0 failed** (dwa przebiegi pod rząd).
-Deploy: bez zmian od poprzedniej zmiany (nic nie wypychano).
+`pnpm run check` zielony. `pnpm build` zielony (`/quiz` 11,4 kB, first load 113 kB).
+`npx playwright test` = **150 passed + 12 skipped + 0 failed** (dwa przebiegi pod rząd).
+Deploy: bez zmian (nic nie wypychano, obowiązuje zakaz).
 
 ## Nowe znaleziska tej zmiany
-- **F7-06** `test` (ZAMKNIĘTE) - `f2-03` padał w pełnej suite, bo uciekinier przeskakiwał
-  pod sam kursor i nie było kolejnego `mouseenter`.
-- **F7-07** `ui` (ZAMKNIĘTE) - `Pieczatka` rysowała tekst po łuku do góry nogami, a dłuższy
-  napis owijał się poza ścieżkę. Zastane z F1-02, wykryte oględzinami screenshotu.
-- **F7-05** ROZSZERZONE - widżet RadioKomisji nie zasłania już tylko stopki: przykrywa
-  przycisk `PRZYJMUJĘ WERDYKT, ŻĄDAM QUIZU` na mobile i wchodzi na scenę na desktopie.
-  AC obejmuje teraz kolizję z każdym elementem klikalnym na obu viewportach.
+- **F7-08** `silnik` (ZAMKNIĘTE) - `zapiszStan` z debounce 400 ms gubił werdykt etapu przy
+  szybkim F5. Naprawione u źródła: `lib/stan.ts` ma `zapiszTeraz()`, użyte dla werdyktów
+  quizu I egzaminu (ten sam błąd siedział w `app/egzamin/Plansza.tsx`).
+- **F7-05** ZAMKNIĘTE - `RadioKomisji` przestał być `position: fixed` i wrócił do przepływu
+  nad stopką (DECISIONS #8: świadome odstępstwo od plan/04 A pkt 4).
+- **DECISIONS #9** - `steps(60)` i `steps(12)` z tabeli 06 D łamią Z7 (2-8 klatek), oba
+  zjechały na `steps(8)`.
 - F7-01, F7-02, F7-04 nadal otwarte. Otwarte D1-D4 z `plan/README.md` nadal nietknięte.
 
 ## Świadome uproszczenia do ewentualnego dobrania w F6
 - Krok 1 ceremonii z 05→B (arkusz składa się w samolocik na `clip-path`) nie istnieje -
-  arkusz po prostu schodzi z ekranu. Oznaczone `ponytail:` w `app/egzamin/Plansza.tsx`.
-- Próg werdyktu wysoki/niski = 9 punktów, dobrany z zakresu 6-10 (`data/egzamin.json`),
-  bo `komisja.json` nie podaje liczby. Oznaczone `ponytail:` w `app/egzamin/Narada.tsx`.
+  arkusz po prostu schodzi z ekranu (`ponytail:` w `app/egzamin/Plansza.tsx`).
+- Próg werdyktu wysoki/niski egzaminu = 9 punktów (`ponytail:` w `app/egzamin/Narada.tsx`).
+- Krok 1 maszyny prawdy ("stos teczek zjeżdża do środka") jest uproszczony do podmiany
+  panelu: zakładki zostają, teczka ustępuje miejsca maszynie. Reszta harmonogramu 06 B
+  zaimplementowana co do milisekundy.
+- Signature 9 (kość) nie ma pętli dekoracyjnej - rusza się wyłącznie po kliknięciu, bo Z8
+  zabrania być naraz dekoracją i ceremonią.
