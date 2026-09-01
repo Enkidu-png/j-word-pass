@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <!-- Pieczatka Komisji. Literaly kolorow: tlo = --papier (#f4e9c8), obrys i litery
-       = --urzad (#b3241a) z app/tokens.css. Plik statyczny, var() tu nie dziala. -->
-  <rect width="32" height="32" fill="#f4e9c8"/>
-  <circle cx="16" cy="16" r="13" fill="none" stroke="#b3241a" stroke-width="3"/>
-  <circle cx="16" cy="16" r="9.5" fill="none" stroke="#b3241a" stroke-width="1.5"/>
-  <path d="M11 11 v10 M11 11 l5 10 l5 -10 M21 11 v10" fill="none" stroke="#b3241a" stroke-width="2.4"/>
-</svg>

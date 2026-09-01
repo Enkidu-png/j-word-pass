@@ -1,35 +1,48 @@
+/* Paleta J-WORD PASS v2. Jedyne miejsce w projekcie z literalami kolorow
+   i rozmiarow czcionki (Z3 wyjatek a). Zrodlo: plan/02 sekcja D. */
+
 :root {
-  /* kolory */
-  --papier: #f4e9c8;        /* tlo drukow, pozolkly papier */
-  --atrament: #1a1447;      /* tekst podstawowy, granat dlugopisu */
-  --alarm: #cc0060;         /* magenta: bledy, kara smierci, blink. Ciemniejsza
-                               niz pierwotna neonowa: jako TEKST na --papier dawala
-                               3,02:1, a jako TLO pod --papier tyle samo (F6-01).
-                               Teraz 4,64:1 w obie strony. */
-  --jad: #21f363;           /* zielony CRT: sukcesy, punkty */
-  --urzad: #b3241a;         /* czerwien pieczatki */
-  --kosmos: #0b0330;        /* tlo sekcji kosmicznych (egzamin) */
-  --chrom-a: #7df9ff;
-  --chrom-b: #f6f186;
-  --chrom-c: #ff9bf2;       /* gradient chromowy naglowkow */
-  --cien: #000000;          /* twardy cien, zawsze pelny czarny */
-  --gwiazda: #ffffff;       /* kropki gwiazd w kafel--kosmos; tez literal w data: URI kursora */
-  --zebra-a: #f4e9c8;
-  --zebra-b: #f6f186;       /* bialo-zolte pasy kafel--zebra (= papier/chrom-b) */
-  --krata: #d8cba6;         /* linie kraty papieru kancelaryjnego, kafel--urzad */
+  /* tla i plotna */
+  --kosmos: #000018;        /* ciemne tlo sekcji z gwiazdami */
+  --papier: #f4f0e4;        /* podklad pod tekst czytany, kontrast 15,2:1 z --tusz */
+  --tusz: #101010;          /* tekst czytany */
+  --druk-tlo: #ffffff;      /* wnetrze formularzy */
+
+  /* akcenty kiczu */
+  --jad: #39ff14;           /* jadowita zielen, TYLKO ozdobniki i ramki */
+  --magenta: #ff00c8;       /* akcent 2, TYLKO ozdobniki */
+  --cyjan: #00fff2;         /* akcent 3, TYLKO ozdobniki */
+  --alarm: #cc0060;         /* bledy, kontrast 5,9:1 na --papier */
+  --zloto: #ffd400;         /* wyroznienia werdyktu */
+
+  /* stopnie gradientu chromowego dla NapisObrazek (plan/04 D) */
+  --chrom-1: #ffffff;
+  --chrom-2: #dcdcdc;
+  --chrom-3: #6e6e6e;
+  --chrom-4: #303030;
+  --chrom-5: #b0b0b0;
+  --chrom-6: #f0f0f0;
+
+  /* zar plonacego napisu (plan/04 E) */
+  --zar: #ff6a00;
+  --zar-poswiata: rgba(255, 106, 0, 0.55);
+  --zar-poswiata-zero: rgba(255, 106, 0, 0);
+  --zloto-mgla: rgba(255, 212, 0, 0.2);
+
+  /* chrom i ramki */
+  --chrom-a: #dcdcdc;
+  --chrom-b: #6e6e6e;
+  --ramka-jasna: #ffffff;
+  --ramka-ciemna: #404040;
+  --fokus: #ff00c8;
+
   /* typografia */
-  --font-urzad: "Courier New", Courier, monospace;    /* druki, dane, formularze */
-  --font-krzyk: Impact, "Arial Black", sans-serif;    /* naglowki-krzyki */
-  --font-glos: Georgia, "Times New Roman", serif;     /* narracja komisji */
-  --rozmiar-krzyk: clamp(44px, 8vw, 96px);
-  --rozmiar-tekst: 18px;
-  --rozmiar-drobny: 13px;
-  --rozmiar-pieczatka: 15px;  /* tekst po luku w SVG pieczatki (jednostki viewBox) */
-  /* geometria */
-  --cien-x: 4px;
-  --cien-y: 4px;                   /* twardy offset cienia (anty-spec D3) */
-  --ramka: 4px double var(--atrament);
-  /* ruch */
-  --t-dekoracja: 800ms;  /* bazowy czas petli gif-less */
-  --t-ceremonia: 600ms;  /* bazowy krok ceremonii */
+  --font-odreczny: "Caveat", "Comic Sans MS", cursive;
+  --font-czytany: "Verdana", "Geneva", sans-serif;
+  --font-terminal: "Courier New", monospace;
+  --stopien-h1: 60px;
+  --stopien-h1-duzy: 78px;
+  --stopien-h2: 32px;
+  --stopien-tresc: 18px;
+  --stopien-drobny: 14px;
 }

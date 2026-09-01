@@ -172,3 +172,24 @@ i `steps(12)` z tabeli 06 D zjechały na `steps(8)` z tego samego powodu).
 
 Konsekwencja: gdyby user chciał wolniejszego dryfu, trzeba najpierw zmienić Z7
 w `plan/01`, a nie obchodzić go w komponencie.
+
+## #11 - kasacja NEXT-TASKS.md i WERYFIKACJA.md przed startem F0-01
+
+Oba pliki zostały po buildzie v1 i twierdzą, że "fazy F0-F6 zamknięte". Backlog v2
+nie ma ani jednego odhaczonego issue, a prompt workera każe czytać `NEXT-TASKS.md`
+na starcie - pierwszy worker dostałby więc instrukcję sprzeczną ze stanem repo.
+
+Decyzja: orkiestrator kasuje oba pliki przed spawnem pierwszego workera (zasada 3 -
+zmiana mechaniczna, dwa pliki, zero logiki). Kasacja i tak jest częścią AC F0-01,
+więc wchodzi do commita `F0-01` razem z resztą czystki.
+
+## #12 - lista kasacji z plan/02 C jest niepelna, uzupelniona wg plan/02 B
+
+`plan/02 C` wymienia do kasacji testy `f1-`, `f2-`, `f4-`, `f6-`, `f7-`, ale pomija
+`tests/f3-02..04`, `tests/f5-01`, `tests/f5-03` oraz `screenshots/F0/`. Wszystkie
+one dotycza widokow v1, ktore wlasnie znikaja, wiec zostawienie ich dawaloby
+czerwony `npx playwright test` od pierwszego dnia budowy v2.
+
+Rozstrzygajaca jest sekcja `plan/02 B` (lista tego, co ZOSTAJE): z testow zostaja
+wylacznie `tests/f3-01.spec.ts` i `tests/f5-02.spec.ts` (kontrakty API) oraz
+`tests/smoke.spec.ts` (przepisywany w F0-05). Reszta skasowana w F0-01.
