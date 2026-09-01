@@ -374,6 +374,35 @@ console.log(Object.keys(localStorage), Object.keys(sessionStorage));
 
 ---
 
+## 13a. Poprawki po review końcowym (F7-09..F7-15)
+
+Osiem znalezisk reviewera zamkniętych po napisaniu tej listy. Sprawdzenie wymaga
+LOKALNEGO buildu produkcyjnego, bo dwie z nich działają tylko przy `NODE_ENV=production`:
+
+```bash
+pkill -f "next dev"
+VERCEL_PROJECT_PRODUCTION_URL=j-word-pass.vercel.app pnpm build
+npx next start -p 3100
+```
+
+- [ ] **Podgląd linku w social działa** (F7-09) - `curl -s http://localhost:3100/ | grep og:image`
+      pokazuje `https://j-word-pass.vercel.app/opengraph-image?...`, NIE `http://localhost:3000/...`.
+      Bez zmiennej `VERCEL_PROJECT_PRODUCTION_URL` ten sam build wraca na localhost i to jest poprawne.
+- [ ] **Druk ma limit żądań** (F7-10) - cztery POST-y pod rząd:
+      `for i in 1 2 3 4; do curl -s -o /dev/null -w "%{http_code} " -X POST http://localhost:3100/api/zgloszenie -H 'content-type: application/json' -d '{"email":"x"}'; done`
+      daje `400 400 400 429`.
+- [ ] **Pule limitów są rozdzielone** (F7-10) - zaraz po powyższym sześć żądań do oceny
+      daje `200 200 200 200 200 429`, czyli złożenie druku nie zjadło puli egzaminu.
+- [ ] **Punkty spoza skali są odrzucane** (F7-11) - POST z `"punktyEgzamin":9999` daje 400
+      z komunikatem `PUNKTY Z ETAPU 1 POZA SKALĄ KOMISJI (0-10)`, a nie cichy zapis z zerem.
+- [ ] **Walidator pilnuje kanonu** (F7-12) - dopisz do dowolnego komponentu linię
+      `const X = "a — b";`, uruchom `pnpm run check`: ma paść z `Z2 dlugi mysnik`.
+      Usuń linię, `pnpm run check` wraca do `lint-tokens: czysto`.
+- [ ] **Świeży klon wie, czego potrzebuje** (F7-14) - `cat .env.example` wymienia
+      `OPENROUTER_API_KEY` i `BLOB_READ_WRITE_TOKEN`, obie puste, każda z opisem.
+
+---
+
 ## 14. Co ZOSTAJE otwarte (nie odhaczaj - to decyzje dla Ciebie)
 
 - [ ] **F8-01** deploy produkcyjny - czeka na Twoją zgodę, nic nie było wypychane
