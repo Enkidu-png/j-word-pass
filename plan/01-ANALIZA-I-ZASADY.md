@@ -1,209 +1,206 @@
-# 01 - ANALIZA REFERENCJI, TWARDE ZASADY, SŁOWNIK
+# 01 - ANALIZA REFERENCJI I TWARDE ZASADY
 
-Ten plik jest źródłem charakteru projektu. Każdy inny plik pakietu odwołuje się do
-nazw i zasad zdefiniowanych tutaj. Złamanie zasady z sekcji B = issue niezaliczone.
+## A. DLACZEGO PIERWSZA WERSJA BYŁA KLAPĄ (analiza porażki, nie narzekanie)
 
----
+Pierwszy pakiet (`plan-v1/`) opisywał estetykę „powściągliwego retro urzędowego":
+papier, chrom, pieczątki, wszystko rysowane proceduralnie. Zawierał zasadę
+**„zero binariów w repo, obrazy wyłącznie jako inline SVG i CSS"**. Ta jedna zasada
+przesądziła o klapie, bo referencja, którą dostaliśmy, **JEST zbiorem animowanych
+GIF-ów**. Nie da się zbudować `make-frontend-shit-again` bez GIF-ów, tak jak nie da się
+zbudować kolażu bez wycinków.
 
-## A. ANALIZA REFERENCJI (co dokładnie zbadano i co z tego bierzemy)
+Druga przyczyna: pakiet v1 kazał wszystko rysować od zera („proceduralnie"), więc
+powstały czyste, spójne, oszczędne sceny. Referencja jest odwrotnością spójności -
+to wysypisko niepasujących do siebie obrazków na kafelkowym tle.
 
-### A1. `SaraVieira/make-frontend-shit-again` (kod przeczytany z repo, gałąź `master`)
+**Wniosek do egzekwowania w całym tym pakiecie: charakter tej strony robią GOTOWE
+ANIMOWANE OBRAZKI, gęsto upchane, na kafelkowych tłach. Kod jest tylko rusztowaniem,
+które je rozstawia.**
 
-Zbadane pliki: `layouts/default.vue`, `pages/_lang/index.vue`, `components/Page1..5.vue`,
-`nuxt.config.js`, `package.json`, drzewo `assets/` (46 plików, w tym 30 GIF-ów).
+## B. ANATOMIA REFERENCJI (zmierzona w kodzie, nie z pamięci)
 
-Ustalenia faktograficzne (nie interpretacje):
+Źródło: `github.com/SaraVieira/make-frontend-shit-again`, sklonowane i przeczytane
+plik po pliku 2026-09-02. Autorka: Sara Vieira. Stack referencji: Nuxt 2 + SCSS.
+My przepisujemy zachowanie, nie kod (inny framework).
 
-| Co | Jak zrobione w oryginale | Plik |
-|---|---|---|
-| Ruch na stronie | Wyłącznie animowane GIF-y i `<marquee behavior="alternate">`. **Zero animacji CSS, zero JS animacji.** | `Page1.vue`, `Page3.vue` |
-| Kursor | `cursor: url("../assets/cursor.gif"), auto` na `html` | `layouts/default.vue` |
-| Tło | Kafelkowany bitmapowy `background-image` na `html`, **inny bitmapowy kafelek per sekcja** (`bg.png`, `bg-1.png`, `bg-3.png`, `bg4.png`, `bg5.png`) | `layouts/default.vue`, `Page3.vue` |
-| Struktura strony | Jedna długa strona, sekcje `.container` po `min-height: 100vh`, scroll natywny. Zero routingu między sekcjami. | `pages/_lang/index.vue` |
-| Dźwięk | `<audio autoplay controls>` z coverem Titanica w wersji techno, dodatkowo `document.querySelector("audio").play()` w `mounted()` | `pages/_lang/index.vue` |
-| Wrogość wobec użytkownika | `contextmenu` blokowany, `alert("Right click is disabled!!!")` | `layouts/default.vue` |
-| Ozdobniki krawędzi | Paski przyklejone do góry/dołu viewportu wypełnione kafelkiem GIF (`under.gif`, `baloons.gif`) | `Page1.vue`, `Page3.vue` |
-| Wiarygodność epoki | Zewnętrzny licznik odwiedzin `cutercounter.com`, odznaki `valid-html40.png`, `w3c-css.gif`, `netscape.gif` | `Page1.vue`, `assets/` |
-| Typografia | Google Font `Caveat` (odręczny) na WSZYSTKIM, `h1` = 60-78 px, `p` = 18 px, brak skali | `nuxt.config.js`, `layouts/default.vue` |
-| Kolor linku | `a { color: lightblue }` (słowo kluczowe CSS, nie token) | `layouts/default.vue` |
+### B1. Warstwa globalna (`layouts/default.vue`)
 
-**Wniosek metodyczny (to jest sedno stylu):** wrażenie „strona żyje" nie bierze się
-z jednej dużej animacji, tylko z **wielu małych, niezależnych, zapętlonych ruchów, które
-nie są ze sobą zsynchronizowane i nie reagują na użytkownika**. GIF nie ma easingu,
-nie ma stanu, nie ma `transition`. Ma stałą liczbę klatek i skacze między nimi.
+| Cecha | Wartość zmierzona w kodzie |
+|---|---|
+| Tło `html` | `background-image: url(bg.png)` - kafel 304x234 px, POWTARZANY, bez `background-size` |
+| Kursor | `cursor: url(cursor.gif), auto` - animowany GIF 50x50 px jako kursor CAŁEJ strony |
+| Font | `"Caveat"` (odręczny!) z fallbackiem `Source Sans Pro`, potem systemowy |
+| Kolor tekstu | biały na sekcji 1, CZARNY na sekcjach z jasnym tłem - decyzja per sekcja, nie globalna |
+| `h1` | 60 px globalnie, 78 px na sekcjach 2 i 3 |
+| `p` | 18 px |
+| Linki | `color: lightblue` |
+| Prawy klik | ZABLOKOWANY, z `alert("Right click is disabled!!!")` |
+| Sekcja | `.container`: `min-height: 100vh; width: 100vw`, flex center, `flex-wrap: wrap` |
 
-**Czego NIE bierzemy:** binarnych GIF-ów (nie mamy assetów i nie będziemy ich generować),
-`autoplay` dźwięku bez zgody, blokady prawego przycisku, zewnętrznych liczników.
+### B2. Sekcje (`components/Page1..5.vue`) - pięć pełnoekranowych ekranów
 
-**Co bierzemy i jak to zastępujemy:** patrz `03-SILNIK-ANIMACJI.md`, motyw `gif-less`.
+Każda sekcja ma WŁASNY kafel tła. To jest główny mechanizm rytmu strony:
 
-### A2. `cameronsworld.net`
+| Sekcja | Kafel tła | Rozmiar kafla | Zawartość charakterystyczna |
+|---|---|---|---|
+| Page1 | `bg.png` (dziedziczy z `html`) | 304x234 | statek `ship.gif`, napis-obrazek `make.gif`, `<marquee behavior="alternate">`, licznik odwiedzin, `baby.gif`, dolny pas `under.gif` |
+| Page2 | `bg-1.png` | 41x73 | wirujący statek `ship2.gif`, napis-obrazek `fun.gif`, pasek `crysballbar.gif`, DWA `hotdog.gif` w dolnych rogach (prawy odbity) |
+| Page3 | `bg-3.png` | 128x128 | lista 4 pozycji, każda z GIF-em obok tekstu, górny pas `baloons.gif`, dwa `37.gif` w dolnych rogach |
+| Page4 | `bg4.png` | 144x136 | 5 GIF-ów rozrzuconych po `position: absolute` w rogach i przy krawędziach, `dope.gif` na środku |
+| Page5 | `bg5.png` | 527x400 | tekst zamykający, `10.gif`, plakietki `valid-html40.png` + `w3c-css.gif` + `netscape.gif`, dwa pasy `16.gif` (góra i dół) |
 
-Kolaż z archiwum GeoCities. Kluczowe obserwacje: layout tabelaryczny, zagnieżdżone ramki,
-skrajnie gęste upakowanie (brak oddechu jako środek wyrazu), kolory sąsiadujące bez logiki
-(neon na neonie), Times New Roman, tekst rozstrzelony literami pionowo („M Y I N T E R E S T S"),
-webringi (Prev / Next / Random / List), „always under construction", zalecenia typu
-„best viewed at 800x600".
+### B3. Trzy powtarzalne wzorce układu (to jest CAŁA gramatyka tej strony)
 
-Co bierzemy: **gęstość i kolaż** (element może nachodzić na element), pionowe rozstrzelenie
-liter jako motyw nagłówka pobocznego, retoryka „pod nadzorem" / „ta strona jest zawsze
-w budowie", nawigacja typu webring w stopce.
+1. **ROGI.** GIF w `position: absolute` przyklejony do rogu: `left:0; bottom:0` oraz
+   `right:0; bottom:0` z `transform: scaleX(-1)` (lustro, NIE obrót). Występuje na
+   Page2 (hotdog), Page3 (37.gif), Page4 (dolphin).
+2. **PASY.** Wąski GIF rozciągnięty na całą szerokość jako `background` diva o stałej
+   wysokości: `under.gif` 45 px (dół Page1), `baloons.gif` 43 px (góra Page3),
+   `16.gif` 15 px (góra i dół Page5).
+3. **NAPIS-OBRAZEK.** Nagłówek to nie tekst, tylko animowany GIF z napisem
+   (`make.gif` 713x79, `fun.gif` 1060x75, `dope.gif` 684x106) wstawiony w `<h1>`.
 
-### A3. `dinostomatopie.com`
+### B4. Dźwięk
 
-Strona lokalnej pizzerii utrzymana w stanie z 2000 roku. Kluczowe: nawigacja rozsypana
-po treści jako obrazkowe przyciski („Click here for..."), narracja pierwszoosobowa zamiast
-copy marketingowego, losowe pogrubienia i kursywy w środku zdania, niekonsekwentna
-wielkość liter („Seattle's", „SEattle"), licznik odwiedzin, „last updated 03/01/2000",
-podpis autora strony („website design by Sammy").
+Referencja ma `<audio controls autoplay>` z coverem „My Heart Will Go On (Techno Mix)",
+**widoczny** w lewym górnym rogu, i wymusza `play()` w `mounted()`. My robimy to samo
+w duchu, ale z koncertem Post Malone Tiny Desk (patrz `09-RADIO.md`).
 
-Co bierzemy: **głos** - pierwsza osoba, konkret, brak korporacyjnego copy; losowe
-pogrubienia w środku zdania; podpis autora i data ostatniej aktualizacji w stopce;
-przyciski akcji opisane zdaniem, nie czasownikiem („Kliknij tutaj żeby oddać dowód
-komisji"), nigdy „Wyślij".
+## C. DRUGA REFERENCJA: POST MALONE TINY DESK
 
-### A4. Synteza - czym jest J-WORD PASS
+`https://youtu.be/oCcks-fwq2c` - koncert z serii NPR Tiny Desk. ID filmu: `oCcks-fwq2c`.
+Rola w projekcie: **to jest ścieżka dźwiękowa strony**, odpowiednik `music.mp3`
+z referencji. Nie analizujemy go wizualnie, nie kopiujemy estetyki NPR. Kontrakt
+techniczny w `09-RADIO.md`.
 
-Trzy referencje dają trzy różne rzeczy: **MFSA** daje mechanikę ruchu, **Cameron's World**
-daje gęstość i kolaż, **Dino's Tomato Pie** daje głos. Sklejamy je klamrą fabularną:
+## D. ODBIORCA: ALEKSANDRA (jedna osoba, nie „użytkownik")
 
-> J-WORD PASS to system egzaminacyjny Międzygalaktycznej Komisji Kwalifikacyjnej,
-> postawiony w 1998 roku i od tamtej pory nietknięty, mimo że nadal wydaje przepustki.
-> Kandydat przechodzi trzy etapy: EGZAMIN Z FIZYKI, QUIZ O WSZYSTKIM I O NICZYM,
-> PRÓBA OGNIA. Na końcu dostaje zadanie. Zadanie jest tajne.
+Strony używa **wyłącznie Aleksandra**. To nie jest produkt, to jest żart zrobiony
+dla jednej konkretnej osoby. Konsekwencje, obowiązujące w każdym pliku copy:
 
-Cała biurokracja jest udawana i przesadzona: pieczątki, numery formularzy (`F-7/BIS`),
-paski postępu, które cofają się bez powodu, komisja z trzech głów, klauzule o karze śmierci
-za udostępnianie zadania. Kicz jest **konsekwentny i celowy**, nie przypadkowy: brzydota ma
-własne reguły i tych reguł się trzymamy.
+- **Zero form bezosobowych.** Nie „Kandydat proszony jest o", tylko „Aleksandro,
+  Komisja prosi Cię o". Nie „Wypełniono niegodnie", tylko „Aleksandro, to nie jest
+  adres e-mail".
+- Zwrot grzecznościowy: **wołacz „Aleksandro"** albo drugą osobą liczby pojedynczej.
+  Formularze zwracają się do niej bezpośrednio.
+- Zero wariantów językowych, zero i18n, zero „dla wszystkich kandydatów".
+- Komisja jest pompatyczna, ale mówi DO NIEJ. Napięcie między urzędowym tonem
+  a imieniem w wołaczu jest tu żartem, nie błędem.
 
----
+## E. TWARDE ZASADY (łamanie = issue niezaliczone)
 
-## B. TWARDE ZASADY (numerowane, egzekwowalne)
+Numeracja Z1-Z18. Każda zasada ma przykład złamania, żeby nie było wątpliwości.
 
-Łamanie = issue niezaliczone, PR odrzucony.
+**Z1. Zakaz wyśrodkowanej kropki `·` jako ozdobnika między słowami.**
+Złamanie: `ETAP 1 · EGZAMIN`. Poprawnie: `ETAP 1 - EGZAMIN`.
 
-**Z1. Zero wyśrodkowanych kropek `·` jako ozdobnika między słowami.**
-Złamanie: `EGZAMIN · KROK 1 · 2026`. Zamiast tego: `EGZAMIN /// KROK 1 /// 2026`
-albo tabela, albo osobne elementy.
+**Z2. Zakaz długiego myślnika `—` i półpauzy `–` w copy i UI.** Dotyczy też tekstu
+wracającego z modelu AI (sanitizer w `/api/ocena` zostaje z v1). Złamanie:
+`Komisja obraduje — proszę czekać`. Poprawnie: `Komisja obraduje, proszę czekać`.
 
-**Z2. Zero długich myślników `—` w copy i UI.** Dozwolony wyłącznie zwykły dywiz `-`.
-Dotyczy też tekstów generowanych przez AI: prompt systemowy zawiera ten zakaz, a odpowiedź
-przechodzi przez `sanitizeDash()` (patrz `08-AI-KOMISJA.md`).
+**Z3. Kolory i rozmiary czcionek WYŁĄCZNIE przez tokeny z `app/tokens.css`.**
+Wyjątki: `app/vendor/**` oraz wnętrze `url("data:...")`. Złamanie: `color: #ff00ff`
+w komponencie. Poprawnie: `color: var(--jad)`.
 
-**Z3. Style wyłącznie przez tokeny CSS.** W żadnym pliku komponentu nie może wystąpić
-literał koloru (`#ff00ff`, `rgb(...)`, `hotpink`) ani literał rozmiaru czcionki.
-Wolno: `var(--kolor-alarm)`, `var(--font-krzyk)`. Wyjątki: (a) plik `app/tokens.css`;
-(b) wartości geometryczne bez znaczenia semantycznego (`translateX(3px)`, `0`, `100%`);
-(c) wnętrze `url("data:image/svg+xml,...")` (kursor, favicon) - tam `var()` nie działa,
-więc literał dozwolony pod warunkiem, że ta sama wartość istnieje jako token i jest
-wskazana w komentarzu obok; walidator pomija wnętrza `data:` URI; (d) pliki
-`app/vendor/**` (polityka kopiowania, 02 sekcja F). Weryfikacja: `pnpm run check` (skrypt w F0).
+**Z4. Zero emoji w UI.** Emoji wolno wyłącznie w polu `emojiZrodlowe` danych quizu.
+Charakter robią GIF-y, nie emoji. Złamanie: `<h2>Etap 1 🚀</h2>`.
 
-**Z4. Zero emoji w UI.** Emoji z treści quizu dostarczonej przez użytkownika NIE trafiają
-do interfejsu jako znaki Unicode. Każda kategoria quizu ma zamiast tego `signature`
-(motyw wizualny CSS/SVG) opisany w `06-QUIZ.md`. Emoji wolno zostawić wyłącznie
-w `data/quiz.json` jako pole `emojiZrodlowe` (dokumentacja pochodzenia, nierenderowane).
+**Z5. Zakaz lewego brandowego paska akcentu (`border-left`) na calloutach, cytatach
+i pillach.** To sygnatura generycznego szablonu dokumentacji. Złamanie:
+`.uwaga { border-left: 4px solid var(--jad); }`. Poprawnie: pełna ramka `border: 3px
+outset` albo tło kafelkowe.
 
-**Z5. Zero lewego brandowego paska akcentu (`border-left`) na calloutach, cytatach, pillach.**
-Ramka ma być pełna, podwójna (`border-style: double`), wytłoczona (`outset`/`inset`)
-albo żadna. `border-left` solo to sygnatura generycznego szablonu.
+**Z6. ZAKAZ PRZEKRZYWIANIA. Żadnych `rotate()`, `skew()`, `rotate3d()` ani
+`transform: rotate` na treści, nagłówkach, kartach, obrazkach i pieczątkach.**
+Wszystko stoi pod kątem prostym. Dozwolone wyjątki, wyczerpująca lista:
+(a) `scaleX(-1)` do lustrzanego odbicia GIF-a w przeciwległym rogu (wzorzec ROGI z B3);
+(b) obrót wewnątrz EKRANU ŁADOWANIA 3D (`04-SILNIK-SCENY.md` sekcja F) - to jedyne
+miejsce, gdzie obrót jest zamówiony wprost;
+(c) `scaleY(-1)` w odbiciu-lustrze wody, jeśli powstanie.
+Złamanie: pieczątka wbijana pod kątem 12 stopni, przekrzywiony nagłówek, karta
+z `rotate(-2deg)` „dla luzu".
 
-**Z6. Zero bibliotek do animacji, UI i formularzy.** Zakazane: framer-motion, gsap,
-tailwind, shadcn, react-hook-form, zod-form, lottie, three.js, dowolna biblioteka
-komponentów. Ruch robimy CSS-em i `requestAnimationFrame`. Dozwolone zależności runtime:
-`next`, `react`, `react-dom`, `@vercel/blob` (serwer) i nic więcej bez wpisu
-w `DECISIONS.md` z uzasadnieniem. WYJĄTEK (nie łamie tej zasady): vendoring PLIKÓW
-CSS/SVG na licencji MIT/ISC/BSD/CC0 do `app/vendor/` wg plan/02 sekcja F - kopiujemy
-pliki, nigdy pakiety npm; pliki binarne (fonty, obrazy) zakazane także w vendor.
-(Uzasadnienie: styl polega na ręcznej robocie; biblioteka animacji natychmiast wprowadza
-easing „produktowy", który zabija efekt.)
+**Z7. Assety graficzne to PLIKI w `public/assets/`, nie kod.** Odwrotność zasady
+z pakietu v1 i główny powód tej przebudowy. Nagłówki sekcji, stwory w rogach, paski,
+kursor - wszystko to gotowe pliki GIF/PNG. Rysowanie SVG od zera jest dozwolone tylko
+tam, gdzie plik nie istnieje i `03-BIBLIOTEKA-ASSETOW.md` mówi to wprost.
 
-**Z7. Każdy ruch dekoracyjny jest skokowy.** Animacje dekoracyjne (motyw `gif-less`)
-używają wyłącznie `animation-timing-function: steps(N)` z N od 2 do 8 i czasu trwania
-z zakresu 300-1400 ms. `ease`, `ease-in-out`, `cubic-bezier` są zarezerwowane WYŁĄCZNIE
-dla animacji sterowanych akcją użytkownika (przejścia etapów, otwieranie listu) - patrz Z8.
+**Z8. Gęstość, nie oszczędność.** Każdy pełnoekranowy widok ma **minimum 6 animowanych
+elementów** (GIF-y, `<marquee>`, migające bloki), z czego minimum 2 w rogach i minimum
+1 pas na całą szerokość. Widok z trzema elementami i dużą pustą przestrzenią jest
+złamaniem zasady, nawet jeśli „wygląda lepiej".
 
-**Z8. Ruch ma dwie klasy i nie wolno ich mieszać.**
-`dekoracja` = zapętlona, skokowa, nieinteraktywna, nigdy nie blokuje wejścia.
-`ceremonia` = jednorazowa, wyzwolona kliknięciem, może zająć ekran, ma zdefiniowany czas
-całkowity i zawsze da się ją pominąć (`Esc` lub przycisk `POMIŃ CEREMONIĘ`).
-Element nie może być jednocześnie dekoracją i ceremonią.
+**Z9. Każda strona ma własny kafel tła.** Kafel to plik PNG/GIF powtarzany przez
+`background-repeat: repeat`, BEZ `background-size`, w oryginalnej rozdzielczości.
+Złamanie: `background-size: cover` na kaflu, gradient CSS zamiast kafla.
 
-**Z9. Żadna ceremonia nie trwa dłużej niż 9 s bez możliwości pominięcia** i każda
-kończy się stanem, w którym fokus klawiatury jest ustawiony na sensownym elemencie
-(pierwszy nagłówek nowego etapu albo pierwszy przycisk).
+**Z10. Fokus klawiaturą musi być widoczny na każdym elemencie interaktywnym.**
+`:focus-visible` daje `outline: 3px dashed var(--fokus); outline-offset: 2px`.
+Zakaz `outline: none` bez zamiennika. Kicz nie zwalnia z dostępności.
 
-**Z10. `prefers-reduced-motion: reduce` wyłącza WSZYSTKIE ruchy klasy `dekoracja`
-i skraca każdą `ceremonię` do jednego kroku ≤ 400 ms.** Treść i punktacja muszą
-pozostać w pełni dostępne. Weryfikacja: Playwright `page.emulateMedia({reducedMotion:"reduce"})` plus screenshot.
+**Z11. `prefers-reduced-motion: reduce` zatrzymuje ruch.** Animacje CSS dostają
+`animation-play-state: paused`, a animowane GIF-y są podmieniane na statyczną klatkę
+(mechanizm w `04-SILNIK-SCENY.md` sekcja G). Wyjątek: nic. Nawet napis płonący.
 
-**Z11. Zero utraty danych kandydata przy przeładowaniu.** Odpowiedzi egzaminu i quizu
-zapisują się w `sessionStorage` pod kluczem `jwp.v1` przy każdej zmianie pola
-(debounce 400 ms). Przeładowanie strony w połowie quizu przywraca zaznaczenia.
+**Z12. Sekrety wyłącznie w `.env.local` i w env Vercela.** `OPENROUTER_API_KEY`
+i `BLOB_READ_WRITE_TOKEN` nie mogą pojawić się w kodzie, commicie, promptcie workera
+ani w czacie. Złamanie: `const key = "sk-or-..."`.
 
-**Z12. Klucz OpenRouter nigdy nie trafia do klienta ani do repozytorium.** Wywołania AI
-idą wyłącznie przez Route Handler po stronie serwera. W kodzie klienta nie może wystąpić
-string `OPENROUTER`. Weryfikacja: `grep -r OPENROUTER app/ --include=*.tsx` = 0 trafień
-oraz `grep -r "sk-or-" . --exclude-dir=.git --exclude=.env.local` = 0 trafień.
+**Z13. Walidacja na granicy zaufania po stronie serwera, zawsze.** Route API waliduje
+każde pole, niezależnie od walidacji w formularzu. Zostaje z v1 bez zmian.
 
-**Z13. Copy jest po polsku, pisane pierwszą osobą Komisji, z pełnymi znakami
-diakrytycznymi.** Zakaz „ą" zapisanego jako „a". Zakaz korporacyjnych czasowników:
-`Wyślij`, `Dalej`, `Rozpocznij`, `Zatwierdź`. Każdy przycisk to zdanie
-(`ODDAJĘ DOWÓD KOMISJI`, `JESTEM GOTOWA NA PRÓBĘ OGNIA`).
+**Z14. Zero bibliotek runtime poza `next`, `react`, `react-dom`, `@vercel/blob`.**
+Żadnych bibliotek animacji, UI, formularzy, 3D. Walidator `scripts/lint-tokens.mjs`
+pilnuje allowlisty. Efekt 3D robimy CSS-owymi transformacjami, nie `three.js`.
 
-**Z14. Zero paska sukcesu bez pieczątki.** Każdy komunikat o wyniku musi być osadzony
-w motywie `pieczatka` albo `formularz-F7`, nigdy jako zwykły zielony alert.
+**Z15. Dźwięk startuje TYLKO po geście Aleksandry.** Zero autoplay z dźwiękiem.
+Stan włączenia zapamiętany w `localStorage` pod kluczem `jwp.audio`.
 
-**Z15. Zero scroll-hijackingu i zero blokowania natywnych zachowań przeglądarki.**
-Prawy przycisk działa. `Ctrl+F` działa. Zaznaczanie tekstu działa. Kicz robimy warstwą
-wizualną, nie odbieraniem kontroli. (Świadome odejście od referencji A1.)
+**Z16. Copy mówi do Aleksandry po imieniu** (sekcja D). Złamanie: „Kandydat proszony
+jest o wypełnienie druku".
 
-**Z16. Dźwięk nigdy nie startuje sam.** Ścieżka dźwiękowa jest wyłączona domyślnie,
-włącza ją wyłącznie kliknięcie w motyw `radio-komisji`. Stan zapamiętywany w
-`localStorage` pod `jwp.audio`.
+**Z17. Zakaz `transition: all`.** Zawsze lista konkretnych właściwości.
 
----
+**Z18. Budżet wagi widoku: suma assetów pobieranych na jednym ekranie <= 2,5 MB.**
+Referencja ma pliki po 1,6 MB (`frontend1.gif`) - my takich nie bierzemy bez
+przepuszczenia przez optymalizację. Metoda pomiaru w `03-BIBLIOTEKA-ASSETOW.md`.
 
-## C. SŁOWNIK POJĘĆ (nazwy obowiązujące w całym pakiecie i w kodzie)
+## F. SŁOWNIK POJĘĆ (używaj TYLKO tych nazw w całym pakiecie i w kodzie)
 
-Nazwy w kodzie: klasy CSS i komponenty używają dokładnie tych nazw w formie
-kebab-case (CSS) lub PascalCase (React). Zakaz synonimów.
+| Nazwa | Znaczenie |
+|---|---|
+| `kafel` | plik graficzny powtarzany jako tło sekcji przez `background-repeat: repeat` |
+| `stwór-rogowy` | animowany GIF przyklejony do rogu widoku, wzorzec ROGI z B3 |
+| `pas` | wąski GIF rozciągnięty na 100% szerokości jako tło diva o stałej wysokości |
+| `napis-obrazek` | nagłówek będący plikiem GIF z tekstem, a nie tekstem w `<h1>` |
+| `kursor-komisji` | animowany GIF ustawiony jako `cursor` całej strony |
+| `pas-goniec` | element `<marquee>` albo jego CSS-owy odpowiednik, przewijający tekst |
+| `ekran-ladowania` | pełnoekranowy ekran startowy z animacją 3D, sekcja F w `04` |
+| `plonacy-napis` | napis `EGZAMIN JASIU` z nałożonym ogniem, sekcja E w `04` |
+| `radio-tiny-desk` | odtwarzacz koncertu Post Malone, kontrakt w `09` |
+| `druk` | dowolny formularz w tym projekcie |
+| `werdykt` | wynik etapu zapisany w `sessionStorage` |
+| `komisja` | narrator strony, pisze urzędowo, ale zwraca się do Aleksandry po imieniu |
+| `pass-o-metr` | pasek postępu przez 3 etapy, element wspólny w shellu |
+| `biblioteka-assetow` | katalog `public/assets/` plus manifest `data/assety.json` |
 
-| Nazwa | Co to jest | Gdzie zdefiniowane |
-|---|---|---|
-| `gif-less` | Technika ruchu: zapętlona animacja CSS `steps(N)` udająca animowany GIF z epoki. Podstawowy budulec dekoracji. | `03` |
-| `kafel-tla` | Kafelkowane tło sekcji generowane proceduralnie (`repeating-linear-gradient` + `radial-gradient`), inne dla każdego z 5 wariantów. | `03` |
-| `pasek-krawedzi` | Poziomy pas 40-48 px przyklejony do górnej lub dolnej krawędzi viewportu, wypełniony kafelkiem w ruchu. | `03` |
-| `kursor-komisji` | Własny kursor (SVG data-URI, 32x32) plus `kometa-kursora`. | `04` |
-| `kometa-kursora` | Ślad z 8 kwadratów podążający za kursorem z opóźnieniem klatkowym. Wyłączany przez Z10 i na dotyku. | `03` |
-| `pass-o-metr` | Globalny wskaźnik postępu przez trzy etapy, stylizowany na pasek postępu z Windows 95, który potrafi się cofnąć. | `04` |
-| `formularz-F7` | Wizualny motyw „druku urzędowego": ramka `double`, nagłówek z numerem druku, pola z podkreśleniem kropkowanym. | `04` |
-| `pieczatka` | Okrągła lub owalna pieczęć nakładana z obrotem i skokiem skali, z tekstem po łuku. Każdy wynik dostaje pieczątkę. | `03`, `05` |
-| `komisja` | Trzy „głowy" egzaminatorów (SVG, styl clip-art), animowane niezależnie, wypowiadające kwestie w dymkach. | `05` |
-| `karta-dowodowa` | Przeciągalna karta z danymi wejściowymi zadania z fizyki (masa słonia, prędkość zebry itd.). | `05` |
-| `maszyna-prawdy` | Ceremonia sprawdzania quizu: przewracanie kart pytań i naliczanie punktów na liczniku mechanicznym. | `06` |
-| `licznik-mechaniczny` | Wyświetlacz liczb z bębnami przewijanymi pionowo `steps()`. | `03`, `06` |
-| `signature` | Unikalna interakcja przypisana do jednego pytania quizu. Każde z 15 pytań ma inną. | `06` |
-| `proba-ognia` | Trzeci etap: formularz plus ceremonia ognia. | `07` |
-| `list-w-butelce` | Finalna ceremonia: butelka dryfująca po morzu, po kliknięciu rozwija pergamin z komunikatem końcowym. | `07` |
-| `radio-komisji` | Widget dźwięku (wyłączony domyślnie, Z16). | `04` |
-| `webring-stopki` | Stopka z nawigacją Prev / Next / Random / Lista i datą ostatniej aktualizacji. | `04` |
-| `ceremonia` / `dekoracja` | Dwie klasy ruchu, patrz Z8. | `03` |
+## G. ANTY-SPEC GLOBALNA (czego NIE robić - to chroni charakter mocniej niż nakazy)
 
----
-
-## D. ANTY-SPEC GLOBALNA (czego nie robimy nigdzie)
-
-1. Nie robimy hero z wyśrodkowanym nagłówkiem, podtytułem i dwoma przyciskami obok siebie.
-2. Nie robimy siatki kart 3 w rzędzie z ikoną, tytułem i akapitem.
-3. Nie robimy `box-shadow: 0 1px 3px rgba(0,0,0,.1)` ani żadnego miękkiego cienia
-   produktowego. Cień jest twardy, przesunięty o całkowitą liczbę pikseli, bez rozmycia.
-4. Nie robimy `border-radius` większego niż 0 nigdzie poza motywami `pieczatka`
-   i `list-w-butelce`. Świat jest kanciasty.
-5. Nie robimy gradientów pastelowych ani „glassmorphism". Gradient jest dozwolony wyłącznie
-   jako kafelek tła w jaskrawych kolorach albo jako `chrom` w nagłówku.
-6. Nie robimy scroll-triggered fade-in-up. Element albo jest, albo wskakuje skokowo.
-7. Nie robimy dark mode. Strona ma jeden wygląd i jest nim zawsze.
-   (`prefers-color-scheme` ignorujemy świadomie; to nie jest produkt, to jest artefakt.)
-8. Nie tłumaczymy interfejsu. Tylko polski.
+1. **Zero „czystego, minimalistycznego retro".** Jeśli wynik wygląda jak nowoczesna
+   strona z pikselową czcionką, jest do przerobienia. Punkt odniesienia to wysypisko
+   GIF-ów, nie plakat w stylu vintage.
+2. **Zero hero z jednym nagłówkiem i dwoma przyciskami obok siebie.**
+3. **Zero kart w siatce 3 na wiersz z jednakowymi cieniami.**
+4. **Zero `border-radius` powyżej 4 px.** Rogi są ostre albo `outset`/`ridge`.
+5. **Zero cieni typu `box-shadow: 0 10px 30px rgba(0,0,0,.1)`.** Dozwolone tylko
+   twarde obramowania `outset`, `ridge`, `groove` i cień 2 px bez rozmycia.
+6. **Zero animacji `ease-in-out` na ozdobnikach.** Ruch dekoracyjny jest skokowy
+   (`steps()`) albo pochodzi z GIF-a.
+7. **Zero pustej przestrzeni „dla oddechu"** - patrz Z8.
+8. **Zero przeciągania myszą jako mechaniki zadania** (usunięte na wyraźne życzenie,
+   szczegóły w `06-EGZAMIN.md`).
+9. **Zero scroll-hijackingu i animacji wyzwalanych scrollem.** Strona ma się dać
+   przewinąć normalnie.
+10. **Zero tekstu na tle bez podkładu.** Kafle są kontrastowe, więc każdy blok tekstu
+    ma własne tło (biały/czarny prostokąt albo ramka `outset`), inaczej jest nieczytelny.
+    To jedyny punkt, w którym referencja jest gorsza od nas i świadomie ją poprawiamy.

@@ -1,206 +1,132 @@
-# 02 - FUNDAMENT: STACK, TOKENY, DANE KANONICZNE, KONWENCJE
+# 02 - FUNDAMENT: STACK, CO ZOSTAJE, TOKENY, DANE
 
-## A. STACK (dokładny, bez wariantów)
+## A. STACK I REPO
 
-- **Next.js 15 (App Router), TypeScript, React 19.** Scaffold: `pnpm create next-app@latest . --ts --app --no-tailwind --no-eslint --src-dir=false --import-alias "@/*"` bez ESLinta.
-- **Zależności runtime: dokładnie next, react, react-dom, @vercel/blob** (Z6; @vercel/blob
-  dochodzi w F5-02, allowlist w walidatorze). DevDeps dozwolone: typescript,
-  @playwright/test, @axe-core/playwright. ESLinta nie instalujemy (ponytail: tsc +
-  walidator wystarczą).
-- **Deploy: Vercel**, projekt `j-word-pass`, repo GitHub `Enkidu-png/j-word-pass` (prywatne? NIE - publiczne, nie ma nic wrażliwego poza env). Env produkcyjne: `OPENROUTER_API_KEY` (ustawiane przez `vercel env add`, nigdy w repo).
-- **Struktura katalogów:**
+- Next.js 15 App Router, React 19, TypeScript. Katalog: `~/repos/j-word-pass`.
+- Repo: `Enkidu-png/j-word-pass` (public), deploy Vercel, projekt już podlinkowany.
+- Zależności runtime: `next`, `react`, `react-dom`, `@vercel/blob`. Nic więcej (Z14).
+- Komendy: `pnpm dev`, `pnpm build`, `pnpm run check`, `npx playwright test`.
+- Menedżer: pnpm 11. Node 26. TypeScript **przypięty do `^5.9.3`** - TS 7 psuje Next 15.5.
+- Konfiguracja to `next.config.mjs`, NIE `.ts` (patrz `DECISIONS.md` #2 z v1).
 
-```
-app/
-  layout.tsx          # shell: tokens.css, kursor-komisji, pass-o-metr, webring-stopki
-  page.tsx            # Etap 0: brama (wejście)
-  egzamin/page.tsx    # Etap 1
-  quiz/page.tsx       # Etap 2
-  proba-ognia/page.tsx# Etap 3
-  api/ocena/route.ts  # POST: ocena egzaminu przez OpenRouter
-  api/zgloszenie/route.ts # POST: zapis 1 pliku JSON per zgłoszenie do Vercel Blob (patrz D)
-  tokens.css          # JEDYNE miejsce z literałami kolorów/rozmiarów (Z3)
-  globals.css         # reset + klasy motywów wspólnych (gif-less, formularz-F7...)
-components/           # PascalCase = nazwy ze słownika (PassOMetr.tsx, Pieczatka.tsx...)
-lib/
-  stan.ts             # sessionStorage jwp.v1: zapis/odczyt/typy
-  animacje.ts         # pomocniki ceremonii (rAF, steps)
-data/
-  egzamin.json        # kanoniczne dane egzaminu
-  quiz.json           # kanoniczne 15 pytań + klucz + signature
-  komisja.json        # kwestie dialogowe komisji (teksty dymków)
-scripts/
-  lint-tokens.mjs     # walidator Z3 + walidacja danych kanonicznych
-```
+## B. CO ZOSTAJE Z WERSJI 1 (nie dotykać bez potrzeby)
 
-## B. TOKENY (`app/tokens.css` - wartości startowe, wolno tunować, nie wolno omijać)
+Decyzja Aleksandry: „nowa skóra, stary szkielet". Te rzeczy są zweryfikowane
+i działają na produkcji, przepisywanie ich to czysta strata:
 
-Paleta: „urzędowo-jarmarczna". Kolory celowo za ostre, ale NAZWANE i używane spójnie.
+| Plik | Rola | Zmiany dozwolone |
+|---|---|---|
+| `app/api/ocena/route.ts` | ocena egzaminu przez OpenRouter, clamp 6-10, sanitizeDash, limit 5/min | tylko treść promptu (zwrot do Aleksandry) |
+| `app/api/zgloszenie/route.ts` | zapis do Vercel Blob, walidacja, limit 3/min, tryb dev-log | tylko komunikaty błędów (zwrot do Aleksandry) |
+| `lib/limit.ts` | wspólny limiter z pulą per route | brak |
+| `lib/stan.ts` | stan w `sessionStorage` pod `jwp.v1`, `zapiszStan` z debounce 400 ms, `zapiszTeraz` | brak |
+| `data/egzamin.json`, `data/quiz.json`, `data/komisja.json` | treść kanoniczna | treść tak, struktura nie |
+| `scripts/lint-tokens.mjs` | walidator Z3, Z6-allowlist, kanon Z1/Z2/Z5, walidacja danych | rozszerzenie o Z6-zakaz-obrotu i Z9 |
+| `playwright.config.ts` | dwa viewporty 1280x800 i 390x844 | brak |
+| `tests/f3-01.spec.ts`, `tests/f5-02.spec.ts` | testy kontraktów API | brak |
+
+## C. CO LECI DO KOSZA (usunięte w F0-02, bez litości)
+
+Cała warstwa wizualna v1. Kasujemy pliki, nie komentujemy ich „na wszelki wypadek":
+
+- `app/globals.css` i `app/tokens.css` - przepisywane od zera
+- `app/page.tsx`, `app/egzamin/**`, `app/quiz/**`, `app/proba-ognia/**` - wszystkie widoki
+- `components/**` - wszystkie komponenty wizualne (`Pieczatka`, `PasekKrawedzi`,
+  `PassOMetr`, `KometaKursora`, `RadioKomisji`, `WebringStopki`, `StrazEtapu`,
+  segregator quizu, 15 plików signature, scena egzaminu, karty dowodowe)
+- `app/dev/animacje` - playground silnika v1
+- `tests/f1-*.spec.ts`, `tests/f2-*.spec.ts`, `tests/f4-*.spec.ts`, `tests/f6-*.spec.ts`,
+  `tests/f7-*.spec.ts` - testy nieistniejących już komponentów
+- `screenshots/F1..F7/**` - dowody z poprzedniego buildu
+
+`StrazEtapu` (blokada wejścia na etap bez ukończenia poprzedniego) i `PassOMetr`
+odtwarzamy od zera w nowej skórze - logika była dobra, wygląd nie.
+
+## D. TOKENY CSS (`app/tokens.css`) - paleta jaskrawa, nie stonowana
+
+Referencja nie ma palety, ma zderzenia kolorów. Nasza paleta ma być czytelna
+w druku i jaskrawa w ozdobnikach. Wartości startowe, kontrast zmierzony:
 
 ```css
 :root {
-  /* kolory */
-  --papier: #f4e9c8;        /* tło druków, pożółkły papier */
-  --atrament: #1a1447;      /* tekst podstawowy, granat długopisu */
-  --alarm: #ff2079;         /* magenta: błędy, kara śmierci, blink */
-  --jad: #21f363;           /* zielony CRT: sukcesy, punkty */
-  --urzad: #b3241a;         /* czerwień pieczątki */
-  --kosmos: #0b0330;        /* tło sekcji kosmicznych (egzamin) */
-  --chrom-a: #7df9ff; --chrom-b: #f6f186; --chrom-c: #ff9bf2; /* gradient chromowy nagłówków */
-  --cien: #000000;          /* twardy cień, zawsze pełny czarny */
-  --gwiazda: #ffffff;       /* kropki gwiazd w kafel--kosmos; też literał w data: URI kursora */
-  --zebra-a: #f4e9c8; --zebra-b: #f6f186; /* biało-żółte pasy kafel--zebra (= papier/chrom-b) */
+  /* tła i płótna */
+  --kosmos: #000018;        /* ciemne tło sekcji z gwiazdami */
+  --papier: #f4f0e4;        /* podkład pod tekst czytany, kontrast 15,2:1 z --tusz */
+  --tusz: #101010;          /* tekst czytany */
+  --druk-tlo: #ffffff;      /* wnętrze formularzy */
+
+  /* akcenty kiczu */
+  --jad: #39ff14;           /* jadowita zieleń, TYLKO ozdobniki i ramki */
+  --magenta: #ff00c8;       /* akcent 2, TYLKO ozdobniki */
+  --cyjan: #00fff2;         /* akcent 3, TYLKO ozdobniki */
+  --alarm: #cc0060;         /* błędy, kontrast 5,9:1 na --papier */
+  --zloto: #ffd400;         /* wyróżnienia werdyktu */
+
+  /* chrom i ramki */
+  --chrom-a: #dcdcdc;
+  --chrom-b: #6e6e6e;
+  --ramka-jasna: #ffffff;
+  --ramka-ciemna: #404040;
+  --fokus: #ff00c8;
+
   /* typografia */
-  --font-urzad: "Courier New", Courier, monospace;    /* druki, dane, formularze */
-  --font-krzyk: Impact, "Arial Black", sans-serif;    /* nagłówki-krzyki */
-  --font-glos: Georgia, "Times New Roman", serif;     /* narracja komisji */
-  --rozmiar-krzyk: clamp(44px, 8vw, 96px);
-  --rozmiar-tekst: 18px;
-  --rozmiar-drobny: 13px;
-  /* geometria */
-  --cien-x: 4px; --cien-y: 4px;   /* twardy offset cienia (anty-spec D3) */
-  --ramka: 4px double var(--atrament);
-  /* ruch */
-  --t-dekoracja: 800ms;  /* bazowy czas pętli gif-less */
-  --t-ceremonia: 600ms;  /* bazowy krok ceremonii */
+  --font-odreczny: "Caveat", "Comic Sans MS", cursive;
+  --font-czytany: "Verdana", "Geneva", sans-serif;
+  --font-terminal: "Courier New", monospace;
+  --stopien-h1: 60px;
+  --stopien-h1-duzy: 78px;
+  --stopien-h2: 32px;
+  --stopien-tresc: 18px;
+  --stopien-drobny: 14px;
 }
 ```
 
-Czcionek webowych NIE ładujemy (Impact/Courier/Georgia są systemowe; brak requestu
-do Google Fonts = zero CLS i zero zależności). Wyjątek dozwolony w F5 (polish), jeśli
-worker uzna, że potrzebny jest font pikselowy: wtedy self-hosted woff2 w `public/`,
-z fallbackiem, decyzja odnotowana w DECISIONS.md.
+**Reguła kontrastu (Z10 + F6):** tekst czytany zawsze na `--papier` albo `--druk-tlo`,
+nigdy bezpośrednio na kaflu. Jaskrawe tokeny (`--jad`, `--magenta`, `--cyjan`) są
+zabronione jako kolor tekstu dłuższego niż 3 słowa.
 
-## C. DANE KANONICZNE (jedyne źródła prawdy, Z-jedno-źródło)
+**Fonty:** `Caveat` self-hostowany jako `woff2` w `public/fonts/` (F0-04), z `font-display:
+swap` i fallbackiem `Comic Sans MS`. Zakaz ładowania z Google Fonts w runtime (Z14
+dotyczy też zewnętrznych zasobów blokujących render).
 
-### C1. `data/egzamin.json`
-```json
-{
-  "tytul": "EGZAMIN PAŃSTWOWY Z FIZYKI STOSOWANEJ NR F-7/BIS",
-  "tresc": "Kto twoim zdaniem wygrałby pojedynek - 2000 zebr z jetpackami, ale biało-żółtych, czy 1 słoń z karabinem maszynowym na trąbie?",
-  "zalozenia": [
-    {"id": "kosmos", "tekst": "Pojedynek odbywa się w kosmosie."},
-    {"id": "zebra-v", "tekst": "Prędkość zebry w kosmosie wynosi 300 km/h. Jetpacki mają zasięg około 1000 km (potem już tylko pęd)."},
-    {"id": "slon-oko", "tekst": "Słoń ma sokole oko i 5000 naboi."},
-    {"id": "slon-masa", "tekst": "Masa słonia wynosi około 10 t (elefantus gigantis)."},
-    {"id": "zebra-cv", "tekst": "Jedna z zebr ma raka trzustki i skończyła akademię wojskową."},
-    {"id": "odrzut", "tekst": "Przyjmujemy, że słoń przy każdym strzale przyspiesza o 1 km/h."}
-  ],
-  "polecenie": "Zastosuj odpowiednie wzory i udowodnij wynik.",
-  "liczbaPodzadan": 1,
-  "punktyMin": 6, "punktyMax": 10, "punktyPuste": 0
-}
-```
-Uwaga wierności: treść zadania przepisana Z ZACHOWANIEM absurdu, ale z poprawioną
-ortografią (`trszustki` -> `trzustki`, `zeber` -> `zebr`). Absurd merytoryczny zostaje w 100%.
+## E. DANE KANONICZNE
 
-### C2. `data/quiz.json`
-15 pytań - PEŁNA treść kanoniczna w `plan/11-QUIZ-TRESC.md` (pytania, warianty,
-kategorie, emoji źródłowe, klucz, signature). Przepisać 1:1 (treści wariantów bez zmian).
-Schemat rekordu:
-```json
-{
-  "id": 1, "kategoria": "Biologia", "emojiZrodlowe": "🐙",
-  "typ": "abcd",                      // "abcd" | "otwarte" (pytanie 14: Mohsa)
-  "pytanie": "Które z poniższych zdań jest prawdziwe?",
-  "warianty": {"A": "...", "B": "...", "C": "...", "D": "..."},
-  "poprawna": "B",
-  "kluczOtwarte": null,               // dla typ=otwarte: ["mohsa", "skala mohsa"]
-  "signature": "osmiornica-trzy-serca" // patrz 06-QUIZ.md sekcja D
-}
-```
-Klucz odpowiedzi (z inputu): 1:B, 2:C, 3:A, 4:B, 5:A, 6:A, 7:A, 8:A, 9:A, 10:A, 11:A,
-12:A, 13:A, 14:otwarte („Mohsa"), 15:A. Pytanie otwarte akceptuje dopasowanie
-case-insensitive po `normalize("NFD")` bez diakrytyków do listy `kluczOtwarte`.
+Bez zmian strukturalnych względem v1. `data/egzamin.json`, `data/quiz.json`
+(15 pytań), `data/komisja.json` (stany dymków + werdykty awaryjne).
 
-### C3. `data/komisja.json`
-Kwestie trzech głów komisji (imiona: `PRZEWODNICZĄCY HIENIALIUSZ`, `SEKRETARZ OKOŃ`,
-`CZŁONKINI Z URZĘDU`). Minimum 6 kwestii na stan: powitanie, czekanie, ocenianie,
-werdykt-wysoki (9-10), werdykt-niski (6-8), werdykt-zero. Teksty pisze worker w F3
-zgodnie z głosem z `01` sekcja A3 (pierwsza osoba, konkret, zero korpo).
+**Nowy plik: `data/assety.json`** - manifest biblioteki assetów, jedyne źródło prawdy
+o tym, co gdzie leży. Kontrakt w `03-BIBLIOTEKA-ASSETOW.md` sekcja D.
 
-### C4. Walidacja danych: `scripts/lint-tokens.mjs` waliduje też JSON-y:
-quiz ma dokładnie 15 rekordów, każde `abcd` ma 4 warianty i `poprawna` w {A,B,C,D},
-`signature` unikalne, `id` ciągłe 1-15. Wywołanie: `pnpm run check` (skrypt łączy
-lint tokenów + walidację danych + `tsc --noEmit`). Nie podpinamy do CI ani `predeploy`;
-`pnpm run check` uruchamia worker ręcznie per issue (AC). Walidator ma też allowlist
-zależności runtime (next, react, react-dom, @vercel/blob) i ignoruje `app/vendor/**`
-oraz wnętrza `url("data:...")`.
+**Zmiana treści (nie struktury):** wszystkie stringi widoczne dla Aleksandry
+przechodzą na zwrot bezpośredni (Z16). To dotyczy `data/komisja.json`,
+`data/egzamin.json`, promptu systemowego w `/api/ocena` i wszystkich komunikatów
+walidacji w `/api/zgloszenie`.
 
-## D. ZAPIS ZGŁOSZEŃ (formularz, wariant „tylko zapis")
+## F. KONWENCJE KODU
 
-Decyzja użytkownika: tylko zapis + list w butelce, mail wysyłany ręcznie.
-Realizacja bez dodatkowych usług: `app/api/zgloszenie/route.ts` robi POST do
-**Vercel Blob** (`@vercel/blob` - DOZWOLONY wyjątek od Z6, bo to warstwa serwerowa,
-nie UI; wpis w DECISIONS.md z góry zatwierdzony) - jeden plik JSON per zgłoszenie:
-`zgloszenia/<ISO-timestamp>-<losowe6>.json` z polami
-`{email, rozmiarButa, srednicaUchaMm, punktyEgzamin, punktyQuiz, ts}`.
-Wymaga `BLOB_READ_WRITE_TOKEN` (Vercel tworzy przy podpięciu Blob store w F0).
-Fallback gdy env brak (lokalny dev): zapis do `console.log` + odpowiedź 200 z polem
-`"tryb": "dev-log"` - formularz działa lokalnie bez tokenów.
-Odczyt zgłoszeń: user wchodzi w dashboard Vercel Blob (nie budujemy panelu admina - YAGNI).
+- Komponenty w `components/`, jeden plik = jeden komponent, nazwy po polsku bez
+  polskich znaków (`PasGoniec`, `StworRogowy`, `NapisObrazek`).
+- Wszystkie style w `app/globals.css` plus pliki `app/style/<obszar>.css` importowane
+  do `globals.css`. Zero CSS-in-JS, zero modułów CSS (jeden mechanizm, nie trzy).
+- Klasy CSS po polsku bez znaków diakrytycznych, w konwencji BEM-lite:
+  `.stwor-rogowy`, `.stwor-rogowy--lustro`, `.pas--gorny`.
+- `route.ts` w Next.js NIE MOŻE eksportować nic poza handlerami i konfiguracją
+  segmentu. `tsc --noEmit` tego nie łapie, wywala dopiero `pnpm build`.
+- Commit: `Fx-NN: opis` po polsku bez znaków diakrytycznych, jeden per issue.
 
-Walidacja serwerowa (granica zaufania, obowiązkowa): email regex `.+@.+\..+`,
-rozmiarButa liczba 10-70, srednicaUchaMm liczba 5-500, payload ≤ 2 KB. Błąd -> 400
-z komunikatem w stylu Komisji.
+## G. PUŁAPKI ŚRODOWISKOWE (zmierzone w buildzie v1, nie tracić na nie czasu ponownie)
 
-## E. KONWENCJE KODU
-
-- Komponenty klienckie tylko tam, gdzie jest stan/interakcja (`"use client"` per plik).
-  Strony renderują strukturę serwerowo, wyspy interaktywne jako komponenty.
-- Nazwy plików komponentów = PascalCase nazwy słownika: `PassOMetr.tsx`, `Pieczatka.tsx`,
-  `MaszynaPrawdy.tsx`, `ListWButelce.tsx`, `KartaDowodowa.tsx`, `Komisja.tsx`.
-- Klasy CSS = kebab-case ze słownika: `.gif-less`, `.formularz-F7`, `.pasek-krawedzi`.
-- Commity: `Fx-NN: opis` (per issue, konwencja z BACKLOG).
-- Screenshoty dowodowe: `screenshots/Fx/` w repo (PNG z Playwright, viewport 1280x800
-  oraz 390x844 dla mobile tam, gdzie AC tego wymaga).
-- Playwright: `@playwright/test` w devDeps, `npx playwright install chromium` w F0-04
-  (config: viewporty 1280x800 i 390x844, baseURL http://localhost:3000).
-  Testy w `tests/` - używane jako narzędzie weryfikacji AC (screenshot + asercje),
-  nie jako pełny suite regresyjny.
-
-## F. POLITYKA KOPIOWANIA (przyspieszenie: gotowe bloki z GitHuba - dyrektywa usera)
-
-Nie wynajdujemy kół. Workerzy AKTYWNIE kopiują gotowy kod open source zamiast pisać
-od zera, na tych warunkach:
-
-1. **Wolno kopiować (wklejka do repo, "vendoring"):** fragmenty CSS/JS/SVG z repozytoriów
-   i serwisów na licencjach MIT/ISC/BSD/CC0/WTFPL - np. kolekcje animacji CSS
-   (`animate.css` - wybrane keyframes, `css-loaders`), generatory patternów
-   (`css-pattern`, MagicPattern), clip-arty SVG (openclipart CC0, SVG Repo z filtrem
-   licencji), kursory/odznaki z kolekcji public domain, snippety z CodePen oznaczone
-   MIT. Każda wklejka dostaje komentarz `/* src: <URL> (licencja) */` w miejscu użycia.
-2. **Wolno całe biblioteki CSS jako JEDEN plik statyczny** (nie npm): `98.css` (MIT)
-   lub `NES.css` (MIT) mogą zostać zvendorowane do `app/vendor/` i użyte selektywnie
-   (np. okna/przyciski Windows 95 dla `pass-o-metr` i `formularz-F7`), BEZ towarzyszących
-   plików fontów (binarki zakazane także w vendor; `98.css` używamy z naszym
-   `--font-urzad`), pod warunkiem przemapowania kolorów na nasze tokeny (Z3 dotyczy NASZYCH komponentów; plik
-   vendor jest wyłączony spod lint-tokens - wpisany na listę ignore skryptu).
-3. **Nadal ZAKAZANE:** zależności npm runtime (Z6 bez zmian - kopiujemy pliki, nie
-   instalujemy pakietów), kod GPL/AGPL (licencja wirusowa), kopiowanie całych stron
-   1:1 (przejmujemy techniki i bloki, nie cudzy produkt), assety bez jasnej licencji.
-4. **Priorytet szukania** przy każdym issue UI: (a) czy jest gotowy snippet/keyframes
-   do wklejenia? (b) czy 98.css/NES.css ma ten komponent? (c) dopiero potem pisanie
-   od zera. Wybór odnotowany jednym zdaniem w commit message.
-5. Skopiowany ruch dekoracyjny MUSI zostać przestawiony na `steps()` (Z7) - easing
-   z wklejki się wymienia, reszta zostaje.
-
-## G. STAN `sessionStorage jwp.v1` (kontrakt `lib/stan.ts`)
-
-Jeden klucz, jeden obiekt (zapis debounce 400 ms, odczyt przy mount):
-
-```ts
-type StanJWP = {
-  v: 1;
-  egzamin: { odpowiedz: string; zalaczone: string[];        // id kart w slotach
-             punkty: number | null; komentarz: string | null } | null;
-  quiz:    { odpowiedzi: Record<number, string>;            // id pytania -> "A".."D"/tekst
-             punkty: number | null } | null;
-  ogien:   { email: string; rozmiarButa: number | null; srednicaUchaMm: number | null;
-             wyslano: boolean } | null;
-};
-```
-
-`lib/stan.ts` eksportuje: `czytajStan()`, `zapiszStan(patch)` (merge płytki per etap),
-`wyczyscStan()`. Wyłącznie sessionStorage (Z11); jedyny localStorage w projekcie to
-`jwp.audio`. Suma do pergaminu: `(egzamin?.punkty ?? 0) + (quiz?.punkty ?? 0)` / 25.
+1. `pnpm build` NADPISUJE `.next` i psuje działający `pnpm dev` (potem 500/404 i brak
+   hydracji). Kolejność zawsze: testy, potem build, potem restart dev.
+2. `reuseExistingServer: true` w `playwright.config.ts` potrafi serwować STARĄ stronę
+   i dać fałszywe „failed" przy poprawnym kodzie. Przy niewytłumaczalnych failach:
+   ubij dev server i wystartuj świeży.
+3. Wyścig z hydracją: `fill()` przed hydracją bywa nadpisany przez `useEffect`
+   czytający `sessionStorage`. To realny błąd, naprawiany w kodzie (wartość z DOM ma
+   pierwszeństwo, CTA `disabled` do hydracji), nie w teście.
+4. Playwright MCP startuje na kanale `chrome`, którego nie ma na tej maszynie. Do
+   zrzutów używać `npx playwright test` albo `chrome-headless-shell`.
+5. Komendy `vercel blob` wymagają jawnego `--rw-token` (token z `vercel env pull`
+   do pliku tymczasowego). Sama zmienna `VERCEL_OIDC_TOKEN` nie wystarcza.
+6. Poza produkcją `/api/zgloszenie` NIE pisze do Bloba (inaczej każdy przebieg testów
+   zaśmieca płatny store - w v1 uzbierało się 332 pliki).
