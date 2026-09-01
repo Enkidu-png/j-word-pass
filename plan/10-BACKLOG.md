@@ -91,9 +91,18 @@ przemapowane na `var(--...)` (dozwolone tylko w komentarzu licencyjnym).
 
 ## F3 - EGZAMIN + AI (najważniejsza powierzchnia)
 
-- [ ] **F3-01** `ai` Route `/api/ocena`: OpenRouter gemini-2.5-flash-lite + fallback mistral + clamp 6-10 + sanitizeDash + limity.
+- [x] **F3-01** `ai` Route `/api/ocena`: OpenRouter gemini-2.5-flash-lite + fallback mistral + clamp 6-10 + sanitizeDash + limity.
   CZYTAJ: 08 (cały); 01→B (Z1,Z2,Z12).
   AC: wszystkie punkty z 08→D (obecnie 7; pkt 7 = tylko produkcja, weryfikacja w F8-01) - curl-e wklejone do commita; negatywne: string OPENROUTER nie występuje w żadnym pliku klienckim.
+  DOWÓD (`pnpm dev` + curl, potem utrwalone w `tests/f3-01.spec.ts` = ✓ 4 passed):
+  ✓ D1 `curl -X POST localhost:3000/api/ocena -d '{"odpowiedz":"zebry wygrają bo pęd","zalaczoneDowody":2}'` -> HTTP 200, `punkty:6`, komentarz po polsku („(...) argumentacja oparta na 'pędzie' nie spełnia minimalnych kryteriów oceny kreatywności zgodnie z paragrafem 3.b protokołu."); drugi strzał: `punkty:7`, sprawdzone programowo - brak `—`, `–`, `·`, brak emoji, są diakrytyki.
+  ✓ D2 payload 9000 znaków -> HTTP 413 `{"blad":"Wniosek przekracza dopuszczalną objętość akt."}`.
+  ✓ D3 `odpowiedz:""` -> HTTP 200 `{"punkty":0,"komentarz":"PUSTKA."}` (bez wywołania modelu).
+  ✓ D4 dev z `OPENROUTER_API_KEY=` (klucz odpięty) -> HTTP 502 `{"blad":"Komisja nieosiągalna."}` w 0,43 s.
+  ✓ D5 `grep -r "sk-or-"` (bez node_modules/.git/.next/.env.local) = 7 trafień, wszystkie to TREŚĆ AC w `plan/` i `DECISIONS.md`, zero kluczy (zgodnie z DECISIONS z F0-05).
+  ✓ D6 `grep -rln OPENROUTER app lib components scripts` = tylko `app/api/ocena/route.ts`; import z `route.ts` w kliencie = 0 trafień.
+  ⏳ D7 rate limit - kod aktywny wyłącznie przy `NODE_ENV === "production"`, weryfikacja w F8-01 (tak przewiduje spec).
+  UWAGA: plik route Next.js NIE MOŻE eksportować nic poza handlerami - `export function sanitizeDash` przechodzi `tsc --noEmit`, ale wywala `pnpm build` („does not match the required types of a Next.js Route"). Funkcja jest modułowo prywatna.
 - [ ] **F3-02** `ui` ⚠ HARD Scena egzaminu: kosmos, słoń ze strzałem hoverowym + licznik naboi, 12 zeber (1 oficerska reverse), arkusz formularz-F7 z textarea.
   CZYTAJ: 05→A1,A2; 03→B (warianty); 02→F (kopiowanie).
   AC: screenshot desktop + mobile 390px (kolumna, 5 zeber); hover słonia odpala strzał + odrzut + licznik -1 (Playwright: licznik po 3 hoverach = 4997); hover zebry robi beczkę raz; negatywne: treść założeń NIE występuje jako blok `<p>` (anty-spec 05→D1).
