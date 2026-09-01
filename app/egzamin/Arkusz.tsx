@@ -8,9 +8,19 @@ import { czytajStan, zapiszStan } from "@/lib/stan";
 // atrybut `data-pole-robocze` zostaje na textarea, bo to nadal TO SAMO pole
 // odpowiedzi kandydata i asercje przezycia reloadu maja go po czym znalezc.
 
-const SLOTY = 6;
-
-export default function Arkusz() {
+export default function Arkusz({
+  sloty,
+  celSlotu,
+  naSlot,
+  ciagniona,
+  zalaczone,
+}: {
+  sloty: React.ReactNode[];
+  celSlotu: number;      // slot wskazany klawiatura, -1 = nic nie jest podniesione
+  naSlot: (i: number) => void;
+  ciagniona: boolean;    // trwa przeciaganie: sloty swieca krata --jad
+  zalaczone: number;
+}) {
   const [odpowiedz, ustawOdpowiedz] = useState("");
   const pole = useRef<HTMLTextAreaElement>(null);
 
@@ -31,8 +41,15 @@ export default function Arkusz() {
       className="arkusz formularz-F7"
       data-arkusz=""
       onSubmit={(e) => {
-        // F3-04 podepnie tu ceremonie narada-komisji
         e.preventDefault();
+        // ponytail: sam wniosek do Komisji. Ceremonia narada-komisji i werdykt
+        // na ekranie dokłada F3-04 - tutaj liczy sie kontrakt payloadu (05 A3:
+        // liczba zalaczonych dowodow idzie do AI).
+        void fetch("/api/ocena", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ odpowiedz, zalaczoneDowody: zalaczone }),
+        });
       }}
     >
       {/* chromowy gradient czyta sie dopiero na ciemnym pasku - na papierze ginie */}
@@ -44,9 +61,17 @@ export default function Arkusz() {
 
       <div className="arkusz__dowody">
         <span className="arkusz__etykieta">ZAŁĄCZ DOWODY (PRZECIĄGNIJ)</span>
-        <ul className="arkusz__sloty">
-          {Array.from({ length: SLOTY }, (_, i) => (
-            <li className="arkusz__slot" key={i} data-slot={i} />
+        <ul className={`arkusz__sloty${ciagniona ? " arkusz__sloty--czekaja" : ""}`}>
+          {sloty.map((zawartosc, i) => (
+            <li
+              className={`arkusz__slot${celSlotu === i ? " arkusz__slot--cel" : ""}`}
+              key={i}
+              data-slot={i}
+              data-zajety={zawartosc ? "tak" : "nie"}
+              onClick={() => naSlot(i)}
+            >
+              {zawartosc}
+            </li>
           ))}
         </ul>
       </div>

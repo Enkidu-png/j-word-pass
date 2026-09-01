@@ -719,7 +719,98 @@ a:hover, button:hover { outline: 3px dashed var(--alarm); outline-offset: 2px; }
 /* mobile: kolumna, scena nad arkuszem, 5 zeber zamiast 12 (plan/05 C) */
 @media (max-width: 767px) {
   .egzamin__plansza { grid-template-columns: 1fr; }
-  .scena { min-height: 340px; }
+  /* rolka kart zjada dol sceny - scena rosnie, a slon wchodzi nad rolke */
+  .scena { min-height: 440px; }
+  .scena__slon { bottom: 132px; width: 56%; }
   .scena__zebra:nth-child(n + 6) { display: none; }
   .arkusz__sloty { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* == KARTY DOWODOWE (plan/05 A3) == */
+.karty { list-style: none; margin: 0; padding: 0; }
+.karty__miejsce {
+  /* rozrzut po scenie: rzad z indeksu, kolumna na przemian (05 A3) */
+  position: absolute;
+  width: 34%;
+  min-width: 140px;
+  left: 3%;
+  top: calc(4% + var(--nr) * 15%);
+  z-index: 3;
+}
+.karty__miejsce:nth-child(even) { left: 40%; }
+
+.karta-dowodowa {
+  border: var(--ramka);
+  background: var(--papier);
+  box-shadow: var(--cien-x) var(--cien-y) 0 var(--cien);
+  padding: 6px 8px;
+  font-size: var(--rozmiar-drobny);
+  transform: rotate(var(--przechyl, 0deg));
+  touch-action: manipulation;
+  user-select: none;
+}
+.karta-dowodowa--podniesiona {
+  /* uniesienie: skala i twardszy cien, zero rozmycia (anty-spec 01 D3) */
+  transform: rotate(var(--przechyl, 0deg)) scale(1.05);
+  box-shadow: 8px 8px 0 var(--cien);
+  z-index: 9;
+}
+.karta-dowodowa--zalaczona { position: relative; box-shadow: none; }
+.karta-dowodowa__stempel {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  line-height: 0;
+}
+/* pieczec bazowa ma sztywne 120 px - na fiszce musi byc mini. Tekst po luku
+   skalowany w gore, inaczej ZAL. na 46 px jest nie do odczytania. */
+.karta-dowodowa__stempel .pieczatka { width: 46px; }
+.karta-dowodowa__stempel .pieczatka__tekst { font-size: calc(var(--rozmiar-pieczatka) * 1.7); }
+.karta-dowodowa--powrot {
+  animation-name: jwp-powrot;
+  animation-duration: 240ms;
+  animation-timing-function: steps(3, end);
+  animation-iteration-count: 1;
+}
+@keyframes jwp-powrot {
+  0% { transform: rotate(var(--przechyl, 0deg)) translate(24px, -24px); }
+  100% { transform: rotate(var(--przechyl, 0deg)) translate(0, 0); }
+}
+
+/* slot czeka na dowod: kratka --jad zapala sie na czas przeciagania albo
+   na slocie wskazanym klawiatura */
+.arkusz__sloty--czekaja .arkusz__slot[data-zajety="nie"],
+.arkusz__slot--cel {
+  border-style: solid;
+  border-color: var(--jad);
+  background-image:
+    repeating-linear-gradient(0deg, var(--jad) 0 1px, transparent 1px 12px),
+    repeating-linear-gradient(90deg, var(--jad) 0 1px, transparent 1px 12px);
+}
+.arkusz__slot { position: relative; padding: 4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .karta-dowodowa--powrot { animation: none !important; }
+}
+
+/* mobile: karty jako pozioma rolka nad arkuszem, przeciaganie zastapione tap-tap */
+@media (max-width: 767px) {
+  .karty {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 8px;
+    background: var(--kosmos);
+    border-top: var(--ramka);
+  }
+  .karty__miejsce {
+    position: static;
+    flex: 0 0 62%;
+    min-width: 0;
+    width: auto;
+  }
 }

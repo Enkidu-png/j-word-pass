@@ -48,7 +48,18 @@ test("stado: 12 zeber, jedna oficerska leci pod prad, hover robi beczke RAZ", as
     .evaluateAll((els) => els.map((el) => getComputedStyle(el).animationDelay));
   expect(new Set(delaye).size).toBeGreaterThanOrEqual(10);
 
-  const zebra = page.locator("[data-zebra='0']");
+  // karty dowodowe (F3-03) leza na scenie i czesc zeber zaslaniaja - bierzemy
+  // pierwsza, ktora faktycznie jest na wierzchu w swoim srodku
+  const numer = await page.evaluate(() => {
+    for (const el of document.querySelectorAll("[data-zebra]")) {
+      const r = el.getBoundingClientRect();
+      const pod = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+      if (pod?.closest("[data-zebra]") === el) return el.getAttribute("data-zebra");
+    }
+    return null;
+  });
+  expect(numer).not.toBeNull();
+  const zebra = page.locator(`[data-zebra='${numer}']`);
   await page.mouse.move(0, 0);
   await zebra.hover();
   const beczka = await zebra.evaluate((el) => {

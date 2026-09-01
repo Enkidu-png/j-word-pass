@@ -13,7 +13,7 @@ const NABOJE_START = 5000;
 const ZEBR = 12;
 const OFICERKA = 4; // ta z akademii wojskowej: czapka, dyplom, ruch pod prad
 
-export default function Scena() {
+export default function Scena({ children }: { children?: React.ReactNode }) {
   const [naboje, ustawNaboje] = useState(NABOJE_START);
   // klucz salwy: zmiana remontuje pociski i odrzut, wiec ceremonia startuje od nowa
   const [salwa, ustawSalwe] = useState(0);
@@ -94,6 +94,7 @@ export default function Scena() {
           </li>
         ))}
       </ul>
+      {children}
     </section>
   );
 }
