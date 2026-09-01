@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test("NapisObrazek: role img, aria-label i title rowne tekstowi", async ({ page }) => {
   await page.goto("/dev/scena");
-  const svg = page.locator("svg[data-napis]").first();
+  const svg = page.locator('svg[data-napis][aria-label="J-WORD PASS"]');
   await expect(svg).toHaveAttribute("role", "img");
   await expect(svg).toHaveAttribute("aria-label", "J-WORD PASS");
   expect(await svg.locator("title").textContent()).toBe("J-WORD PASS");
@@ -11,8 +11,7 @@ test("NapisObrazek: role img, aria-label i title rowne tekstowi", async ({ page 
 test("gradient chromowy ma dokladnie 6 stopni", async ({ page }) => {
   await page.goto("/dev/scena");
   const stopnie = await page
-    .locator("svg[data-napis='chrom']")
-    .first()
+    .locator('svg[data-napis="chrom"][aria-label="J-WORD PASS"]')
     .evaluate((e) => e.querySelectorAll("stop").length);
   expect(stopnie).toBe(6);
 });

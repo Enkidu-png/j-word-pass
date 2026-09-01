@@ -253,3 +253,20 @@ pisma `y=96` kreska nad `Ó` wychodzila NAD `viewBox` i byla scinana. Wysokosc
 podniesiona do 130, linia pisma do 104. Test w `tests/f1-02.spec.ts` porownuje
 teraz wszystkie cztery krawedzie bbox napisu z viewBox, wiec kazdy nastepny
 napis z diakrytykiem obroni sie sam.
+
+## #16 - `npx playwright test | tail -3` potrafi ukryc czerwone
+
+Pomiar z F1-03: przy szesciu falach reporter `list` wypisuje najpierw liste
+nazw, potem `N failed`, potem `N skipped` i `N passed`. Trzy ostatnie linie
+pokazaly wtedy `8 skipped / 52 passed` i wygladalo to na zielono, mimo ze
+wyzej stalo `6 failed`. Commit poszedl na czerwonym drzewie i trzeba go bylo
+poprawiac.
+
+Do konca budowy: podsumowanie testow czytamy `tail -12` albo jawnym
+`grep -E "failed|passed"`, nigdy `tail -3`.
+
+Sama przyczyna faili jest tez lekcja o testach: `locator(...).first()`
+i liczenie po CALYM dokumencie sa kruche na playgroundzie, ktory rosnie
+z kazdym issue. Plonacy napis dolozyl kilkanascie kopii ozdoby `ogien`
+i dwa testy z F1-01 oraz jeden z F1-02 zaczely mierzyc co innego niz
+mierzyly wczoraj. Selektory zawezone do konkretnej sekcji i do `aria-label`.

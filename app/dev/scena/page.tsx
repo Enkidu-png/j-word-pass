@@ -1,6 +1,7 @@
 import NapisObrazek from "@/components/scena/NapisObrazek";
 import Ozdoba from "@/components/scena/Ozdoba";
 import PasGoniec from "@/components/scena/PasGoniec";
+import PlonacyNapis from "@/components/scena/PlonacyNapis";
 import Pas from "@/components/scena/Pas";
 import StworRogowy from "@/components/scena/StworRogowy";
 import { POZYCJE, pozycjeRoli } from "@/lib/assety";
@@ -19,6 +20,11 @@ export default function Playground() {
         Pozycji w manifescie: {POZYCJE.length}, w tym ozdob: {ozdoby.length},
         pasow: {pasy.length}.
       </p>
+
+      <h2>PLONACY NAPIS</h2>
+      <div className="playground-plonacy">
+        <PlonacyNapis tekst="EGZAMIN JASIU" />
+      </div>
 
       <h2>NAPISY-OBRAZKI</h2>
       <div className="playground-napisy">

@@ -3,19 +3,24 @@ import { pozycjeRoli } from "../lib/assety";
 
 const LICZBA_OZDOB = pozycjeRoli("ozdoba").length;
 
+// Liczymy w SIATCE, nie w calym dokumencie: plonacy napis dokłada kilkanascie
+// kopii ozdoby "ogien", ktorych liczba zalezy od szerokosci okna.
 test("playground renderuje po jednej Ozdobie na kazda pozycje roli ozdoba", async ({ page }) => {
   await page.goto("/dev/scena");
-  await expect(page.locator("img[data-ozdoba]")).toHaveCount(LICZBA_OZDOB + 4); // +4 stwory rogowe
-  const unikalne = await page.evaluate(() =>
-    new Set([...document.querySelectorAll("img[data-ozdoba]")].map((e) => e.getAttribute("data-ozdoba"))).size,
+  await expect(page.locator(".playground-siatka img[data-ozdoba]")).toHaveCount(LICZBA_OZDOB);
+  const unikalne = await page.evaluate(
+    () => new Set([...document.querySelectorAll(".playground-siatka img[data-ozdoba]")].map((e) => e.getAttribute("data-ozdoba"))).size,
   );
   expect(unikalne).toBe(LICZBA_OZDOB);
+  await expect(page.locator("[data-stwor] img[data-ozdoba]")).toHaveCount(4);
 });
 
 test("reduced motion podmienia KAZDA ozdobe na klatke statyczna (Z11)", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/dev/scena");
-  await expect(page.locator("img[data-ozdoba]").first()).toBeVisible();
+  // .first() nie nadaje sie: pierwsza ozdoba w DOM to plomien z warstwy, ktora
+  // reduced motion chowa przez display:none. Czekamy na widoczna z siatki.
+  await expect(page.locator(".playground-siatka img[data-ozdoba]").first()).toBeVisible();
   const zrodla = await page.evaluate(() =>
     [...document.querySelectorAll("img[data-ozdoba]")].map((e) => (e as HTMLImageElement).getAttribute("src") ?? ""),
   );

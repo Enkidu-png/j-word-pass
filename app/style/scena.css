@@ -186,3 +186,101 @@
   border: 2px outset var(--chrom-a);
   color: var(--jad);
 }
+
+/* PLONACY NAPIS (plan/04 E). Trzy warstwy, zero obrotu - wszystko stoi prosto. */
+.plonacy {
+  position: relative;
+  padding-bottom: 60px;
+}
+.plonacy__poswiata {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 40%;
+  z-index: 1;
+  transform-origin: 50% 100%;
+  background: radial-gradient(
+    ellipse at 50% 100%,
+    var(--zar-poswiata) 0%,
+    var(--zar-poswiata-zero) 70%
+  );
+  animation: plonacy-oddech 1300ms steps(4) infinite;
+}
+.plonacy__napis {
+  position: relative;
+  z-index: 2;
+  will-change: opacity;
+  filter: drop-shadow(0 0 12px var(--zar));
+  animation: plonacy-zar 900ms steps(3) infinite;
+}
+.plonacy__ogien {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 60px;
+  z-index: 3;
+  pointer-events: none;
+}
+.plonacy__plomien {
+  position: absolute;
+  bottom: 0;
+  display: block;
+  mix-blend-mode: screen;
+  animation: plonacy-drganie 700ms steps(3) infinite;
+}
+.plonacy__plomien .ozdoba {
+  height: 60px;
+  width: auto;
+}
+@keyframes plonacy-zar {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.82;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes plonacy-oddech {
+  0% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(1.12);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+@keyframes plonacy-drganie {
+  0% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.85;
+  }
+}
+
+/* Z11 bez wyjatkow: zostaje sam chromowy napis. */
+@media (prefers-reduced-motion: reduce) {
+  .plonacy__poswiata,
+  .plonacy__ogien {
+    display: none;
+  }
+  .plonacy__napis {
+    animation-name: none;
+  }
+}
+
+.playground-plonacy {
+  background: var(--kosmos);
+  border: 2px outset var(--chrom-a);
+  padding: 10px;
+}
