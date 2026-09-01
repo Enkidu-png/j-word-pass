@@ -24,6 +24,38 @@ Kolejność sięgania po plik, od góry:
    dla jednej osoby, nie produktem komercyjnym, ale to nie jest powód, żeby nie
    zapisać, skąd co pochodzi.
 
+### A1. PRZEPIS NA GIFCITIES (zweryfikowany 2026-09-02, działa z curl)
+
+GifCities nie ma publicznego API JSON. Ma zwykły formularz, który zwraca HTML,
+a w nim bezpośrednie adresy plików. Pełna ścieżka, sprawdzona na żywo:
+
+```bash
+# 1. Szukanie - zwraca HTML z adresami plikow
+curl -s "https://gifcities.org/search?q=spaceship&offset=0&page_size=200" \
+  | grep -oE 'https://blob\.gifcities\.org/gifcities/[A-Z0-9]+\.gif' \
+  | sort -u > /tmp/kandydaci.txt
+
+# 2. Pobranie kandydata
+curl -s -o public/assets/statek.gif "$(head -1 /tmp/kandydaci.txt)"
+
+# 3. Sprawdzenie, co sie realnie pobralo (wymiary decyduja o przydatnosci)
+file public/assets/statek.gif    # -> GIF image data, version 89a, 640 x 170
+```
+
+**Wynik weryfikacji:** zapytanie `spaceship` zwróciło kilkanaście unikalnych adresów,
+pobrany plik to poprawny GIF 89a. Ścieżka jest wykonalna bez przeglądarki i bez
+udziału Aleksandry.
+
+Uwagi praktyczne dla workera:
+- Wyszukiwarka zwraca WSZYSTKO, co pasuje hasłem, w losowych wymiarach. **Sprawdzaj
+  `file` po każdym pobraniu** i odrzucaj to, co nie mieści się w wymiarach z tabeli B.
+- Hasła szukaj po angielsku (`spaceship`, `fire`, `dolphin`, `under construction`,
+  `starfield`, `88x31`), archiwum jest anglojęzyczne.
+- Jeden plik nie pasuje - bierz następny z listy kandydatów. **Nie blokuj się na
+  jednym obrazku**, lista ma zwykle kilkadziesiąt pozycji.
+- Kafle tła szukaj hasłami `background tile`, `starry background`, `seamless tile`.
+  Kafel poznasz po małych wymiarach (poniżej 350 px w obu osiach).
+
 **Każdy pobrany plik dostaje wpis w `ATTRIBUTION.md`** w formacie:
 `<nazwa pliku> | <URL źródła> | <licencja albo "GeoCities archive, public domain-ish"> | <data pobrania>`.
 
