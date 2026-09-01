@@ -104,6 +104,33 @@ i anty-spec z `plan/01 G`, wpis raportu fazy, zero znalezisk bez issue w F7-ZNAL
   AC: `html` ma `cursor` z `url("/assets/kursor.gif") 4 2`; plik kursora <= 32x32; `tests/budzet.spec.ts` mierzy `/dev/scena` i podaje zmierzoną sumę (wynik w dowodzie), a podniesienie progu do 1 KB powoduje FAIL (dowód, że test realnie mierzy); produkcyjny build zwraca 404 na `/dev/scena`; zero long tasków > 50 ms w 5 s bezczynności; negatywne: `grep -rn 'transition: all' app components` = 0.
   DOWOD: ✓ `getComputedStyle(document.documentElement).cursor` = `url("http://localhost:3000/assets/kursor.gif") 4 2, auto`, a na `button` = `url(".../assets/kursor-rece.gif") 8 2, pointer`; ✓ `sips`: `kursor.gif` 32x32, `kursor-rece.gif` 20x15; ✓ ZMIERZONY budzet: `/dev/scena` = **525399 B (513.1 KB)** przy progu 2621440 B na desktopie i 228807 B na 390 px, `/` = 4622 B; ✓ test realnie mierzy: po zbiciu progu do 1024 B OBA warianty `/dev/scena` i `/` PADAJA, po przywroceniu progu 3 passed; ✓ `pnpm build` plus `pnpm start` i curl: `/dev/scena` = **404**, `/dev` = **404**, a cztery route'y produkcyjne = 200; ✓ `PerformanceObserver({type:'longtask'})` przez 5 s bezczynnosci na `/dev/scena`: **brak** long taskow na obu viewportach; ✓ `grep -rn 'transition: all' app components` = 0. ZNALEZISKO naprawione po drodze: podmiana klatki na reduced-motion byla asynchroniczna i plomienie plonacego napisu (montowane po pomiarze ResizeObserverem) pokazywaly ruchomy GIF mimo Z11 - przepisane na `useSyncExternalStore`, opis w DECISIONS.md #17. Commit: `F1-05`.
 
+### RAPORT FAZY F1 (DoD punkt po punkcie)
+
+- `pnpm run check` ZIELONY. `pnpm build` ZIELONY, first load 102 kB, playground 106 kB
+  (limit 160 kB z F6-02). `npx playwright test` BEZ FAILOW: 68 passed, 0 failed,
+  8 skipped na obu viewportach.
+- Zrzuty stanu fazy: `screenshots/F1/F1-01-playground-{desktop,mobile,reduced}.png`
+  plus zrzuty poszczegolnych komponentow, wszystkie OBEJRZANE.
+- Ocena wzgledem Z7-Z9 i anty-spec `plan/01 G` oraz anty-spec silnika `plan/04 K`:
+  - Z6 (zakaz przekrzywiania): SPELNIONY. Jedyne obroty w projekcie siedza w
+    `app/style/ladowanie.css` (7 wystapien) i sa tam zamowione wprost przez Z6b.
+    Walidator z F0-02 pilnuje reszty i jest zielony. `scaleX(-1)` w stworze
+    rogowym to dozwolony Z6a.
+  - Z7 (assety to pliki): SPELNIONY. Jedyny wyjatek to `NapisObrazek`, dozwolony
+    wprost przez `plan/03 B4`, bo napisow po polsku w archiwum nie ma.
+  - Z11 (reduced motion): SPELNIONY i sprawdzony na zywo dla ozdob, pasow,
+    plonacego napisu, pasa-gonca i ekranu ladowania.
+  - Z8, Z9 (gestosc, kafle): NADAL NIE DOTYCZY, F1 nie ma widokow. Wchodzi w F2.
+  - Anty-spec silnika K1-K6: `transition: all` = 0 trafien; animacje jada po
+    `transform` i `opacity`; zero `IntersectionObserver`; zero PETLI
+    `requestAnimationFrame` - jedyne wywolanie w projekcie to jednorazowe
+    odroczenie fokusu w `EkranLadowania`, nie petla; ruch robia GIF-y i CSS,
+    potwierdzone brakiem long taskow w 5 s bezczynnosci; `background-size` nie wystepuje w `app/style`.
+  - Anty-spec globalna 6 (zero `ease-in-out` na ozdobnikach): SPELNIONY, caly ruch
+    dekoracyjny jest na `steps()`.
+- Znaleziska bez issue: BRAK. Trzy znaleziska fazy naprawione w tych samych
+  issues i opisane w `DECISIONS.md` #15, #16 i #17.
+
 ## F2 - SHELL I BRAMA
 
 - [ ] **F2-01** `ui` Shell: `PasGoniec` górny, `PassOMetr` (3 stany, awaria co 45 s), `StrazEtapu`, stopka-webring z licznikiem lokalnym i plakietkami.
