@@ -7,91 +7,98 @@
 
 ## Gdzie jestesmy
 
-**Fazy F0, F1 i F2 ZAMKNIETE**, kazda z raportem DoD w `plan/11-BACKLOG.md`.
-W tym przebiegu doszly: F2-01, F2-02a, F2-02b, F2-03, F2-04, F2-05.
-Jeden commit na issue plus jeden commit poprawkowy `F2-04` (obwodka fokusu).
+**Fazy F0, F1, F2 i F3 ZAMKNIETE**, kazda z raportem DoD w `plan/11-BACKLOG.md`.
+W tym przebiegu doszly: F3-01, F3-02, F3-03. Jeden commit na issue plus commit
+z raportem fazy.
 
-Brama dziala end to end: kafel gwiazd, statek, chromowy napis, podtytul,
-pas-goniec ze strzalka, tablica ogloszen z 6 migajacymi ozdobami, druk wstepny
-`ALEKSANDRA` readOnly, przycisk-uciekinier, dwa delfiny rogowe, pas
-`UNDER CONSTRUCTION`, ceremonia wejscia z ekranem ladowania 3D. Shell (goniec
-gorny, PassOMetr, straz etapu, stopka-webring) stoi nad wszystkimi widokami.
+Etap 1 dziala end to end: kafel kosmiczny, pas balonow, `ETAP 1` chromem,
+plonacy napis `EGZAMIN JASIU`, scena kosmiczna (planeta, ladownik, 12 gwiazdek,
+`pointer-events: none`), druki `DANE DO ZADANIA` i `TREŚĆ PYTANIA`, druk
+odpowiedzi z licznikiem, osmiornice rogowe, ceremonia narady z dymkami komisji
+i werdykt `ZDANE`/`NIEZDANE` z przejsciem na etap 2. Sprawdzone na ZYWYM modelu:
+werdykt `7/10` po 5465 ms, komentarz w wolaczu `Aleksandro`.
 
-**Preview na zywo:** https://j-word-pass-numze2ovx-enkidu-pngs-projects.vercel.app
-Produkcja NIE zostala tknieta (`j-word-pass-mhtj52hct...` bez zmian). Bramka F8
-nadal nalezy do Aleksandry.
+**Deploy: NIE ruszany w tej paczce.** Ostatni preview jest sprzed F3, produkcja
+bez zmian. Bramka F8 nadal nalezy do Aleksandry.
 
 ## Nastepne issue
 
-**F3-01** (pierwsze issue fazy F3, EGZAMIN). Sprawdz jego `CZYTAJ:` w backlogu.
+**F4-01** (pierwsze issue fazy F4, QUIZ, oznaczone `⚠ HARD`). Sprawdz jego
+`CZYTAJ:` w backlogu. Faza F4 nie zalezy od F3 - uzywa F1 i F2.
 
 ## Stan srodowiska
 
 - `pnpm dev` chodzi na `localhost:3000`. `pnpm run check` zielony, `pnpm build`
-  zielony (brama 107 kB first load, playground 107 kB), `npx playwright test`
-  = 118 passed, 0 failed, 8 skipped, TRZY pelne przebiegi z rzedu.
-- Nowe pliki tej fazy: `components/shell/` (`PassOMetr`, `StrazEtapu`,
-  `StopkaWebring`, `FokusNaNaglowku`, `uzyjStanu`), `components/brama/`
-  (`DrukWstepny`, `PrzyciskUciekinier`, `PierwszeWejscie`),
-  `components/scena/KafelTla`, `app/style/shell.css`, `app/style/brama.css`,
-  `tests/pomoc.ts`.
-- `KafelTla id="..."` to sposob na Z9 w kazdym kolejnym widoku: renderuje jedna
-  regule `html:root{background-image:...}` ze sciezka z manifestu. Uzyj go w F3-F6
-  zamiast wpisywac kafel do arkusza.
-- `FokusNaNaglowku` w shellu fokusuje `main.tresc h1` po KAZDEJ zmianie sciezki.
+  zielony (`/egzamin` first load 112 kB, limit 160 kB), `npx playwright test`
+  = 146 passed, 0 failed, 10 skipped, dwa pelne przebiegi z rzedu.
+- Nowe pliki tej fazy: `components/egzamin/DrukOdpowiedzi.tsx`,
+  `app/style/egzamin.css`, `tests/f3-02.spec.ts`, `tests/f3-03.spec.ts`.
+- **`.ladowanie` jest teraz `position: fixed`** (bylo `absolute`). Kazda kolejna
+  ceremonia odpalana przyciskiem ponizej pierwszego ekranu dziala dzieki temu
+  poprawnie. Nie cofaj tego bez przeczytania testu regresji w `tests/f3-03.spec.ts`.
+- **`uzyjStanu` nasluchuje zdarzenia `jwp:stan`.** Kto zapisuje werdykt etapu
+  BEZ zmiany sciezki, ten musi po `zapiszTeraz` zrobic
+  `window.dispatchEvent(new Event("jwp:stan"))`, inaczej PassOMetr zostanie
+  z etapem zamknietym. Wzorzec: `components/egzamin/DrukOdpowiedzi.tsx`.
+- **Zero punktow NIE idzie do `sessionStorage`.** `etapUkonczony` patrzy na
+  `punkty != null`, wiec zapisane `0` otworzyloby quiz, a `plan/02 E1` mowi,
+  ze pusta odpowiedz ma zostawiac bramke zamknieta. `lib/stan.ts` nie wolno
+  zmieniac (`plan/02 B`), wiec pilnuje tego strona zapisujaca.
+- `KafelTla id="..."` to sposob na Z9 w kazdym kolejnym widoku.
+- `FokusNaNaglowku` fokusuje `main.tresc h1` po KAZDEJ zmianie sciezki.
   Naglowki etapow musza miec `tabIndex={-1}`. Naglowek bramy CELOWO go nie ma.
 - `EkranLadowania` renderuje sie portalem do `<body>`. Nie wkladaj go w scene
   widoku - wpadnie w pomiary tego widoku.
 
 ## Pulapki zmierzone w tym przebiegu (nie tracic na nie czasu drugi raz)
 
-1. **Wchodzac testem na `/` uzywaj `wejdz(page)` z `tests/pomoc.ts`**, nie
-   `page.goto`. Ceremonia wejscia zaslania brame na 1200-2600 ms przy pierwszym
-   wejsciu w sesji, a Playwright daje kazdemu testowi swiezy kontekst, czyli
-   swieza sesje. Samo „poczekaj az nakladka zniknie" NIE wystarcza: przechodzi,
-   zanim nakladka zdazy sie zamontowac. Bariera to klucz `jwp.ladowanie`
-   w `sessionStorage`.
-2. **Jeden zielony przebieg testow niczego nie dowodzi.** Dwa bledy tej fazy
-   (wyscig z ceremonia, prog czasu przy reduced motion) pojawialy sie WYLACZNIE
-   przy pelnym przebiegu na czterech workerach i znikaly przy uruchomieniu
-   pojedynczego pliku. Przed odhaczeniem: `npx playwright test` co najmniej dwa
-   razy z rzedu.
-3. **Nie mierz czasu przez `MutationObserver` z ciasnym progiem.** Do 400 ms
-   kontraktu dochodzi narzut dwoch commitow Reacta i obciazenia serwera dev
-   (425-456 ms w izolacji, ponad 700 ms przy czterech workerach). Prog ma
-   pilnowac wyboru galezi kontraktu, nie szumu. Dokladny czas mierz
-   znacznikami STRONY, jak w F1-04.
-4. **Pozycje elementu mierz `offsetLeft`/`offsetTop`, nie `boundingBox()`**,
-   jesli w tescie jest `hover()` albo `focus()` - jedno i drugie dowija strone
-   i wspolrzedne ekranowe zmieniaja sie takze wtedy, gdy element stoi w miejscu.
-   Dwa testy uciekiniera padaly wylacznie z tego powodu.
-5. **`pnpm build` psuje dzialajacy `pnpm dev`.** Kolejnosc zawsze: testy, build,
-   restart dev. Potwierdzone drugi raz w tym przebiegu.
-6. **Zrzut z PREVIEW pokazuje rzeczy, ktorych nie widzi lokalne uruchomienie.**
-   Obwodka fokusu na naglowku i ucinanie tekstu w goncu wyszly dopiero tam.
-7. **`bash ~/.claude/agent-context.sh` oddaje `STALE-TRANSCRIPT`** przez caly
-   przebieg (raz na starcie oddal `40`, potem juz nigdy liczby). Warunek
+1. **JEDEN `pnpm dev` naraz.** Drugi serwer na innym porcie dzieli katalog
+   `.next` i psuje hydracje pierwszego: strona przestaje reagowac na JS,
+   a formularz wysyla sie natywnie GET-em z trescia w query stringu. Wyglada
+   jak blad komponentu, jest bledem srodowiska. Lekarstwo: `rm -rf .next`
+   i jeden serwer. Dowod wymagajacy innego env zbieraj po kolei. DECISIONS #19.
+2. **`position: absolute` na pelnoekranowej nakladce to pulapka.** Element
+   siada na gorze DOKUMENTU, nie okna. Jesli odpala go przycisk ponizej
+   pierwszego ekranu, nakladka jest w DOM i przechodzi `toBeVisible()`,
+   a uzytkownik nie widzi jej wcale. Mierz `boundingBox().y` wzgledem OKNA.
+3. **Nie renderuj wyniku ceremonii rownolegle z nakladka.** Werdykt wstawiony
+   do drzewa juz w fazie narady konczyl etap po 300 ms zamiast po kontraktowych
+   3500 ms i przechodzil przez wszystkie assercje poza pomiarem czasu.
+4. **`locator.textContent()` bez `timeout` zjada caly limit testu.** W petli
+   probkujacej element, ktory za chwile zniknie, domyslne 30 s zawiesza test.
+   Zawsze `textContent({ timeout: 200 }).catch(() => null)`.
+5. **Assercja `expect(y).toBeLessThanOrEqual(0)` przechodzi takze dla `-1090`.**
+   Kontrola przez cofniecie poprawki jest obowiazkowa: test, ktory nie pada po
+   przywroceniu buga, niczego nie pilnuje. Wlasciwa forma: `Math.abs(y) <= 1`.
+6. **`:hover` bije `:disabled` na tej samej specyficznosci.** Przycisk po
+   oddaniu pracy dalej zapalal sie na `--jad` pod kursorem. Zawsze
+   `:hover:not(:disabled)`.
+7. **Zrzuty z `pnpm dev` maja czarne kolko z `N` przy lewej krawedzi** - to
+   `<nextjs-portal>`, znaczek dev-toolsow, `position: fixed`. W produkcji go
+   nie ma. Skrypt zrzutow chowa go `nextjs-portal{display:none!important}`.
+8. **`pnpm build` psuje dzialajacy `pnpm dev`.** Kolejnosc zawsze: testy, build,
+   restart dev. Potwierdzone trzeci raz.
+9. **`bash ~/.claude/agent-context.sh` oddaje `STALE-TRANSCRIPT`** przez caly
+   przebieg (raz na starcie oddal `44`, potem juz nigdy liczby). Warunek
    sztafety „konczy przy 55%" jest tym narzedziem niemierzalny. DECISIONS #14.
    Ta paczka zostala domknieta NA GRANICY FAZY, zgodnie z dyspozycja.
 
 ## Otwarte issues w F7-ZNALEZISKA
 
 - **F7-01** dwa testy w `tests/f5-02.spec.ts` sparkowane, odpiac po F5-02.
-- **F7-02** naglowek `h1` przyciety przy lewej krawedzi okna (Caveat ma ujemny
-  wysiew, `body` ma `margin: 0`). Dotyczy wszystkich widokow z `h1`.
+- **F7-02** naglowek `h1` przyciety przy lewej krawedzi okna. Uwaga: NIE dotyczy
+  `/egzamin`, bo tam `h1` niesie `NapisObrazek`, a nie tekst Caveatem.
 - **F7-03** plakietki webringu nie maja klatki statycznej, wiec animuja sie mimo
-  reduced motion. Przez to `tests/f1-01.spec.ts` skanuje tylko `main.tresc`.
-- **F7-04** kontrast tekstu w zamknietym polu PassOMetr okolo 3,8:1 (spec kaze
-  `--tusz` na `--chrom-b`). Konflikt spec kontra dostepnosc, czeka na decyzje.
+  reduced motion.
+- **F7-04** kontrast tekstu w zamknietym polu PassOMetr okolo 3,8:1. Konflikt
+  spec kontra dostepnosc, czeka na decyzje.
 - **F7-05** wariant `odbijany` pasa-gonca liczy droge od szerokosci OKNA, nie
-  kontenera, wiec na bramie ucina `ALEKSANDRO`. Widoczne na zrzucie z preview.
+  kontenera, wiec na bramie ucina `ALEKSANDRO`.
 
 ## Decyzje w toku
 
 - **D-kontekst (do Aleksandry):** `agent-context.sh` nie mierzy okna workera.
   Rekomendacja: konczyc paczke na granicy fazy. Opis: `DECISIONS.md` #14.
-- **F7-04 (do Aleksandry):** kontrast pola zamknietego. Albo zmieniamy tlo/tekst,
-  albo swiadomie zostawiamy kicz i zapisujemy to w `DECISIONS.md`.
-- Swiadome odstepstwa opisane i zamkniete: `DECISIONS.md` #15 (viewBox
-  `NapisObrazek`), #16 (kruche selektory), #17 (klatka reduced-motion
-  synchronicznie), **#18** (AC F2-02a jest kopia AC F2-02b).
+- **F7-04 (do Aleksandry):** kontrast pola zamknietego PassOMetr.
+- Swiadome odstepstwa opisane i zamkniete: `DECISIONS.md` #15, #16, #17, #18,
+  **#19** (dwa serwery dev kontra katalog `.next`).
