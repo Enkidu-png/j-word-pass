@@ -271,6 +271,15 @@ i anty-spec z `plan/01 G`, wpis raportu fazy, zero znalezisk bez issue w F7-ZNAL
 - [x] **F4-01** `ui` ⚠ HARD Karta pytania i nawigacja: 15 pytań, warianty A-D, pytanie 14 otwarte, rząd 15 kwadratów, zapis stanu.
   CZYTAJ: 07→A,D,E; 04→B,C,D; 02→B (lib/stan.ts).
   AC: wszystkie 15 pytań przechodne klawiaturą (strzałki lewo/prawo i kliknięcie w kwadrat); zaznaczenie 3 wariantów, `page.reload()`, zaznaczenia wracają; pytanie 14 akceptuje `mohsa`, `Mohsa` i `skala Mohsa` (test normalizacji); kwadrat odpowiedzianego pytania ma inny styl niż nieodpowiedzianego (porównanie `getComputedStyle`); negatywne: zero informacji o poprawności przed oddaniem arkusza (żaden element nie ma klasy sugerującej poprawność), zero emoji w DOM.
+  UZUPELNIENIE PO RECENZJI KONCOWEJ: dowod ponizej byl mierzony na `pnpm dev`
+  i przez to KLAMAL. Na buildzie produkcyjnym nawigacja strzalkami nie dzialala
+  wcale - nasluch wisial na `<section className="arkusz">`, a po wejsciu na
+  `/quiz` `document.activeElement` to `<body>`, wiec zdarzenie nigdzie nie
+  docieralo. Na dev maskowal to podwojny efekt StrictMode, ktory przypadkiem
+  fokusowal karte (stad tez flakiness testu). Naprawione w commicie recenzji:
+  nasluch przeniesiony na `window`, tak jak `naEscape` w tym samym pliku.
+  Zmierzone na `npx next start -p 3100`: `activeElement=BODY`, dwie strzalki
+  w prawo daja `PYTANIE 03 / 15`.
   ✓ `npx playwright test tests/f4-01.spec.ts` = 18 passed (desktop plus mobile), zrzuty
   `screenshots/F4/F4-01-quiz-{desktop,mobile}.png` i `F4-01-pytanie-14-{desktop,mobile}.png`
   OBEJRZANE. Dowody po kolei: 15 pytan przechodzone `ArrowRight` z assercja licznika
@@ -529,6 +538,14 @@ i anty-spec z `plan/01 G`, wpis raportu fazy, zero znalezisk bez issue w F7-ZNAL
 - [x] **F6-01** `a11y` Audyt dostępności: przejście przez 3 etapy samą klawiaturą, kontrasty tokenów, `aria-label` na ozdobach interaktywnych, `role="button"` na butelce.
   CZYTAJ: 01→E (Z10, Z11); 02→D.
   AC: pełny przepływ brama-pergamin przechodzalny bez myszy (kroki wypisane w commit message); `@axe-core/playwright` zwraca 0 błędów `critical` na 4 stronach plus 404; każdy token tekstu ma kontrast >= 4,5:1 na swoim tle (tabela pomiarów w dowodzie); wszystkie `img[data-ozdoba]` dekoracyjne mają `alt=""` i `aria-hidden="true"`, a te niosące treść mają `alt` z manifestu; negatywne: żaden `outline: none` bez zamiennika.
+  UZUPELNIENIE PO RECENZJI KONCOWEJ: audyt PRZEOCZYL zlamane Z11. Regula
+  `.pas-goniec--odbijany .pas-goniec__tresc` (0,2,0) bila blok
+  `prefers-reduced-motion` (0,1,0), wiec gorny pasek jechal dalej przy
+  zredukowanym ruchu na KAZDYM widoku. Przeszlo, bo `tests/f1-02.spec.ts`
+  sprawdzal tylko wariant `zwykly`. Naprawione w commicie recenzji
+  (`:where` na modyfikatorze, precedens F7-07), test sparametryzowany po obu
+  wariantach. Zmierzone na buildzie produkcyjnym: `animation-name: none`
+  na wszystkich paskach na `/`, `/egzamin`, `/quiz`, `/proba-ognia`.
   DOWOD: ✓ `npx playwright test tests/f6-01.spec.ts` = 34 passed na obu viewportach, cala suita 258 passed / 0 failed / 6 skipped; ✓ PRZEPLYW SAMA KLAWIATURA (bez jednego kliknięcia, 15 kroków wypisanych przez test): brama Tab do `PRZYSTĘPUJĘ` -> Enter -> `/egzamin` -> Tab do `textarea` -> pisanie -> Tab do `ODDAJ` -> Enter -> werdykt 9/10 -> Tab do `PRZEJDŹ` -> `/quiz` -> 15 pytań (Tab do radia, Space; Tab do `NASTĘPNE`, Enter) -> Tab do `ODDAJ ARKUSZ` -> Enter -> werdykt -> Tab do `PRZEJDŹ` -> `/proba-ognia` -> Tab e-mail, but, ucho, pokora (Space), `SKŁADAM` (Enter) -> ceremonia -> Tab do `[data-butelka]` (`role="button"`) -> Enter -> pergamin otwarty; na KAZDYM z siedmiu przystanków test asertuje `outline: 3px dashed rgb(255,0,200)` (Z10 dosłownie); ✓ axe-core na 5 stronach (`/`, `/egzamin`, `/quiz`, `/proba-ognia`, `/nie-ma`): `critical = 0` wszędzie (pozostałe: `region/moderate` x1 i - przed poprawką - `color-contrast/serious` x4); ✓ TABELA KONTRASTU mierzona na żywej stronie (kolor tekstu kontra pierwszy nieprzezroczysty przodek), wszystkie widoki >= 4,5:1 po poprawce; przed poprawką ZNALEZIONO 4 realne naruszenia w obudowie radia: `--papier` na `--chrom-b` = 4,48:1 (`radio__marka`, `radio__podpis` x2) i `--cyjan` na `--chrom-b` = 4,03:1 (`radio__zrodlo`) - obudowa przestawiona na `--ramka-ciemna`, po zmianie 9,10:1 i 8,19:1 (zmierzone, nie policzone z tabeli); pozostałe pomiary: `pass-o-metr__*` 16,70:1, `pas-goniec__tresc` 14,03:1, `stopka__licznik-cyfry` 14,03:1, `uciekinier__napis` 13,88:1, `radio__napis` 15,29:1, `druk__pole`/`tablica__naglowek` 16,70:1; kontrolki NIEAKTYWNE (`ODDAJ PRACĘ`, `SKŁADAM WNIOSEK`, `POPRZEDNIE` = 3,72:1) zostają w tabeli, ale poza progiem - WCAG 1.4.3 wyłącza je wprost, a szarość JEST tu komunikatem; `pass-o-metr__pole` wyłączone z asercji jako **F7-04** (czeka na decyzję Aleksandry) i dalej raportowane; ✓ `img[data-ozdoba]`: na 5 widokach ZERO obrazków z `alt=""` bez `aria-hidden="true"` i ZERO z `alt` niepustym plus `aria-hidden` (sprzeczność); ✓ negatywne: przejście po `document.styleSheets` na żywej stronie (`CSSStyleRule` plus `CSSGroupingRule`) nie znajduje ANI JEDNEJ reguły kasującej `outline` bez zamiennika; ✓ Z10 dosłownie: `outline: 3px solid` w `app/globals.css` i `app/style/quiz.css` przestawione na `dashed` (spec mówi `dashed`), `.wariant__radio` dostał brakujący `outline-offset: 2px`; ✓ `pnpm run check` czysto; ✓ screenshots/F6/f6-01-radio-stopka.png i f6-01-fokus-cta.png OBEJRZANE - obudowa radia ciemna, cały tekst czytelny, kreskowana magentowa obwódka fokusu widoczna na `PRZYSTĘPUJĘ DO ETAPU 1` i nie zasłania napisu. Commit: `F6-01`.
 - [x] **F6-02** `perf` Budżety: brak long tasków > 50 ms w 5 s bezczynności na 4 stronach, first load JS < 160 kB, suma obrazów na widok <= 2,5 MB.
   CZYTAJ: 03→C; 04→L.
