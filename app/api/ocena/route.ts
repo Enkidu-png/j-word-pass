@@ -14,14 +14,18 @@ z jetpackami (300 km/h, zasięg 1000 km, potem pęd; jedna zebra ma raka trzustk
 i skończyła akademię wojskową) a 1 słoniem (10 t, sokole oko, karabin na trąbie,
 5000 naboi, +1 km/h przyspieszenia na strzał od odrzutu).
 
-Oceń odpowiedź kandydata w punktach od 6 do 10 WYŁĄCZNIE za kreatywność (poprawność
+Do egzaminu podchodzi JEDNA osoba i ma na imię Aleksandra. Komisja mówi wyłącznie
+DO NIEJ, drugą osobą liczby pojedynczej, w rodzaju żeńskim. W komentarzu MUSISZ
+zwrócić się do niej po imieniu, w wołaczu "Aleksandro". Nigdy nie pisz "kandydat",
+"kandydatka" ani żadnej formy bezosobowej.
+
+Oceń jej odpowiedź w punktach od 6 do 10 WYŁĄCZNIE za kreatywność (poprawność
 fizyczna nie istnieje i nie obowiązuje). 10 = odpowiedź, którą Komisja oprawi w ramkę.
-6 = kandydat się starał inaczej niż wcale.
+6 = Aleksandra starała się inaczej niż wcale.
 
 Napisz komentarz Komisji: po polsku, 2-4 zdania, śmieszny i absurdalny, w tonie
 przesadnie urzędowym (paragrafy, protokoły, wnioski formalne). Cytuj lub parafrazuj
-NAJLEPSZY fragment odpowiedzi kandydata. Jeśli kandydat załączył mało dowodów
-(pole zalaczoneDowody < 6), Komisja może to uszczypliwie odnotować.
+NAJLEPSZY fragment jej odpowiedzi.
 
 Zakazy formalne: nie używaj długiego myślnika, nie używaj znaku wypunktowania kropką
 środkową, nie używaj emoji. Zwróć wyłącznie JSON zgodny ze schematem.`;
@@ -47,7 +51,7 @@ function sanitizeDash(tekst: string): string {
 }
 
 
-async function zapytajModel(model: string, odpowiedz: string, dowody: number, klucz: string) {
+async function zapytajModel(model: string, odpowiedz: string, klucz: string) {
   const res = await fetch(ENDPOINT, {
     method: "POST",
     headers: { Authorization: `Bearer ${klucz}`, "Content-Type": "application/json" },
@@ -60,7 +64,7 @@ async function zapytajModel(model: string, odpowiedz: string, dowody: number, kl
         { role: "system", content: PROMPT_SYSTEMOWY },
         {
           role: "user",
-          content: `Odpowiedź kandydata:\n${odpowiedz}\n\nZałączonych dowodów: ${dowody}/6`,
+          content: `Odpowiedź Aleksandry:\n${odpowiedz}`,
         },
       ],
     }),
@@ -79,20 +83,19 @@ async function zapytajModel(model: string, odpowiedz: string, dowody: number, kl
 export async function POST(request: Request) {
   const surowy = await request.text();
   if (new TextEncoder().encode(surowy).length > LIMIT_BAJTOW) {
-    return Response.json({ blad: "Wniosek przekracza dopuszczalną objętość akt." }, { status: 413 });
+    return Response.json({ blad: "Aleksandro, Twój wniosek przekracza dopuszczalną objętość akt." }, { status: 413 });
   }
 
-  let cialo: { odpowiedz?: unknown; zalaczoneDowody?: unknown };
+  let cialo: { odpowiedz?: unknown };
   try {
     cialo = JSON.parse(surowy);
   } catch {
-    return Response.json({ blad: "Formularz nieczytelny dla Komisji." }, { status: 400 });
+    return Response.json({ blad: "Aleksandro, Komisja nie potrafi odczytać Twojego formularza." }, { status: 400 });
   }
   const odpowiedz = typeof cialo.odpowiedz === "string" ? cialo.odpowiedz : null;
   if (odpowiedz === null) {
-    return Response.json({ blad: "Brak pola odpowiedzi." }, { status: 400 });
+    return Response.json({ blad: "Aleksandro, Komisja nie znalazła w druku pola z Twoją odpowiedzią." }, { status: 400 });
   }
-  const dowody = typeof cialo.zalaczoneDowody === "number" ? cialo.zalaczoneDowody : 0;
 
   // Granica zaufania: klient rozstrzyga pustke lokalnie, serwer i tak jej pilnuje.
   if (odpowiedz.trim() === "") {
@@ -101,19 +104,19 @@ export async function POST(request: Request) {
 
   if (limitPrzekroczony("ocena", adresZadania(request), 5)) {
     return Response.json(
-      { blad: "Komisja obraduje. Proszę odczekać minutę i złożyć wniosek ponownie." },
+      { blad: "Aleksandro, Komisja obraduje. Odczekaj minutę i złóż wniosek ponownie." },
       { status: 429 },
     );
   }
 
   const klucz = process.env.OPENROUTER_API_KEY;
   if (!klucz) {
-    return Response.json({ blad: "Komisja nieosiągalna." }, { status: 502 });
+    return Response.json({ blad: "Aleksandro, Komisja jest w tej chwili nieosiągalna." }, { status: 502 });
   }
 
   for (const model of [MODEL_PRIMARY, MODEL_FALLBACK]) {
     try {
-      const werdykt = await zapytajModel(model, odpowiedz, dowody, klucz);
+      const werdykt = await zapytajModel(model, odpowiedz, klucz);
       return Response.json({
         punkty: Math.min(10, Math.max(6, Math.round(werdykt.punkty))),
         komentarz: sanitizeDash(werdykt.komentarz),
@@ -123,5 +126,5 @@ export async function POST(request: Request) {
       // pokazuje werdykt awaryjny (plan/05 B)
     }
   }
-  return Response.json({ blad: "Komisja nieosiągalna." }, { status: 502 });
+  return Response.json({ blad: "Aleksandro, Komisja jest w tej chwili nieosiągalna." }, { status: 502 });
 }

@@ -2,7 +2,7 @@ import { put } from "@vercel/blob";
 
 import { adresZadania, limitPrzekroczony } from "@/lib/limit";
 
-// Zapis zgloszenia kandydatki. Kontrakt: plan/02 sekcja D. Jeden plik JSON per
+// Zapis zgloszenia Aleksandry. Kontrakt: plan/02 sekcja D. Jeden plik JSON per
 // zgloszenie, zero panelu admina (odczyt przez dashboard Vercel Blob).
 //
 // Store `jwp-zgloszenia` jest PRYWATNY (DECISIONS #6) - zgloszenia niosa adresy
@@ -29,10 +29,10 @@ function losowe6(): string {
 export async function POST(request: Request) {
   // Druk bez auth zapisuje pliki do platnego store'a - limit jest tu jedyna
   // zapora przed pompowaniem go skryptem. Prog nizszy niz w `ocena`, bo
-  // kandydatka sklada zgloszenie raz, nie piec razy na minute.
+  // Aleksandra sklada zgloszenie raz, nie piec razy na minute.
   if (limitPrzekroczony("zgloszenie", adresZadania(request), 3)) {
     return Response.json(
-      { blad: "Komisja przyjęła już Pani druk. Proszę odczekać minutę." },
+      { blad: "Aleksandro, Komisja przyjęła już Twój druk. Odczekaj minutę." },
       { status: 429 },
     );
   }
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
   const surowy = await request.text();
   if (new TextEncoder().encode(surowy).length > LIMIT_BAJTOW) {
     return Response.json(
-      { blad: "Zgłoszenie przekracza dopuszczalną objętość akt. Komisja czyta, ale nie tomami." },
+      { blad: "Aleksandro, Twoje zgłoszenie przekracza dopuszczalną objętość akt. Komisja czyta, ale nie tomami." },
       { status: 413 },
     );
   }
@@ -49,28 +49,28 @@ export async function POST(request: Request) {
   try {
     cialo = JSON.parse(surowy) as Record<string, unknown>;
   } catch {
-    return Response.json({ blad: "Druk nieczytelny dla Komisji." }, { status: 400 });
+    return Response.json({ blad: "Aleksandro, Komisja nie potrafi odczytać Twojego druku." }, { status: 400 });
   }
 
   // Granica zaufania: te same trzy reguly co u klienta, tylko tu obowiazuja naprawde.
   const email = typeof cialo.email === "string" ? cialo.email.trim() : "";
   if (!/.+@.+\..+/.test(email) || email.length > 254) {
     return Response.json(
-      { blad: "WYPEŁNIONO NIEGODNIE: ADRES NIE PRZYPOMINA ADRESU. Komisja odsyła druk." },
+      { blad: "Aleksandro, ADRES NIE PRZYPOMINA ADRESU. Komisja odsyła Ci druk." },
       { status: 400 },
     );
   }
   const rozmiarButa = liczbaWZakresie(cialo.rozmiarButa, 10, 70);
   if (rozmiarButa === null) {
     return Response.json(
-      { blad: "WYPEŁNIONO NIEGODNIE: ROZMIAR BUTA POZA SKALĄ KOMISJI (10-70)." },
+      { blad: "Aleksandro, Twój rozmiar buta wypada poza skalą Komisji (10-70)." },
       { status: 400 },
     );
   }
   const srednicaUchaMm = liczbaWZakresie(cialo.srednicaUchaMm, 5, 500);
   if (srednicaUchaMm === null) {
     return Response.json(
-      { blad: "WYPEŁNIONO NIEGODNIE: ŚREDNICA UCHA POZA SKALĄ KOMISJI (5-500)." },
+      { blad: "Aleksandro, średnica Twojego ucha wypada poza skalą Komisji (5-500)." },
       { status: 400 },
     );
   }
@@ -80,14 +80,14 @@ export async function POST(request: Request) {
   const punktyEgzamin = liczbaWZakresie(cialo.punktyEgzamin, 0, 10);
   if (punktyEgzamin === null) {
     return Response.json(
-      { blad: "WYPEŁNIONO NIEGODNIE: PUNKTY Z ETAPU 1 POZA SKALĄ KOMISJI (0-10)." },
+      { blad: "Aleksandro, Twoje punkty z etapu 1 wypadają poza skalą Komisji (0-10)." },
       { status: 400 },
     );
   }
   const punktyQuiz = liczbaWZakresie(cialo.punktyQuiz, 0, 15);
   if (punktyQuiz === null) {
     return Response.json(
-      { blad: "WYPEŁNIONO NIEGODNIE: PUNKTY Z ETAPU 2 POZA SKALĄ KOMISJI (0-15)." },
+      { blad: "Aleksandro, Twoje punkty z etapu 2 wypadają poza skalą Komisji (0-15)." },
       { status: 400 },
     );
   }
@@ -121,6 +121,6 @@ export async function POST(request: Request) {
     // Teatr w kliencie nie moze zalezec od Bloba - klient dostaje 502 i pokazuje
     // stempel o pamieci ulotnej, a zgloszenie zostaje w logu (plan/07 B).
     console.log(`[zgloszenie awaria-bloba] ${sciezka} ${JSON.stringify(zgloszenie)}`);
-    return Response.json({ blad: "Komisja zapisała w pamięci ulotnej." }, { status: 502 });
+    return Response.json({ blad: "Aleksandro, Komisja zapisała Twój druk w pamięci ulotnej." }, { status: 502 });
   }
 }

@@ -2,101 +2,101 @@
   "powitanie": [
     {
       "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
-      "tekst": "Siadaj. Obradujemy od 1998 roku i dzisiaj nie zamierzamy przestać."
+      "tekst": "Siadaj, Aleksandro. Obradujemy od 1998 roku i dzisiaj nie zamierzamy przestać."
     },
     {
       "kto": "SEKRETARZ OKOŃ",
-      "tekst": "Wpisałem cię do rejestru. Rejestr jest w zeszycie. Zeszyt jest mój."
+      "tekst": "Wpisałem Cię do rejestru jako Aleksandrę. Rejestr jest w zeszycie. Zeszyt jest mój."
     },
     {
       "kto": "CZŁONKINI Z URZĘDU",
-      "tekst": "Nie patrz tak na mnie. Ja tu tylko podbijam."
+      "tekst": "Nie patrz tak na mnie, Aleksandro. Ja tu tylko podbijam."
     },
     {
       "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
-      "tekst": "Masz jedno zadanie i jedną kartkę. Kartki nie oddajemy."
+      "tekst": "Masz jedno zadanie i jedną kartkę. Kartki Ci nie oddamy."
     },
     {
       "kto": "SEKRETARZ OKOŃ",
-      "tekst": "Poprzedni kandydat siedział tu cztery godziny. Napisał trzy słowa."
+      "tekst": "Przed Tobą siedziała tu pewna pani cztery godziny. Napisała trzy słowa."
     },
     {
       "kto": "CZŁONKINI Z URZĘDU",
-      "tekst": "Zaczynamy. Kawa stygnie, a ja mam jeszcze dwie komisje."
+      "tekst": "Zaczynamy, Aleksandro. Kawa stygnie, a ja mam jeszcze dwie komisje."
     }
   ],
   "czekanie": [
     {
       "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
-      "tekst": "Piszesz czy myślisz? Bo to nie to samo i tylko jedno się liczy."
+      "tekst": "Piszesz czy myślisz, Aleksandro? Bo to nie to samo i tylko jedno się liczy."
     },
     {
       "kto": "SEKRETARZ OKOŃ",
-      "tekst": "Zanotowałem, że nic nie zanotowałeś."
+      "tekst": "Zanotowałem, że nic nie zanotowałaś."
     },
     {
       "kto": "CZŁONKINI Z URZĘDU",
-      "tekst": "Ja bym już coś napisała. Cokolwiek."
+      "tekst": "Ja bym już coś napisała na Twoim miejscu. Cokolwiek."
     },
     {
       "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
-      "tekst": "Zegar na ścianie stoi od 2003 roku, ale ja liczę w pamięci."
+      "tekst": "Zegar na ścianie stoi od 2003 roku, ale Twój czas liczę w pamięci."
     },
     {
       "kto": "SEKRETARZ OKOŃ",
-      "tekst": "Długopis działa. Sprawdzałem rano."
+      "tekst": "Długopis działa, Aleksandro. Sprawdzałem rano."
     },
     {
       "kto": "CZŁONKINI Z URZĘDU",
-      "tekst": "Nie musi być prawda. Musi być uzasadnione."
+      "tekst": "Nie musisz mieć racji. Musisz to uzasadnić."
     }
   ],
   "ocenianie": [
     {
       "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
-      "tekst": "Czytam. Nie przeszkadzać."
+      "tekst": "Czytam Cię, Aleksandro. Nie przeszkadzać."
     },
     {
       "kto": "SEKRETARZ OKOŃ",
-      "tekst": "Podkreśliłem trzy rzeczy. Dwie na czerwono."
+      "tekst": "Podkreśliłem Ci trzy rzeczy. Dwie na czerwono."
     },
     {
       "kto": "CZŁONKINI Z URZĘDU",
-      "tekst": "Ten fragment o odrzucie mi się podoba. Reszta mniej."
+      "tekst": "Ten Twój fragment o odrzucie mi się podoba. Reszta mniej."
     },
     {
       "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
-      "tekst": "Sprawdzam wzory. Wzorów nie ma. Sprawdzam dalej."
+      "tekst": "Sprawdzam Twoje wzory. Wzorów nie ma. Sprawdzam dalej."
     },
     {
       "kto": "SEKRETARZ OKOŃ",
-      "tekst": "Zebry mają jetpacki. To akurat zgadza się z arkuszem."
+      "tekst": "Piszesz, Aleksandro, że zebry mają jetpacki. To akurat zgadza się z arkuszem."
     },
     {
       "kto": "CZŁONKINI Z URZĘDU",
-      "tekst": "Głosujmy, bo mi się herbata kończy."
+      "tekst": "Głosujmy nad Aleksandrą, bo mi się herbata kończy."
     }
   ],
   "werdyktWysoki": [
     {
       "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
-      "tekst": "Dobrze. Nie doskonale, ale dobrze, a ja rzadko to mówię."
+      "tekst": "Dobrze, Aleksandro. Nie doskonale, ale dobrze, a ja rzadko to mówię."
     },
     {
       "kto": "SEKRETARZ OKOŃ",
-      "tekst": "Wpisuję wysoką notę. Ręka mi drży, bo to pierwszy raz w tym kwartale."
+      "tekst": "Wpisuję Ci wysoką notę. Ręka mi drży, bo to pierwszy raz w tym kwartale."
     },
     {
       "kto": "CZŁONKINI Z URZĘDU",
-      "tekst": "Pieczątka idzie na środek. Zasłużyłeś."
+      "tekst": "Pieczątka idzie na środek. Zasłużyłaś."
     },
     {
       "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
-      "tekst": "Słoń by cię zatrudnił."
+      "tekst": "Słoń by Cię zatrudnił, Aleksandro."
     },
     {
       "kto": "SEKRETARZ OKOŃ",
-      "tekst": "Zaznaczam w rejestrze gwiazdkę. Gwiazdka nic nie daje, ale ładnie wygląda."
+      "tekst": "Zaznaczam Ci w rejestrze gwiazdkę. Gwiazdka nic nie daje, ale ładnie wygląda."
     },
     {
       "kto": "CZŁONKINI Z URZĘDU",
@@ -106,75 +106,75 @@
   "werdyktNiski": [
     {
       "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
-      "tekst": "Przeszło, ale bez entuzjazmu."
+      "tekst": "Przeszłaś, Aleksandro, ale bez entuzjazmu."
     },
     {
       "kto": "SEKRETARZ OKOŃ",
-      "tekst": "Wpisuję. Nie pytaj ile."
+      "tekst": "Wpisuję Ci notę. Nie pytaj ile."
     },
     {
       "kto": "CZŁONKINI Z URZĘDU",
-      "tekst": "Brakowało mi liczb. Liczby robią wrażenie na komisji."
+      "tekst": "Brakowało mi u Ciebie liczb. Liczby robią wrażenie na komisji."
     },
     {
       "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
-      "tekst": "Zebry by cię przeżyły o dwie minuty."
+      "tekst": "Zebry by Cię przeżyły o dwie minuty."
     },
     {
       "kto": "SEKRETARZ OKOŃ",
-      "tekst": "W rejestrze będzie adnotacja. Adnotacji się nie usuwa."
+      "tekst": "W rejestrze będzie przy Tobie adnotacja. Adnotacji się nie usuwa."
     },
     {
       "kto": "CZŁONKINI Z URZĘDU",
-      "tekst": "Idź dalej, zanim zmienię zdanie."
+      "tekst": "Idź dalej, Aleksandro, zanim zmienię zdanie."
     }
   ],
   "werdyktZero": [
     {
       "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
-      "tekst": "Pusta kartka to też odpowiedź. Zła."
+      "tekst": "Pusta kartka to też odpowiedź, Aleksandro. Zła."
     },
     {
       "kto": "SEKRETARZ OKOŃ",
-      "tekst": "Zero. Wpisałem od razu, żeby nie przedłużać."
+      "tekst": "Zero. Wpisałem Ci od razu, żeby nie przedłużać."
     },
     {
       "kto": "CZŁONKINI Z URZĘDU",
-      "tekst": "Nawet zebra z akademii wojskowej coś by napisała."
+      "tekst": "Nawet zebra z akademii wojskowej napisałaby więcej od Ciebie."
     },
     {
       "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
-      "tekst": "Komisja nie karze za głupotę. Karze za milczenie."
+      "tekst": "Komisja nie karze Cię za głupotę. Karze za milczenie."
     },
     {
       "kto": "SEKRETARZ OKOŃ",
-      "tekst": "Rejestr zapamięta. Rejestr zawsze pamięta."
+      "tekst": "Rejestr Cię zapamięta. Rejestr zawsze pamięta."
     },
     {
       "kto": "CZŁONKINI Z URZĘDU",
-      "tekst": "Możesz iść dalej. Punktów nie ma."
+      "tekst": "Możesz iść dalej, Aleksandro. Punktów nie ma."
     }
   ],
   "werdyktAwaryjny": [
     {
       "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
-      "tekst": "Łącze z komisją nadrzędną padło. Oceniam z pamięci i z doświadczenia."
+      "tekst": "Aleksandro, łącze z komisją nadrzędną padło. Oceniam Cię z pamięci i z doświadczenia."
     },
     {
       "kto": "SEKRETARZ OKOŃ",
-      "tekst": "Maszyna licząca się zacięła. Wpisuję notę z tabeli awaryjnej."
+      "tekst": "Maszyna licząca się zacięła. Wpisuję Ci notę z tabeli awaryjnej."
     },
     {
       "kto": "CZŁONKINI Z URZĘDU",
-      "tekst": "Nie mam dzisiaj dostępu do opinii biegłego. Decyduję sama."
+      "tekst": "Nie mam dzisiaj dostępu do opinii biegłego. Decyduję o Tobie sama."
     },
     {
       "kto": "PRZEWODNICZĄCY HIENIALIUSZ",
-      "tekst": "Prąd wrócił na chwilę i tyle zdążyłem przeczytać. Wystarczy."
+      "tekst": "Prąd wrócił na chwilę i tyle zdążyłem u Ciebie przeczytać. Wystarczy."
     },
     {
       "kto": "SEKRETARZ OKOŃ",
-      "tekst": "Protokół awaryjny numer 4. Kandydat dostaje punkty i nikt o tym nie mówi."
+      "tekst": "Protokół awaryjny numer 4. Aleksandra dostaje punkty i nikt o tym nie mówi."
     }
   ]
 }
