@@ -948,10 +948,19 @@ Kolejność liniowa jak wszędzie. Fazę wykonujemy PRZED bramką F8.
   Negatywne: `git grep -n "wkurwienia myszy"` = `data/egzamin.json` i ten backlog, zero trafień w komponentach; treść zadania bez `Aleksandro`.
   Znalezisko w trakcie: część 2 dokładana POD zamknięty druk części 1 spychała `<textarea>` na 1804 px od góry na 390 px, czyli dokładnie błąd z F7-08. Naprawione regułą `:has()` w `app/style/egzamin.css` (druk części 1 i `DANE DO ZADANIA` schodzą ze sceny, gdy otwarta jest część 2) plus `scrollIntoView` na przejściu. Po poprawce: druk części 2 na 252 px, `<textarea>` na 1217 px, `scrollY` po kliknięciu = 252.
   Straże: `tests/f3-03.spec.ts` (dwa nowe testy), zaktualizowany przepływ klawiaturowy w `tests/f6-01.spec.ts` (18 kroków, część 2 w środku) i ziarna `sessionStorage` w 12 plikach testów.
-- [ ] **F9-05** `ui` Radio: usunięcie podpisu `LECI: POST MALONE, TINY DESK CONCERT`, dodanie przełączania między trzema materiałami strzałkami.
+- [x] **F9-05** `ui` Radio: usunięcie podpisu `LECI: POST MALONE, TINY DESK CONCERT`, dodanie przełączania między trzema materiałami strzałkami.
   CZYTAJ: 09 (cały).
   Lista materiałów (kolejność wiążąca): 1. `oCcks-fwq2c` (Post Malone, Tiny Desk Concert, NPR Music), 2. `RLmx3KMNuRM` (Top Gun Niesiołowice, czasem łowię ryby), 3. `wj2jITPprLw` (tak puszysty jak almette, ebr cypisz).
   AC: obudowa ma dwie strzałki (`POPRZEDNI` i `NASTĘPNY`) jako przyciski z `aria-label`; klik przełącza materiał w pętli (z trzeciego na pierwszy) i odtwarzacz gra nowy `videoId` (assercja na `src` iframe albo `player.getVideoData().video_id`); wybrany materiał zapisany w `localStorage` pod `jwp.kanal` i wraca po reloadzie; strzałki działają też klawiaturą (Tab plus Enter); podpis `LECI: POST MALONE...` nie występuje (`git grep -ci "leci: post"` = 0), zamiast niego pokazywana jest nazwa bieżącego materiału z listy; negatywne: nadal ZERO żądań do YouTube przed pierwszym kliknięciem `WŁĄCZ`, zero plików audio w `public/`.
+  ✓ WYKONANE (przejście w przeglądarce z realnym odtwarzaczem YouTube, zrzuty `screenshots/f9-05-radio-{mobile,desktop}.png` OBEJRZANE):
+  Dwa przyciski `[data-radio-poprzedni]` / `[data-radio-nastepny]` z `aria-label` `Poprzedni materiał w radiu Komisji` i `Następny materiał w radiu Komisji`.
+  Pętla zmierzona na `player.getVideoData().video_id`: `oCcks-fwq2c` -> `RLmx3KMNuRM` -> `wj2jITPprLw` -> `oCcks-fwq2c`, `POPRZEDNI` z pierwszego wraca na `wj2jITPprLw`.
+  `localStorage.jwp.kanal` = id bieżącego materiału, po `reload()` podpis wraca na wybrany (`TOP GUN NIESIOŁOWICE, CZASEM ŁOWIĘ RYBY`).
+  Klawiatura: Tab przechodzi `POPRZEDNI` -> `WŁĄCZ` -> `NASTĘPNY`, `Enter` na `NASTĘPNY` przełącza materiał.
+  `LECI: POST MALONE...` nie występuje ani w DOM (`page.content()`), ani w kodzie (`git grep -ci "leci: post"` = 0); w tym miejscu stoi `[data-radio-nazwa]` z nazwą materiału.
+  Negatywne: żądań do `youtube.com`/`youtube-nocookie.com` przed pierwszym `WŁĄCZ` = 0, `iframe` w DOM = 0 (także po przełączaniu strzałkami); zero plików audio w `public/`.
+  Znalezisko z pierwszego zrzutu: trzy przyciski w jednym rzędzie zawijały się krzywo w obudowie 220 px - strzałki zjechały do własnego rzędu pod `WŁĄCZ`.
+  Tytuł `iframe` niesie nazwę bieżącego materiału (`Odtwarzacz radia Komisji: ...`); zaktualizowany spec `plan/09` A, B, D i asercja w `tests/f5-03.spec.ts` plus trzy nowe testy F9-05.
 - [ ] **F9-06** `ui` ⚠ HARD Etap 3: po zatwierdzeniu druku i ceremonii spalenia dochodzi ekran z ZADANIEM próby ognia, przedstawiony jako druk Komisji.
   CZYTAJ: 08→C,D,E,F; 04→B,D.
   Treść zadania (dosłownie): `PRÓBA OGNIA: stanąć na głowie, ze skarpetkami na dłoniach, nogami w śpiworze i w okularach przeciwsłonecznych. Punkty bonusowe za piankę marshmallow w buzi. Wykonanie udowodnić zdjęciem albo filmem.`

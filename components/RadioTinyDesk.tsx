@@ -11,13 +11,19 @@ import Pas from "@/components/scena/Pas";
 // (wyjatek od Z14). Laduje sie DOPIERO po gescie Aleksandry, wiec przed
 // kliknieciem `WLACZ` nie leci ani jedno zadanie do YouTube.
 
-const FILM = "oCcks-fwq2c";
+// F9-05: trzy materialy zamiast jednego, kolejnosc wiazaca (plan/11 F9-05).
+const KANALY = [
+  { id: "oCcks-fwq2c", nazwa: "POST MALONE, TINY DESK CONCERT, NPR MUSIC" },
+  { id: "RLmx3KMNuRM", nazwa: "TOP GUN NIESIOŁOWICE, CZASEM ŁOWIĘ RYBY" },
+  { id: "wj2jITPprLw", nazwa: "TAK PUSZYSTY JAK ALMETTE, EBR CYPISZ" },
+];
 const HOST = "https://www.youtube-nocookie.com";
 const API = "https://www.youtube.com/iframe_api";
-const TYTUL = "Odtwarzacz koncertu Post Malone Tiny Desk";
+const tytulRamki = (nr: number) => `Odtwarzacz radia Komisji: ${KANALY[nr].nazwa}`;
 const CZAS_NA_GOTOWOSC = 5000;
 const KLUCZ_AUDIO = "jwp.audio";
 const KLUCZ_GLOSNOSCI = "jwp.glosnosc";
+const KLUCZ_KANALU = "jwp.kanal";
 
 type Odtwarzacz = {
   playVideo: () => void;
@@ -25,6 +31,11 @@ type Odtwarzacz = {
   setVolume: (n: number) => void;
   getPlayerState: () => number;
   getIframe: () => HTMLIFrameElement;
+  // `load` startuje od razu, `cue` tylko podstawia - radio na pauzie ma zostac
+  // na pauzie takze po zmianie materialu (Z15).
+  loadVideoById: (id: string) => void;
+  cueVideoById: (id: string) => void;
+  getVideoData: () => { video_id: string };
 };
 
 type YT = {
@@ -71,6 +82,11 @@ export default function RadioTinyDesk() {
   // a ponowne `WLACZ` startowaloby koncert od poczatku.
   const [zamontowany, ustawZamontowany] = useState(false);
   const [glosnosc, ustawGlosnosc] = useState(60);
+  const [kanal, ustawKanal] = useState(0);
+  // Odtwarzacz powstaje w efekcie po klikniecie WLACZ, wiec domkniecie zlapaloby
+  // stan sprzed kliku. Ref zawsze niesie aktualny numer materialu.
+  const kanalRef = useRef(0);
+  kanalRef.current = kanal;
   const gniazdo = useRef<HTMLDivElement>(null);
   const odtwarzacz = useRef<Odtwarzacz | null>(null);
   const jestGotowy = useRef(false);
@@ -81,6 +97,8 @@ export default function RadioTinyDesk() {
   useEffect(() => {
     ustawGlosnosc(czytajLiczbe(KLUCZ_GLOSNOSCI, 60));
     try {
+      const zapisany = KANALY.findIndex((k) => k.id === window.localStorage.getItem(KLUCZ_KANALU));
+      if (zapisany >= 0) ustawKanal(zapisany);
       if (window.localStorage.getItem(KLUCZ_AUDIO) === "on") ustawWznowienie(true);
     } catch {
       // jw.
@@ -93,7 +111,7 @@ export default function RadioTinyDesk() {
       // Bez jawnego `host` przy nocookie `onReady` nigdy nie przychodzi
       // i radio zawsze wpada w tryb awaryjny (plan/09 A).
       host: HOST,
-      videoId: FILM,
+      videoId: KANALY[kanalRef.current].id,
       width: 260,
       height: 200,
       playerVars: {
@@ -109,7 +127,7 @@ export default function RadioTinyDesk() {
           odtwarzacz.current?.setVolume(glosnosc);
           odtwarzacz.current?.playVideo();
           // YT wstawia wlasny tytul filmu - dostepnosc wymaga naszego (plan/09 D3)
-          odtwarzacz.current?.getIframe()?.setAttribute("title", TYTUL);
+          odtwarzacz.current?.getIframe()?.setAttribute("title", tytulRamki(kanalRef.current));
           window.jwpRadio = odtwarzacz.current ?? undefined;
         },
       },
@@ -146,6 +164,21 @@ export default function RadioTinyDesk() {
       return;
     }
     ustawZamontowany(true);
+  };
+
+  // Przelaczanie w petli: z trzeciego materialu na pierwszy i odwrotnie.
+  // Przed pierwszym WLACZ zmienia sam podpis - odtwarzacza jeszcze nie ma,
+  // wiec zadne zadanie do YouTube nie leci (Z15, plan/09 A).
+  const przelacz = (kierunek: 1 | -1) => {
+    const nowy = (kanal + kierunek + KANALY.length) % KANALY.length;
+    ustawKanal(nowy);
+    kanalRef.current = nowy;
+    zapisz(KLUCZ_KANALU, KANALY[nowy].id);
+    const o = odtwarzacz.current;
+    if (!o) return;
+    if (gra) o.loadVideoById(KANALY[nowy].id);
+    else o.cueVideoById(KANALY[nowy].id);
+    o.getIframe()?.setAttribute("title", tytulRamki(nowy));
   };
 
   const wylacz = () => {
@@ -191,6 +224,30 @@ export default function RadioTinyDesk() {
         {gra ? "WYŁĄCZ" : "WŁĄCZ"}
       </button>
 
+      {/* Strzalki w osobnym rzedzie POD WLACZ: obudowa ma na 390 px 220 px
+          szerokosci, wiec trzy przyciski w jednej linii zawijaly sie krzywo
+          (widac na zrzucie, nie w assercji). */}
+      <div className="radio__strzalki">
+        <button
+          className="radio__przycisk radio__strzalka"
+          type="button"
+          data-radio-poprzedni
+          aria-label="Poprzedni materiał w radiu Komisji"
+          onClick={() => przelacz(-1)}
+        >
+          POPRZEDNI
+        </button>
+        <button
+          className="radio__przycisk radio__strzalka"
+          type="button"
+          data-radio-nastepny
+          aria-label="Następny materiał w radiu Komisji"
+          onClick={() => przelacz(1)}
+        >
+          NASTĘPNY
+        </button>
+      </div>
+
       <label className="radio__suwak" htmlFor="radio-glosnosc">
         <span className="radio__podpis">GŁOŚNOŚĆ</span>
         <input
@@ -209,14 +266,16 @@ export default function RadioTinyDesk() {
         />
       </label>
 
-      <p className="radio__podpis">LECI: POST MALONE, TINY DESK CONCERT</p>
+      <p className="radio__podpis" data-radio-nazwa>
+        {KANALY[kanal].nazwa}
+      </p>
       <a
         className="radio__zrodlo"
-        href={`https://youtu.be/${FILM}`}
+        href={`https://youtu.be/${KANALY[kanal].id}`}
         target="_blank"
         rel="noreferrer"
       >
-        youtu.be/{FILM}
+        youtu.be/{KANALY[kanal].id}
       </a>
     </div>
   );

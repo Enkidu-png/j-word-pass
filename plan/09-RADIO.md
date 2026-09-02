@@ -14,7 +14,7 @@ więc odtwarzacz **jest widoczny** i wbudowany w obudowę radia jako jego ekran.
 Parametry:
 - `src`: `https://www.youtube-nocookie.com/embed/oCcks-fwq2c?enablejsapi=1&playsinline=1&rel=0&origin=<origin strony>`
 - rozmiar: **260x200 px** na desktopie, **200x200 px** na 390 px (minimum z regulaminu)
-- `title="Odtwarzacz koncertu Post Malone Tiny Desk"`
+- `title="Odtwarzacz radia Komisji: <nazwa bieżącego materiału>"` (F9-05)
 - sterowanie przez YouTube IFrame API (`https://www.youtube.com/iframe_api`).
   **To jedyny dozwolony skrypt zewnętrzny w projekcie**, wyjątek od Z14 zapisany
   w `DECISIONS.md`.
@@ -55,8 +55,14 @@ Elementy obudowy, od góry:
   i pionową kreską `3px solid var(--alarm)` przesuwaną `steps(20)` co 4 s, tylko gdy gra
 - przycisk `WŁĄCZ` / `WYŁĄCZ` w ramce `3px outset`
 - suwak głośności `<input type="range" min="0" max="100">` sterujący `setVolume`
-- podpis: `LECI: POST MALONE, TINY DESK CONCERT` plus link `youtu.be/oCcks-fwq2c`
-  otwierany w nowej karcie (atrybucja źródła)
+- **strzałki `POPRZEDNI` i `NASTĘPNY`** (F9-05) w rzędzie pod `WŁĄCZ`, z `aria-label`,
+  przełączające w pętli między trzema materiałami; wybór w `localStorage` pod `jwp.kanal`
+- podpis: nazwa BIEŻĄCEGO materiału (podpis `LECI: POST MALONE...` skasowany w F9-05)
+  plus link `youtu.be/<id bieżącego materiału>` otwierany w nowej karcie (atrybucja źródła)
+
+**Lista materiałów (F9-05, kolejność wiążąca):** 1. `oCcks-fwq2c` (Post Malone, Tiny Desk
+Concert, NPR Music), 2. `RLmx3KMNuRM` (Top Gun Niesiołowice, czasem łowię ryby),
+3. `wj2jITPprLw` (tak puszysty jak almette, ebr cypisz).
 
 ## C. KONTRAKT ZACHOWANIA
 
@@ -76,8 +82,9 @@ Elementy obudowy, od góry:
 
 1. **Zero autoplay z dźwiękiem** (Z15). Zawsze gest Aleksandry.
 2. Stan włączenia w `localStorage` pod `jwp.audio` (`on`/`off`), głośność pod
-   `jwp.glosnosc`. Zero innych kluczy w `localStorage` poza `jwp.odwiedziny`.
-3. `iframe` ma `title="Odtwarzacz koncertu Post Malone Tiny Desk"` (dostępność)
+   `jwp.glosnosc`, wybrany materiał pod `jwp.kanal` (F9-05). Zero innych kluczy
+   w `localStorage` poza `jwp.odwiedziny`.
+3. `iframe` ma `title="Odtwarzacz radia Komisji: <nazwa materiału>"` (dostępność)
    i minimum 200x200 px (regulamin, sekcja A).
 4. Skrypt `iframe_api` ładowany **dopiero po geście**, nie przy starcie strony -
    inaczej psuje budżet pierwszego ładowania.

@@ -343,3 +343,18 @@ body {
     width: 200px;
   }
 }
+
+/* F9-05: strzalki przelaczania materialu, rzad pod przyciskiem WLACZ. */
+.radio__strzalki {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.radio__strzalka {
+  flex: 1 1 0;
+  padding: 6px 4px;
+  letter-spacing: 1px;
+}

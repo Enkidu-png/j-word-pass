@@ -39,7 +39,11 @@ test("WLACZ laduje iframe_api, iframe ma film i minimum 200x200", async ({ page 
   console.log(`iframe radia: ${pudlo?.width}x${pudlo?.height}`);
   expect(pudlo!.width).toBeGreaterThanOrEqual(200);
   expect(pudlo!.height).toBeGreaterThanOrEqual(200);
-  await expect(ramka).toHaveAttribute("title", "Odtwarzacz koncertu Post Malone Tiny Desk");
+  // F9-05: tytul ramki niesie nazwe BIEZACEGO materialu, bo materialy sa trzy
+  await expect(ramka).toHaveAttribute(
+    "title",
+    "Odtwarzacz radia Komisji: POST MALONE, TINY DESK CONCERT, NPR MUSIC",
+  );
 
   expect(await page.evaluate(() => localStorage.getItem("jwp.audio"))).toBe("on");
 });
@@ -117,4 +121,67 @@ test("negatywne: zero plikow audio w public i zero pobieraczy w repo", async () 
     .toString()
     .trim();
   expect(Number(pobieracze)).toBe(0);
+});
+
+// --- F9-05: trzy materialy i przelaczanie strzalkami ---
+
+const KANALY = [
+  { id: "oCcks-fwq2c", nazwa: "POST MALONE, TINY DESK CONCERT, NPR MUSIC" },
+  { id: "RLmx3KMNuRM", nazwa: "TOP GUN NIESIOŁOWICE, CZASEM ŁOWIĘ RYBY" },
+  { id: "wj2jITPprLw", nazwa: "TAK PUSZYSTY JAK ALMETTE, EBR CYPISZ" },
+];
+
+test("F9-05 podpis LECI znika, zostaje nazwa biezacego materialu", async ({ page }) => {
+  await wejdz(page);
+  await expect(page.locator("[data-radio-nazwa]")).toHaveText(KANALY[0].nazwa);
+  expect(await page.content()).not.toContain("LECI: POST");
+  await expect(page.locator("[data-radio-poprzedni]")).toHaveAttribute("aria-label", /Poprzedni/);
+  await expect(page.locator("[data-radio-nastepny]")).toHaveAttribute("aria-label", /Następny/);
+});
+
+test("F9-05 strzalki chodza w petli i zapisuja jwp.kanal, bez zadan do YouTube", async ({
+  page,
+}) => {
+  const yt: string[] = [];
+  page.on("request", (r) => {
+    if (doYT(r.url())) yt.push(r.url());
+  });
+  await wejdz(page);
+
+  for (const oczekiwany of [KANALY[1], KANALY[2], KANALY[0]]) {
+    await page.locator("[data-radio-nastepny]").click();
+    await expect(page.locator("[data-radio-nazwa]")).toHaveText(oczekiwany.nazwa);
+    await expect.poll(() => page.evaluate(() => localStorage.getItem("jwp.kanal"))).toBe(
+      oczekiwany.id,
+    );
+  }
+  await page.locator("[data-radio-poprzedni]").click();
+  await expect(page.locator("[data-radio-nazwa]")).toHaveText(KANALY[2].nazwa);
+
+  // przelaczanie PRZED gestem WLACZ nie budzi YouTube (Z15)
+  expect(yt).toHaveLength(0);
+  expect(await page.locator("iframe").count()).toBe(0);
+
+  // wybor przezywa przeladowanie
+  await page.reload();
+  await expect(page.locator("[data-radio-nazwa]")).toHaveText(KANALY[2].nazwa);
+});
+
+test("F9-05 strzalka dziala klawiatura i podmienia grajacy material", async ({ page }) => {
+  await wejdz(page);
+  await page.locator("[data-radio-cta]").click();
+  await page.waitForFunction(() => window.jwpRadio?.getPlayerState() === 1, null, {
+    timeout: 30_000,
+  });
+  expect(await page.evaluate(() => window.jwpRadio!.getVideoData().video_id)).toBe(KANALY[0].id);
+
+  await page.locator("[data-radio-nastepny]").focus();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("[data-radio-nazwa]")).toHaveText(KANALY[1].nazwa);
+  await expect
+    // tuz po `loadVideoById` odtwarzacz przez chwile nie ma jeszcze danych filmu
+    .poll(() => page.evaluate(() => window.jwpRadio?.getVideoData?.()?.video_id), {
+      timeout: 20_000,
+    })
+    .toBe(KANALY[1].id);
 });
