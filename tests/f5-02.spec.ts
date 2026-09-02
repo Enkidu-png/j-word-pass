@@ -58,12 +58,10 @@ test("payload 3 KB odbity limitem objetosci", async ({ request }) => {
   expect((await res.json()).blad).toContain("objętość");
 });
 
-// PARK F0-05: dwa ostatnie testy tego pliku steruja formularzem /proba-ognia,
-// ktory czystka F0-01 usunela i ktory wraca dopiero w F5-01. Kontrakt API
-// (cztery testy powyzej) dziala i zostaje aktywny. Odpiecie parkowania:
-// issue F7-01 w plan/11-BACKLOG.md.
+// Parkowanie zdjete w F5-02 (issue F7-01): formularz /proba-ognia istnieje
+// od F5-01, a ceremonia spalenia od F5-02.
 
-test.skip("pierwszy submit wysyla POST, powrot z flaga wyslano juz nie (07 D2)", async ({ page }) => {
+test("pierwszy submit wysyla POST, powrot z flaga wyslano juz nie (07 D2)", async ({ page }) => {
   await page.addInitScript(WPUSC);
   const posty: string[] = [];
   page.on("request", (r) => {
@@ -91,7 +89,7 @@ test.skip("pierwszy submit wysyla POST, powrot z flaga wyslano juz nie (07 D2)",
   expect(posty).toHaveLength(1);
 });
 
-test.skip("awaria Bloba nie psuje druku: stempel o pamieci ulotnej po jednym ponowieniu", async ({ page }) => {
+test("awaria Bloba nie psuje druku: stempel o pamieci ulotnej po jednym ponowieniu", async ({ page }) => {
   await page.addInitScript(WPUSC);
   let prob = 0;
   await page.route("**/api/zgloszenie", async (route) => {
@@ -113,4 +111,83 @@ test.skip("awaria Bloba nie psuje druku: stempel o pamieci ulotnej po jednym pon
   expect(prob).toBe(2);                                          // retry dokladnie 1x (07 B)
   expect(await page.evaluate(() => JSON.parse(sessionStorage.getItem("jwp.v1") ?? "{}")?.ogien?.wyslano))
     .not.toBe(true);
+});
+
+// --- Ceremonia spalenia i list w butelce (plan/08 C, D) ---
+
+async function zloz(page: import("@playwright/test").Page) {
+  await page.goto("/proba-ognia");
+  await page.locator("[data-pole='email']").fill("kandydatka@komisja.pl");
+  await page.locator("[data-pole='but']").fill("39");
+  await page.locator("[data-pole='ucho']").fill("240");
+  await page.locator("[data-pokora]").check();
+  await page.locator("[data-cta]").click();
+}
+
+test("cztery kroki ceremonii ida po kolei w kontraktowych czasach", async ({ page }) => {
+  await page.addInitScript(WPUSC);
+  const start = Date.now();
+  await zloz(page);
+
+  const ceremonia = page.locator("[data-ceremonia]");
+  await expect(ceremonia).toHaveAttribute("data-faza", "skladanie");
+  await expect(ceremonia).toHaveAttribute("data-faza", "ogien", { timeout: 3000 });
+  await expect(page.locator(".ceremonia__plomien")).toHaveCount(8);
+  await expect(ceremonia).toHaveAttribute("data-faza", "popiol", { timeout: 3000 });
+  await expect(page.locator("[data-popiol] .popiol__ziarno")).toHaveCount(20);
+  await expect(page.locator("[data-butelka]")).toBeVisible({ timeout: 3000 });
+  // butelka nie moze pojawic sie przed kontraktowymi 3200 ms (plan/08 C)
+  expect(Date.now() - start).toBeGreaterThanOrEqual(3200);
+  await expect(page.locator("[data-goniec]").last()).toContainText("KLIKNIJ BUTELKĘ, ALEKSANDRO");
+});
+
+test("Escape w kroku 1 skacze od razu do butelki", async ({ page }) => {
+  await page.addInitScript(WPUSC);
+  await zloz(page);
+  await expect(page.locator("[data-faza='skladanie']")).toBeVisible({ timeout: 400 });
+  await page.keyboard.press("Escape");
+  await expect(page.locator("[data-butelka]")).toBeVisible({ timeout: 600 });
+});
+
+test("Enter na butelce rozwija pergamin z e-mailem i suma 20/25, pergamin bez przekrzywienia", async ({ page }) => {
+  await page.addInitScript(WPUSC);
+  await zloz(page);
+  const butelka = page.locator("[data-butelka]");
+  await expect(butelka).toBeVisible({ timeout: 9000 });
+  await expect(page.locator("[data-pergamin]")).toHaveCount(0);
+
+  await butelka.focus();
+  await page.keyboard.press("Enter");
+  const pergamin = page.locator("[data-pergamin]");
+  await expect(pergamin).toBeVisible();
+  await expect(page.locator("[data-pergamin-email]")).toContainText("kandydatka@komisja.pl");
+  await expect(pergamin).toContainText("8/10");
+  await expect(pergamin).toContainText("12/15");
+  await expect(page.locator("[data-suma]")).toContainText("20/25");
+
+  // Z6 i anty-spec plan/08 F punkt 3: zero obrotu i skosu na pergaminie
+  const m = await pergamin.evaluate((e) => getComputedStyle(e).transform);
+  if (m !== "none") {
+    const [a, b, c, d] = m.slice(7, -1).split(", ").map(Number);
+    expect([a, b, c, d]).toEqual([1, 0, 0, 1]);
+  }
+});
+
+test("OD NOWA czysci sessionStorage i wraca na brame", async ({ page }) => {
+  await page.addInitScript(WPUSC);
+  await zloz(page);
+  await page.locator("[data-butelka]").click({ timeout: 9000 });
+  await page.locator("[data-cta='od-nowa']").click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect.poll(() => page.evaluate(() => sessionStorage.getItem("jwp.v1"))).toBeNull();
+});
+
+test("negatywne: zero konfetti i zero fajerwerkow po wyslaniu", async ({ page }) => {
+  await page.addInitScript(WPUSC);
+  await zloz(page);
+  await expect(page.locator("[data-butelka]")).toBeVisible({ timeout: 9000 });
+  const klasy = await page.evaluate(() =>
+    Array.from(document.querySelectorAll("*")).map((e) => e.className.toString()).join(" "),
+  );
+  expect(klasy.toLowerCase()).not.toMatch(/konfetti|confetti|fajerwerk|firework/);
 });

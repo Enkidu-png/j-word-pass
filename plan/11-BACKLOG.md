@@ -412,7 +412,24 @@ i anty-spec z `plan/01 G`, wpis raportu fazy, zero znalezisk bez issue w F7-ZNAL
   ✓ `pnpm run check` czysty, `pnpm build` zielony (`/proba-ognia` 107 kB).
   CZYTAJ: 08→A,B,E; 04→B,C; 01→D.
   AC: błędny e-mail powoduje drganie druku (`translateX`, nie obrót) plus stempel `ALEKSANDRO, TO NIE JEST ADRES` plus fokus wraca do pola; but 8 daje stempel o skali 10-70; ucho 200 przechodzi z dopiskiem podziwu; submit `disabled` bez checkboxa; zrzuty desktop i 390 px OBEJRZANE; negatywne: zero czerwonych obwódek bez stempla, zero steppera, zero `rotate` na drganiu.
-- [ ] **F5-02** `ui` ⚠ HARD Ceremonia spalenia plus list w butelce wg `plan/08 C,D`.
+- [x] **F5-02** `ui` ⚠ HARD Ceremonia spalenia plus list w butelce wg `plan/08 C,D`.
+  ✓ `npx playwright test tests/f5-02.spec.ts` = 22 passed (desktop + 390 px),
+  w tym dwa testy odparkowane z F7-01.
+  ✓ cztery zrzuty faz OBEJRZANE: `screenshots/F5/F5-02-krok{1-zjazd,2-ogien,
+  3-popiol,4-butelka}.png` plus `F5-02-pergamin-{desktop,mobile}.png`.
+  Krok 1 zjazd druku `translateY`, krok 2 rzad OSMIU ogni NAD drukiem plus
+  gasniecie `steps(6)`, krok 3 dwadziescia ziaren popiolu 6x6 px, krok 4
+  butelka plus `PasGoniec KLIKNIJ BUTELKĘ, ALEKSANDRO`. Butelka przed 3200 ms
+  nie wchodzi (assercja czasu). `Escape` w kroku 1 skacze do butelki.
+  Klik i `Enter` rozwijaja pergamin z adresem, 8/10, 12/15 i suma 20/25;
+  macierz `transform` pergaminu to `[1,0,0,1]` (Z6). `OD NOWA` czysci
+  `sessionStorage` i wraca na `/`. Powrot na adres po wysylce daje butelke
+  bez drugiego POST-u i bez zadnego `[data-cta]`. Awaria Bloba: dokladnie
+  jedno ponowienie, stempel `[data-ulotna]`, flaga `wyslano` NIE zapada.
+  POST lokalnie wraca `tryb: "dev-log"`. Zero konfetti (assercja na klasach).
+  Nowe: `components/ogien/ListWButelce.tsx`, pole `pismoKoncowe`
+  w `data/komisja.json`.
+  ✓ `pnpm run check` czysty, `pnpm build` zielony (`/proba-ognia` 109 kB).
   CZYTAJ: 08→C,D,E,F; 04→B; 02→B (api/zgloszenie).
   AC: sekwencja czterech kroków udokumentowana czterema zrzutami faz w `screenshots/F5/` (OBEJRZANE); klik i `Enter` na butelce rozwijają pergamin z e-mailem i sumą `N/25`; `Escape` w krokach 1-3 skacze do butelki; `OD NOWA` czyści `sessionStorage` i wraca na `/`; powrót na URL po wysłaniu pokazuje od razu butelkę bez żądania POST; POST trafia do `/api/zgloszenie` i lokalnie zwraca `tryb: "dev-log"`; negatywne: pergamin nie jest przekrzywiony, zero konfetti.
 - [ ] **F5-03** `ui` `RadioTinyDesk` wg `plan/09` - obudowa, YouTube IFrame API po geście, wskaźnik strojenia, suwak.
@@ -440,7 +457,9 @@ Każde znalezisko z zasady 7a ląduje tu jako osobne issue z pełnym AC.
 DoD fazy: każde znalezisko ma issue; każde issue ma dyspozycję (zrobione, świadomie
 odrzucone z powodem, albo przeniesione do trackera).
 
-- [ ] **F7-01** `infra` Odpiecie parkowania dwoch testow w `tests/f5-02.spec.ts`.
+- [x] **F7-01** `infra` Odpiecie parkowania dwoch testow w `tests/f5-02.spec.ts`.
+  ✓ zdjete razem z F5-02: oba `test.skip` sa znowu `test` i przechodza
+  (22 passed w pliku, 6 skipped w calej suicie zamiast 10).
   Znalezisko z F0-05: `plan/02 B` trzyma `tests/f5-02.spec.ts` jako „test kontraktu
   `/api/zgloszenie`, zmiany: brak", ale dwa z szesciu testow tego pliku steruja
   formularzem `/proba-ognia` (`[data-pole='email']`, `[data-cta]`, `[data-butelka]`),

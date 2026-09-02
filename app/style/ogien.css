@@ -173,3 +173,169 @@
     flex: 1 0 100%;
   }
 }
+
+/* --- Ceremonia spalenia (plan/08 C) --- */
+
+.ceremonia {
+  position: relative;
+  z-index: 4;
+  max-width: 760px;
+  min-height: 420px;
+  margin: 0 auto;
+}
+
+/* Krok 1: druk zjezdza w dol do ogniska. Sam `translateY`, zero obrotu (Z6). */
+.ceremonia__druk {
+  animation: druk-zjazd 900ms steps(6) forwards;
+}
+
+.ceremonia__adres {
+  margin: 0;
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-drobny);
+  letter-spacing: 2px;
+}
+
+@keyframes druk-zjazd {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(120px);
+  }
+}
+
+/* Krok 2: rzad ognia nad drukiem, druk gasnie skokowo. */
+.ceremonia[data-faza="ogien"] .ceremonia__druk {
+  animation: druk-znika 1500ms steps(6) forwards;
+}
+
+@keyframes druk-znika {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.ceremonia__ognie {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.ceremonia__plomien {
+  width: 72px;
+  height: auto;
+  animation: ognisko-zar 900ms steps(2) infinite;
+}
+
+/* Krok 3: popiol, 20 kwadratow 6x6 px opadajacych z roznym opoznieniem. */
+.ceremonia__popiol {
+  position: relative;
+  height: 220px;
+  pointer-events: none;
+}
+
+.popiol__ziarno {
+  position: absolute;
+  top: 0;
+  width: 6px;
+  height: 6px;
+  background: var(--chrom-b);
+  animation: popiol-opada 800ms steps(8) forwards;
+}
+
+@keyframes popiol-opada {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(200px);
+    opacity: 0;
+  }
+}
+
+.ceremonia__opis {
+  margin: 10px 0;
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-tresc);
+  letter-spacing: 3px;
+  color: var(--papier);
+  text-shadow: 2px 2px 0 var(--tusz);
+}
+
+/* --- List w butelce (plan/08 D) --- */
+
+.butelka-blok {
+  position: relative;
+}
+
+.butelka {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.butelka__gif {
+  width: 180px;
+  height: auto;
+}
+
+/* Pergamin rozwija sie samym `max-height` - zero przekrzywienia (plan/08 F). */
+.pergamin {
+  overflow: hidden;
+  max-height: 1200px;
+  margin-top: 12px;
+  animation: pergamin-rozwija 600ms steps(8);
+  text-align: left;
+}
+
+@keyframes pergamin-rozwija {
+  from {
+    max-height: 0;
+  }
+  to {
+    max-height: 1200px;
+  }
+}
+
+.pergamin__adres {
+  margin: 0 0 8px;
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-drobny);
+  letter-spacing: 2px;
+}
+
+.pergamin__wynik {
+  list-style: none;
+  margin: 0 0 10px;
+  padding: 0;
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-tresc);
+  letter-spacing: 2px;
+}
+
+.pergamin__wynik li {
+  padding: 4px 0;
+  border-bottom: 2px inset var(--chrom-a);
+}
+
+.pergamin__zamkniecie {
+  margin: 0 0 12px;
+  font-family: var(--font-czytany);
+  font-size: var(--stopien-tresc);
+}
+
+/* Z11: skrocona ceremonia i tak nie moze skakac klatkami. */
+@media (prefers-reduced-motion: reduce) {
+  .ceremonia__druk,
+  .ceremonia[data-faza="ogien"] .ceremonia__druk,
+  .ceremonia__plomien,
+  .popiol__ziarno,
+  .pergamin {
+    animation-name: none;
+  }
+}

@@ -58,7 +58,9 @@ test("bledny e-mail: stempel, drganie translateX i fokus z powrotem w polu", asy
   await expect(druk).toHaveClass(/druk--drga/);
   await expect(page.locator("[data-stempel='email']")).toHaveText("ALEKSANDRO, TO NIE JEST ADRES");
   await expect(pole).toBeFocused();
-  await expect(druk).toHaveAttribute("data-zlozony", "nie");
+  // ceremonia NIE startuje przy bledzie (plan/08 E): druk zostaje na ekranie
+  await expect(druk).toBeVisible();
+  await expect(page.locator("[data-ceremonia]")).toHaveCount(0);
 
   // Drganie jest przesunieciem w poziomie, NIE obrotem (Z6, plan/08 B).
   // Sama klasa nie wystarczy: czytamy klatki kluczowe z CSSOM zywej strony
@@ -114,8 +116,8 @@ test("ucho 900 poza skala, ucho 200 przechodzi z dopiskiem podziwu", async ({ pa
   await page.locator("[data-pole='ucho']").fill("200");
   await expect(page.locator("[data-podziw]")).toHaveText("KOMISJA WYRAŻA PODZIW");
   await page.locator("[data-cta='skladam']").click();
-  await expect(page.locator("[data-stempel='ucho']")).toHaveCount(0);
-  await expect(page.locator("[data-druk-ogien]")).toHaveAttribute("data-zlozony", "tak");
+  await expect(page.locator("[data-druk-ogien]")).toHaveCount(0);
+  await expect(page.locator("[data-ceremonia]")).toBeVisible();
   // druk przyjety trafia do stanu kandydatki (plan/02 G)
   const ogien = await page.evaluate(
     () => JSON.parse(sessionStorage.getItem("jwp.v1") ?? "{}")?.ogien,
