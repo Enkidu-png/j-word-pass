@@ -1,0 +1,255 @@
+/* ETAP 2: QUIZ (plan/07 A, D). Kafel tla siedzi na <html> przez KafelTla -
+   tu tylko uklad arkusza. Zero obrotu i skosu (Z6), postep to rzad kwadratow,
+   a nie cienka linia (plan/07 E2). */
+
+.quiz {
+  position: relative;
+  /* gora: pas balonow 43 px; dol: pas cienki plus stwory rogowe, ktore nie moga
+     lezec na kwadratach ani na nawigacji (test elementFromPoint, plan/04 B) */
+  padding: 55px 12px 220px;
+  text-align: center;
+}
+
+.quiz__naglowek {
+  margin: 0 auto 14px;
+  width: min(60vw, 360px);
+}
+
+.quiz__napis {
+  width: 100%;
+  height: auto;
+}
+
+/* --- Arkusz --- */
+
+.arkusz {
+  position: relative;
+  z-index: 4;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.arkusz__licznik {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  padding: 8px;
+  background: var(--tusz);
+  border: 3px outset var(--chrom-b);
+  color: var(--jad);
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-h2);
+  letter-spacing: 4px;
+}
+
+.arkusz__nowe {
+  width: 32px;
+  height: auto;
+}
+
+/* --- Karta pytania (plan/07 A5) --- */
+
+.karta {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 12px;
+  background: var(--papier);
+  border: 4px ridge var(--chrom-b);
+  color: var(--tusz);
+  text-align: left;
+}
+
+.karta:focus {
+  outline: 4px solid var(--fokus);
+  outline-offset: 2px;
+}
+
+.karta__ozdoba {
+  flex: 0 0 200px;
+  /* pudelko obejmuje ozdobe zamiast rozciagac sie na cala wysokosc karty:
+     przy dlugich wariantach zostawialo ponizej GIF-a pusty biały pas
+     (widac na zrzucie desktopowym, nie w assercji) */
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+  background: var(--druk-tlo);
+  border: 3px inset var(--chrom-a);
+}
+
+.karta__gif {
+  max-width: 180px;
+  height: auto;
+}
+
+.karta__tresc {
+  flex: 1 1 auto;
+}
+
+.karta__kategoria {
+  margin: 0 0 6px;
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-drobny);
+  letter-spacing: 3px;
+}
+
+.karta__pytanie {
+  margin: 0 0 12px;
+  font-family: var(--font-czytany);
+  font-size: var(--stopien-h2);
+}
+
+/* --- Warianty A-D (plan/07 A6): zaznaczony ma ramke `3px inset --jad`
+   i zlota mgle. Zadna klasa ani atrybut nie zdradza poprawnosci (plan/07 E1). --- */
+
+.karta__warianty {
+  display: block;
+}
+
+.wariant {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 8px;
+  background: var(--druk-tlo);
+  border: 2px outset var(--chrom-a);
+  font-family: var(--font-czytany);
+  font-size: var(--stopien-tresc);
+}
+
+.wariant:hover {
+  border-width: 3px;
+}
+
+.wariant[data-wybrany="tak"] {
+  border: 3px inset var(--jad);
+  background: var(--zloto-mgla);
+}
+
+.wariant__litera {
+  flex: 0 0 auto;
+  font-family: var(--font-terminal);
+  font-weight: bold;
+}
+
+.wariant__radio:focus-visible {
+  outline: 3px solid var(--fokus);
+}
+
+.karta__otwarte {
+  display: block;
+}
+
+.karta__etykieta {
+  display: block;
+  margin-bottom: 6px;
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-drobny);
+  letter-spacing: 2px;
+}
+
+.karta__pole {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+  background: var(--druk-tlo);
+  border: 3px inset var(--chrom-a);
+  color: var(--tusz);
+  font-family: var(--font-czytany);
+  font-size: var(--stopien-tresc);
+}
+
+/* --- Nawigacja i kwadraty (plan/07 A8) --- */
+
+.arkusz__nawigacja {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.arkusz__krok {
+  padding: 10px 18px;
+  background: var(--papier);
+  border: 4px outset var(--chrom-a);
+  color: var(--tusz);
+  font-family: var(--font-czytany);
+  font-size: var(--stopien-tresc);
+  font-weight: bold;
+}
+
+.arkusz__krok:hover:not(:disabled) {
+  border-style: inset;
+  background: var(--jad);
+}
+
+.arkusz__krok:disabled {
+  border-style: inset;
+  background: var(--chrom-a);
+  color: var(--chrom-b);
+}
+
+.kwadraty {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 8px;
+  background: var(--papier);
+  border: 4px ridge var(--chrom-b);
+}
+
+.kwadrat {
+  width: 44px;
+  height: 44px;
+  background: var(--druk-tlo);
+  border: 3px outset var(--chrom-a);
+  color: var(--tusz);
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-tresc);
+  font-weight: bold;
+}
+
+/* Wypelniony kwadrat = pytanie odpowiedziane (plan/07 A8). Rozny styl od
+   pustego sprawdza test przez getComputedStyle. */
+.kwadrat[data-odpowiedziane="tak"] {
+  background: var(--jad);
+  border-style: inset;
+}
+
+.kwadrat[data-biezacy="tak"] {
+  border: 3px dashed var(--magenta);
+}
+
+/* Mobile 390 px (plan/07 D): ozdoba nad trescia, kwadraty w rzedach po piec. */
+@media (max-width: 480px) {
+  .quiz {
+    padding-bottom: 180px;
+  }
+  .quiz__naglowek {
+    width: min(80vw, 300px);
+  }
+  .karta {
+    flex-direction: column;
+  }
+  .karta__ozdoba {
+    flex: 0 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .kwadraty {
+    max-width: 280px;
+    margin: 0 auto;
+  }
+  .arkusz__licznik {
+    font-size: var(--stopien-tresc);
+  }
+}

@@ -268,9 +268,29 @@ i anty-spec z `plan/01 G`, wpis raportu fazy, zero znalezisk bez issue w F7-ZNAL
 
 ## F4 - QUIZ
 
-- [ ] **F4-01** `ui` ⚠ HARD Karta pytania i nawigacja: 15 pytań, warianty A-D, pytanie 14 otwarte, rząd 15 kwadratów, zapis stanu.
+- [x] **F4-01** `ui` ⚠ HARD Karta pytania i nawigacja: 15 pytań, warianty A-D, pytanie 14 otwarte, rząd 15 kwadratów, zapis stanu.
   CZYTAJ: 07→A,D,E; 04→B,C,D; 02→B (lib/stan.ts).
   AC: wszystkie 15 pytań przechodne klawiaturą (strzałki lewo/prawo i kliknięcie w kwadrat); zaznaczenie 3 wariantów, `page.reload()`, zaznaczenia wracają; pytanie 14 akceptuje `mohsa`, `Mohsa` i `skala Mohsa` (test normalizacji); kwadrat odpowiedzianego pytania ma inny styl niż nieodpowiedzianego (porównanie `getComputedStyle`); negatywne: zero informacji o poprawności przed oddaniem arkusza (żaden element nie ma klasy sugerującej poprawność), zero emoji w DOM.
+  ✓ `npx playwright test tests/f4-01.spec.ts` = 18 passed (desktop plus mobile), zrzuty
+  `screenshots/F4/F4-01-quiz-{desktop,mobile}.png` i `F4-01-pytanie-14-{desktop,mobile}.png`
+  OBEJRZANE. Dowody po kolei: 15 pytan przechodzone `ArrowRight` z assercja licznika
+  `PYTANIE NN / 15` i tresci pytania z `data/quiz.json`, na krancach strzalka nie
+  wyjezdza poza arkusz; klik w kwadrat 9, 3, 15, 1 skacze do pytania, kwadrat pod
+  fokusem reaguje na `Enter`; trzy zaznaczenia (B w 1, D w 5, A w 2), `page.reload()`,
+  wszystkie trzy wracaja i zaden inny wariant nie jest zaznaczony; pytanie 14 renderuje
+  `input[type=text]` i zero `.wariant`, wpisy `mohsa`, `Mohsa`, `skala Mohsa` trafiaja
+  do `sessionStorage` i wszystkie trzy przechodza `dopasujOtwarte` z `lib/quiz.ts`
+  (`skala richtera` nie przechodzi); kwadrat odpowiedziany `rgb(57, 255, 20) inset`
+  kontra pusty `rgb(255, 255, 255) outset` (`getComputedStyle`); negatywne: na
+  pytaniach 1, 8, 14, 15 zero atrybutow pasujacych do `poprawn|dobra|blad|correct|
+  prawda|falsz` i zero emoji w `main.tresc`. Dodatkowo Z8: 7 animowanych elementow,
+  wlasny kafel `kafel-quiz`, stwory rogowe (`stwor-kot`) nie leza na zadnym kwadracie
+  ani na nawigacji (`elementFromPoint` po przewinieciu). `pnpm run check` czysty,
+  `pnpm build` = `/quiz` 8,01 kB, first load 110 kB (limit 160 kB), pelny
+  `npx playwright test` = 164 passed, 10 skipped.
+  ZRZUT POPRAWIL BLAD, KTOREGO ASERCJA NIE WIDZIALA: pudelko ozdoby rozciagalo sie na
+  cala wysokosc karty i zostawialo pod GIF-em pusty bialy pas okolo 150 px; `align-self:
+  flex-start` w `.karta__ozdoba` to zamknelo.
 - [ ] **F4-02** `ui` Ozdoby 15 pytań wg tabeli `plan/07 B` plus reakcje na hover.
   CZYTAJ: 07→B; 04→B; 03→D.
   AC: zbiór `id` ozdób użytych w 15 pytaniach ma dokładnie 15 elementów (wypisać listę w dowodzie); pytanie 1 na hover wariantu B zmienia `animation-duration` ozdoby (odczyt przed i po); pytanie 14 przy poprawnym wpisie błyska (`animation-name` się zmienia); zrzut-kolaż 15 ozdób w `screenshots/F4/` OBEJRZANY - ozdoby realnie się różnią, nie są 15 wariantami tego samego; negatywne: zero ozdób bez pozycji w manifeście.
