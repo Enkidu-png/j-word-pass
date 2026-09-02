@@ -5,7 +5,7 @@
 > checkboxy w `plan/11-BACKLOG.md`. Jesli ten plik kiedykolwiek zacznie mowic
 > co innego niz backlog, wierz backlogowi i skasuj ten plik.
 
-## Gdzie jestesmy (aktualizacja: paczka F7-02, F7-03, F7-05)
+## Gdzie jestesmy (aktualizacja: paczka F7-04, F7-06)
 
 **Fazy F0-F6 ZAMKNIETE**, kazda z raportem DoD w `plan/11-BACKLOG.md`.
 W tym przebiegu doszly: F6-01, F6-02, F6-03, F6-04 plus raport fazy F6.
@@ -115,19 +115,44 @@ F7-04, ktore czeka na decyzje.
 
 ## Otwarte issues w F7-ZNALEZISKA
 
-- **F7-06** `.napis { width: 100% }` (scena.css, importowany PO brama.css)
-  przykrywa `.brama__napis { width: min(90vw, 720px) }` - ta sama
-  specyficznosc, wygrywa pozniejszy arkusz. Napis bramy ma 1256 px zamiast
-  720 px na 1280x800.
-- **F7-04** kontrast tekstu w zamknietym polu PassOMetr okolo 3,8:1. Konflikt
-  spec kontra dostepnosc, czeka na decyzje. W `tests/f6-01.spec.ts` siedzi
-  jawny wyjatek `WYJATKI_F7_04` - po decyzji Aleksandry ma zniknac.
-- **F7-01 ZAMKNIETE** razem z F5-02. **F7-02**, **F7-03** i **F7-05** zamkniete
-  w tej paczce, kazde z dowodem w `plan/11-BACKLOG.md`.
+- **F7-07** (NOWE, z F7-06) `.werdykt__napis { width: min(70%, 420px) }`
+  w `egzamin.css` jest martwy dokladnie tak samo, jak byl `.brama__napis`:
+  `.napis { width: 100% }` ma te sama specyficznosc i lezy w arkuszu
+  importowanym pozniej. Napis werdyktu ma 760 px zamiast 420 px (desktop).
+  F7-06 nie mogl tego ruszyc, bo jego kryterium negatywne zakazywalo zmiany
+  szerokosci napisow na `/egzamin`. Pelne AC w `plan/11-BACKLOG.md`.
+- Wszystko inne w F7 ZAMKNIETE: **F7-01** (z F5-02), **F7-02**, **F7-03**,
+  **F7-05**, **F7-04** i **F7-06**, kazde z dowodem w `plan/11-BACKLOG.md`.
 
 ## Decyzje w toku
 
 - **D-kontekst (do Aleksandry):** `agent-context.sh` nie mierzy okna workera.
   Rekomendacja: konczyc paczke na granicy fazy. Opis: `DECISIONS.md` #14.
-- **F7-04 (do Aleksandry):** kontrast pola zamknietego PassOMetr.
-- Swiadome odstepstwa opisane i zamkniete: `DECISIONS.md` #15-#20.
+- **F7-04 ROZSTRZYGNIETE** przez orkiestratora (Aleksandra niedostepna):
+  Z10 wygrywa ze spec `plan/05 A1`, `DECISIONS.md` wpis 21. Wyjatek
+  `WYJATKI_F7_04` z `tests/f6-01.spec.ts` USUNIETY.
+- Swiadome odstepstwa opisane i zamkniete: `DECISIONS.md` #15-#21.
+
+## Co doszlo w paczce F7-04 plus F7-06
+
+- **F7-04 ZROBIONE.** Nowy token `--chrom-b-jasny` (`#858585`) uzyty WYLACZNIE
+  w regule `.pass-o-metr__pole--zamkniety`. Kontrast 3,75:1 -> 5,16:1,
+  `axe` na `/` bez `color-contrast`. `--chrom-b` nietkniety.
+  Straznik: `tests/f7-04.spec.ts`.
+- **F7-06 ZROBIONE.** Szerokosc napisu bramy niesie `.brama__naglowek`
+  (wzorzec z `.egzamin__naglowek`), nie `.brama__napis`. 1256 -> 720 px
+  (1280x800), 366 -> 351 px (390x844). Straznik: `tests/f7-06.spec.ts`
+  z tabela pomiarow SPRZED poprawki dla pozostalych widokow.
+- Stan po paczce: `pnpm run check` czysto, `pnpm build` zielony (first load
+  102 kB), `npx playwright test` = **346 passed / 0 failed / 6 skipped**.
+- **F8-01 NIE RUSZANY** - to stop-gate Aleksandry. Zero deployu.
+
+## Pulapka srodowiskowa zlapana na starcie tej paczki
+
+Na porcie 3000 wisial `next-server` z POPRZEDNIEJ sesji, karmiony katalogiem
+`.next` po `pnpm build`. Kazdy `GET /` oddawal 404 (`ENOENT .next/server/app/
+page.js`), a swiezy `pnpm dev` cichcem przenosil sie na port 3001, wiec testy
+z `baseURL: 3000` waliły w martwy serwer i wisialy do timeoutu. Lekarstwo,
+zawsze przed pomiarami: `pkill -f "next dev"; pkill -f next-server;
+rm -rf .next; pnpm dev` i sprawdzenie `curl -o /dev/null -w "%{http_code}"
+http://localhost:3000/` = 200. To dopisek do `DECISIONS.md` #19.
