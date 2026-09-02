@@ -172,3 +172,38 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* --- Przycisk-uciekinier (plan/05 B2) --- */
+
+.uciekinier {
+  /* siatka jednokomorkowa: napis i niewidoczna miara leza na sobie, wiec box
+     przycisku ma zawsze rozmiar DLUZSZEGO z dwoch tekstow i nie skacze przy
+     kapitulacji */
+  display: grid;
+  max-width: 100%;
+  padding: 8px 16px;
+  background: var(--chrom-a);
+  border: 4px outset var(--chrom-a);
+  color: var(--tusz);
+  font-family: var(--font-czytany);
+  font-size: var(--stopien-drobny);
+}
+
+/* Skok to zmiana left/top w obrebie tablicy ogloszen, nigdy transform (Z6).
+   Pozycjonowanie wlacza sie dopiero po pierwszym skoku, zeby przed najechaniem
+   przycisk stal normalnie obok glownego. */
+.uciekinier__napis {
+  grid-area: 1 / 1;
+}
+
+.uciekinier::after {
+  content: attr(data-miara);
+  grid-area: 1 / 1;
+  visibility: hidden;
+}
+
+.uciekinier--skoczyl {
+  position: absolute;
+  z-index: 5;
+  margin: 0;
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import PrzyciskUciekinier from "./PrzyciskUciekinier";
 
 // Druk wstepny bramy (plan/05 B1 punkt 8). Imie jest wpisane na sztywno
 // i readOnly - to zart dla jednej osoby, a nie formularz rejestracji.
@@ -31,6 +32,7 @@ export default function DrukWstepny() {
       <button className="druk-wstepny__cta" type="submit" data-cta="przystepuje">
         PRZYSTĘPUJĘ DO ETAPU 1
       </button>
+      <PrzyciskUciekinier />
     </form>
   );
 }
