@@ -26,7 +26,13 @@ export default function Strona() {
       <KafelTla id="kafel-brama" />
       <PierwszeWejscie />
       <Ozdoba id="statek" klasa="brama__statek" pierwszyEkran />
-      <h1 className="brama__naglowek" tabIndex={-1}>
+      {/* Bez tabIndex: EkranLadowania po zdjeciu nakladki przenosi fokus na
+          pierwszy `h1`, wiec focusowalny naglowek bramy dostawal po ceremonii
+          magentowa obwodke `:focus-visible` na cala szerokosc ekranu (widac na
+          zrzucie z preview, nie w zadnej assercji). Na bramie nie ma dokad
+          przenosic fokusu - nic sie nie przenawigowalo. Naglowki etapow maja
+          `tabIndex={-1}` i to je fokusuje FokusNaNaglowku po zmianie sciezki. */}
+      <h1 className="brama__naglowek">
         <NapisObrazek tekst="J-WORD PASS" wariant="chrom" klasa="brama__napis" />
       </h1>
       <p className="brama__podtytul">MIĘDZYGALAKTYCZNA KOMISJA KWALIFIKACYJNA</p>

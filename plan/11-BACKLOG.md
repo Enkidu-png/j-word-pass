@@ -265,6 +265,27 @@ odrzucone z powodem, albo przeniesione do trackera).
   na `/` nie zglasza naruszenia `color-contrast`; negatywne: pole zamkniete
   dalej ma tlo szare i tekst przekreslony (charakter zostaje).
 
+- [ ] **F7-05** `ui` Wariant `odbijany` pasa-gonca liczy droge od szerokosci OKNA, nie kontenera.
+  Znalezisko z F2-05, zlapane na zrzucie z preview. `app/style/scena.css` ma
+  `@keyframes goniec-odbijany { to { transform: translateX(calc(100vw - 100%)) } }`.
+  W CSS `100%` w `translateX` znaczy „wlasna szerokosc elementu", wiec wzor dziala
+  poprawnie WYLACZNIE wtedy, gdy kontener pasa ma szerokosc okna. Na bramie pas-goniec
+  `< PRZEWIŃ W DÓŁ, ALEKSANDRO >` stoi w kontenerze `.brama__zjazd` szerokim na
+  ~660 px (desktop) i ~300 px (390 px), wiec tekst wyjezdza poza kontener i jest
+  UCINANY przez `overflow: hidden` w polowie slowa `ALEKSANDRO`. Widac to na
+  `screenshots/F2/f2-05-preview-desktop.png` i `-390.png`. Kontrakt z `plan/04 H`
+  mowi „przesuniecie od 0 do calc(100% - <szerokosc tresci>)", czyli od szerokosci
+  KONTENERA, nie okna. Gorny pas-goniec shellu jest pelnej szerokosci, wiec tam
+  blad sie nie objawia i przeszedl przez cala faze F1.
+  CZYTAJ: 04→H; 05→B1 pkt 6.
+  AC: na `/`, na 1280x800 i 390x844, w dowolnej fazie animacji CALY tekst gonca
+  z `.brama__zjazd` miesci sie w swoim kontenerze (`scrollWidth` tresci kontra
+  `clientWidth` kontenera po uwzglednieniu `transform`, albo porownanie
+  `getBoundingClientRect()` tresci z prostokatem kontenera w 5 probkach czasu);
+  zrzut OBEJRZANY, slowo `ALEKSANDRO` widoczne w calosci; gorny pas-goniec shellu
+  dziala jak dotad (test F1-02 zielony bez zmian); negatywne: poprawka nie animuje
+  `left` ani `width` (`plan/04 K2`), zero nowych zaleznosci.
+
 ## F8 - BRAMKA DECYZYJNA
 
 - [ ] **F8-01** `deploy` ⏳ STOP-GATE przed wykonaniem: pokaż Aleksandrze URL preview plus `WERYFIKACJA.md`, zapytaj o zgodę na `vercel deploy --prod` (podmiana żywej produkcji z wersji 1).
