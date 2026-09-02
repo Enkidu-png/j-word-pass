@@ -199,7 +199,9 @@
 /* Mobile 390 px (plan/06 D): scena 200 px, planeta 120 px, szesc gwiazdek. */
 @media (max-width: 480px) {
   .egzamin {
-    padding-bottom: 200px;
+    /* F6-04: 200 px zostawialo na 390 px pusta plachte 160 px miedzy CTA
+       a stworami rogowymi, ktore na tym ekranie maja tylko 72 px wysokosci. */
+    padding-bottom: 150px;
   }
   .egzamin__naglowek {
     width: min(80vw, 300px);

@@ -3,6 +3,7 @@ import KafelTla from "@/components/scena/KafelTla";
 import NapisObrazek from "@/components/scena/NapisObrazek";
 import Ozdoba from "@/components/scena/Ozdoba";
 import Pas from "@/components/scena/Pas";
+import PasGoniec from "@/components/scena/PasGoniec";
 import StworRogowy from "@/components/scena/StworRogowy";
 
 // ETAP 3: PROBA OGNIA (plan/08 A). Ceremonia spalenia i list w butelce
@@ -30,6 +31,11 @@ export default function Strona() {
       </div>
 
       <DrukOgnia />
+
+      {/* F6-04: miedzy drukiem a delfinami zostawala pusta plachta 172 px
+          samego kafla. Goniec jest elementem na cala szerokosc i mowi do
+          Aleksandry, wiec zamyka dziure zgodnie z Z8 i Z16, a nie wypelniaczem. */}
+      <PasGoniec tekst="ALEKSANDRO, KOMISJA NIE ZWRACA DRUKÓW ANI NADZIEI" czas={10000} />
 
       <StworRogowy id="stwor-delfin" rog="lewy-dol" />
       <StworRogowy id="stwor-delfin" rog="prawy-dol" lustro />

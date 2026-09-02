@@ -138,7 +138,11 @@ test("cztery kroki ceremonii ida po kolei w kontraktowych czasach", async ({ pag
   await expect(page.locator("[data-butelka]")).toBeVisible({ timeout: 3000 });
   // butelka nie moze pojawic sie przed kontraktowymi 3200 ms (plan/08 C)
   expect(Date.now() - start).toBeGreaterThanOrEqual(3200);
-  await expect(page.locator("[data-goniec]").last()).toContainText("KLIKNIJ BUTELKĘ, ALEKSANDRO");
+  // Selektor zawezony do bloku butelki: F6-04 dolozyl na tym widoku drugiego
+  // gonca (pod drukiem), wiec `.last()` lapal juz nie ten element.
+  await expect(page.locator(".butelka-blok [data-goniec]")).toContainText(
+    "KLIKNIJ BUTELKĘ, ALEKSANDRO",
+  );
 });
 
 test("Escape w kroku 1 skacze od razu do butelki", async ({ page }) => {

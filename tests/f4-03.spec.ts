@@ -161,8 +161,12 @@ test("negatywne: zero obrotu i zero perspektywy 3D w calym widoku", async ({ pag
       .filter((e) => {
         const cs = getComputedStyle(e);
         const t = cs.transform;
-        // scaleX(-1) (lustro) jest dozwolone, obrot i skos nie
-        const obrot = t !== "none" && t !== "matrix(1, 0, 0, 1, 0, 0)" && t !== "matrix(-1, 0, 0, 1, 0, 0)";
+        // Z6 zabrania OBROTU i SKOSU, a te siedza wylacznie w b i c macierzy
+        // matrix(a,b,c,d,e,f). Lustro scaleX(-1) i przesuniecie gonca (F6-04
+        // dolozyl go pod arkuszem) sa dozwolone i musza przejsc.
+        const m = t.match(/^matrix\(([^)]+)\)$/);
+        const [, b, c] = (m?.[1] ?? "").split(",").map((x) => parseFloat(x));
+        const obrot = t !== "none" && (m === null || b !== 0 || c !== 0);
         return obrot || cs.perspective !== "none" || cs.transformStyle === "preserve-3d";
       })
       .map((e) => `${e.className} ${getComputedStyle(e).transform}`),

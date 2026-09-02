@@ -5,8 +5,10 @@
 .ogien {
   position: relative;
   /* gora: pas cienki 15 px; dol: miejsce na stwory rogowe, zeby nie lezaly
-     na przycisku SKLADAM WNIOSEK (test elementFromPoint z plan/04 B) */
-  padding: 30px 12px 260px;
+     na przycisku SKLADAM WNIOSEK (test elementFromPoint z plan/04 B).
+     F6-04: 260 px zostawialo pod goncem pusta plachte 140 px samego kafla,
+     a delfiny i tak koncza sie 120 px nad dolem - 200 px starcza. */
+  padding: 30px 12px 200px;
   text-align: center;
 }
 

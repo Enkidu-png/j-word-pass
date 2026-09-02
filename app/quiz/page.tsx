@@ -2,6 +2,7 @@ import Arkusz from "@/components/quiz/Arkusz";
 import KafelTla from "@/components/scena/KafelTla";
 import NapisObrazek from "@/components/scena/NapisObrazek";
 import Pas from "@/components/scena/Pas";
+import PasGoniec from "@/components/scena/PasGoniec";
 import StworRogowy from "@/components/scena/StworRogowy";
 
 // ETAP 2: QUIZ (plan/07 A). Tresc pytan idzie WYLACZNIE z data/quiz.json -
@@ -18,6 +19,9 @@ export default function Strona() {
       </h1>
 
       <Arkusz />
+
+      {/* F6-04: pod arkuszem zostawala pusta plachta 128 px samego kafla. */}
+      <PasGoniec tekst="ALEKSANDRO, KOMISJA LICZY KAŻDĄ ODPOWIEDŹ" czas={10000} />
 
       <StworRogowy id="stwor-kot" rog="lewy-dol" />
       <StworRogowy id="stwor-kot" rog="prawy-dol" lustro />
