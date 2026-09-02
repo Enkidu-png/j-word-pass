@@ -315,9 +315,30 @@ i anty-spec z `plan/01 G`, wpis raportu fazy, zero znalezisk bez issue w F7-ZNAL
   wiec `.karta__gif--kopia { display: none }` przegrywalo kolejnoscia przy rownej
   specyficznosci - kopia z pytania 12 byla widoczna bez hovera. Zlapal to zrzut i test,
   naprawia selektor z rodzicem `.karta__ozdoba .karta__gif--kopia`.
-- [ ] **F4-03** `ui` Maszyna prawdy wg `plan/07 C` plus tryb rewizji.
+- [x] **F4-03** `ui` Maszyna prawdy wg `plan/07 C` plus tryb rewizji.
   CZYTAJ: 07→C,D,E; 04→D.
   AC: pełna ceremonia <= 9000 ms (pomiar `performance.now()`, wynik w dowodzie); `Escape` pokazuje wszystkie werdykty naraz; nieodpowiedziane liczą się jako błędne po potwierdzeniu druku; tryb rewizji: poprawna ma ramkę `--jad`, błędnie wybrana `line-through` i ramkę `--alarm`; wynik zapisany w `sessionStorage`; przejście prowadzi na `/proba-ognia`; negatywne: zero przekreśleń pod kątem, zero animacji przewracania kartek 3D.
+  ✓ `npx playwright test tests/f4-03.spec.ts` = 12 passed (desktop plus mobile).
+  Pelna ceremonia zmierzona `performance.now()` od kliku `ODDAJ ARKUSZ KOMISJI`
+  do pojawienia sie `PRZEJDŹ DO PRÓBY OGNIA`: **8415 ms** (desktop) i **8376 ms**
+  (mobile), limit 9000 ms; kontrakt to 15 x 500 ms plus 400 ms kroku 4, reszta to
+  narzut renderu. `Escape` w trakcie odslania wszystkie 15 werdyktow naraz
+  (`[data-werdykt]` = 15) i licznik od razu pokazuje `PUNKTY: 14 / 15`.
+  Nieodpowiedziane: druk `ALEKSANDRO, PYTAŃ BEZ ODPOWIEDZI: 3. LICZĄ SIĘ JAKO BŁĘDNE.`,
+  `WRACAM` zamyka go bez oddawania arkusza, `POTWIERDZAM` liczy pustki jako bledne
+  (`data-werdykt='pustka'` na 3, 9, 14, wynik 11/15). Tryb rewizji: poprawna ramka
+  `solid rgb(57, 255, 20)` (`--jad`), bledna wybrana `solid rgb(204, 0, 96)` (`--alarm`)
+  plus `text-decoration: line-through`. Wynik w `sessionStorage` (`quiz.punkty` = 14)
+  i po `page.reload()` wraca bez powtarzania ceremonii. `PRZEJDŹ DO PRÓBY OGNIA`
+  prowadzi na `/proba-ognia` i straz etapu juz nie odmawia (`.straz` = 0).
+  Negatywne: przekreslenie poziome, `transform: none` na przekreslonym wariancie,
+  a w calym widoku zero elementow z obrotem, `perspective` innym niz `none`
+  albo `transform-style: preserve-3d`. Zrzuty OBEJRZANE (desktop i 390 px):
+  `F4-03-oddaj-*`, `F4-03-potwierdzenie-*`, `F4-03-ceremonia-w-toku-*`,
+  `F4-03-wynik-*`, `F4-03-rewizja-*` w `screenshots/F4/`. Na zrzucie wyniku widac
+  PassOMetr przelaczony na `13/15` i `ETAP 3 OTWARTY` (zdarzenie `jwp:stan`).
+  `pnpm run check` czysty, `pnpm build` `/quiz` 9,22 kB i 115 kB first load
+  (limit 160 kB), pelny `npx playwright test` = 186 passed, 10 skipped.
 
 ## F5 - PRÓBA OGNIA I RADIO
 

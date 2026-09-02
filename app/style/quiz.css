@@ -332,3 +332,130 @@
     animation-name: none;
   }
 }
+
+/* --- Maszyna prawdy (plan/07 C). Zero animacji przewracania kartek 3D
+   i zero przekreslen pod katem (plan/07 E3, Z6). --- */
+
+.arkusz__oddaj {
+  display: block;
+  width: 100%;
+  margin: 12px 0;
+  padding: 14px 18px;
+  background: var(--zloto);
+  border: 4px outset var(--chrom-a);
+  color: var(--tusz);
+  font-family: var(--font-czytany);
+  font-size: var(--stopien-h2);
+  font-weight: bold;
+}
+
+.arkusz__oddaj:hover {
+  border-style: inset;
+  background: var(--jad);
+}
+
+.maszyna {
+  margin: 12px 0;
+  padding: 12px;
+  background: var(--papier);
+  border: 4px ridge var(--chrom-b);
+  color: var(--tusz);
+  text-align: center;
+}
+
+.maszyna__tresc {
+  margin: 0 0 10px;
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-tresc);
+  letter-spacing: 2px;
+}
+
+.maszyna__punkty {
+  margin: 0;
+  padding: 8px;
+  background: var(--tusz);
+  color: var(--jad);
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-h2);
+  letter-spacing: 4px;
+}
+
+.maszyna__wynik {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.maszyna__ogien {
+  width: 90px;
+  height: auto;
+}
+
+.maszyna__napis {
+  width: min(50%, 320px);
+  height: auto;
+}
+
+.maszyna__kroki {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.maszyna__kroki .arkusz__krok {
+  display: inline-block;
+  text-decoration: none;
+}
+
+/* Werdykt kwadratu: zielony albo czerwony, odslaniany po kolei (plan/07 C krok 2).
+   Nieodpowiedziane licza sie jak bledne, wiec dostaja ten sam alarm. */
+.kwadrat[data-werdykt="prawda"] {
+  background: var(--jad);
+  border-style: inset;
+}
+
+.kwadrat[data-werdykt="falsz"],
+.kwadrat[data-werdykt="pustka"] {
+  background: var(--alarm);
+  border-style: inset;
+  color: var(--papier);
+}
+
+/* --- Tryb rewizji (plan/07 C) --- */
+
+.wariant[data-rewizja="poprawna"],
+.karta__otwarte[data-rewizja="poprawna"] .karta__pole {
+  border: 3px solid var(--jad);
+}
+
+/* Przekreslenie POZIOME. Skos jest zakazany (Z6), wiec zadnego `rotate`
+   na kresce ani ukosnego gradientu. */
+.wariant[data-rewizja="bledna"] {
+  border: 3px solid var(--alarm);
+  text-decoration: line-through;
+}
+
+.karta__otwarte[data-rewizja="bledna"] .karta__pole {
+  border: 3px solid var(--alarm);
+  text-decoration: line-through;
+}
+
+.karta__klucz {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-drobny);
+  letter-spacing: 2px;
+}
+
+@media (max-width: 480px) {
+  .maszyna__kroki {
+    flex-direction: column;
+  }
+  .arkusz__oddaj {
+    font-size: var(--stopien-tresc);
+  }
+}
