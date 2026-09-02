@@ -1,0 +1,102 @@
+/* 404 KOMISJI (F6-03). Kafel `kafel-404` siedzi na <html> przez KafelTla,
+   wiec tutaj sa tylko odstepy i sciana zagubionych drukow. */
+
+.brak {
+  position: relative;
+  min-height: 80vh;
+  /* miejsce na pas gorny (45 px), dolny (60 px) i stwory rogowe */
+  padding: 56px 12px 170px;
+  text-align: center;
+}
+
+.brak__statek {
+  width: 160px;
+  height: auto;
+  margin: 0 auto;
+}
+
+.brak__naglowek {
+  margin: 8px 0 16px;
+}
+
+.brak__napis {
+  /* `.napis` jest blokiem na 100% szerokosci, a viewBox "404" ma proporcje
+     226:130, wiec bez tego ograniczenia naglowek rosl na 350 px wysokosci
+     i zostawial nad soba pusta plache tla (widziane na zrzucie, nie w kodzie). */
+  width: 300px;
+  margin: 0 auto;
+}
+
+.brak__druk {
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.brak__tresc {
+  margin: 0 0 16px;
+  font-family: var(--font-czytany);
+  font-size: var(--stopien-tresc);
+  color: var(--tusz);
+}
+
+.brak__archiwum {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.brak__pole {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 130px;
+  padding: 6px;
+  background: var(--druk-tlo);
+  border: 3px inset var(--chrom-a);
+}
+
+.brak__ozdoba {
+  max-width: 100%;
+  max-height: 116px;
+  width: auto;
+  height: auto;
+  animation: brak-miga 1400ms steps(2) infinite;
+}
+
+@keyframes brak-miga {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Z11 bez wyjatkow. */
+@media (prefers-reduced-motion: reduce) {
+  .brak__ozdoba {
+    animation-name: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .brak {
+    padding-bottom: 150px;
+  }
+  .brak__napis {
+    width: 220px;
+  }
+}
+
+/* Stwory w gornych rogach staly pod pasem `pas-budowa` (45 px) i zrzut
+   pokazywal z nich dwa zolte skrawki. Zjazd o wysokosc pasa plus luz. */
+.brak .stwor-rogowy--lewy-gora,
+.brak .stwor-rogowy--prawy-gora {
+  top: 56px;
+}
