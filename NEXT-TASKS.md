@@ -7,63 +7,91 @@
 
 ## Gdzie jestesmy
 
-**Fazy F0 i F1 ZAMKNIETE**, obie z raportem DoD wpisanym w `plan/11-BACKLOG.md`.
-Ukonczone i odhaczone z dowodami: F0-01, F0-02, F0-03a, F0-03b, F0-03c, F0-04,
-F0-05, F0-06, F1-01, F1-02, F1-03, F1-04, F1-05. Jeden commit na issue.
+**Fazy F0, F1 i F2 ZAMKNIETE**, kazda z raportem DoD w `plan/11-BACKLOG.md`.
+W tym przebiegu doszly: F2-01, F2-02a, F2-02b, F2-03, F2-04, F2-05.
+Jeden commit na issue plus jeden commit poprawkowy `F2-04` (obwodka fokusu).
+
+Brama dziala end to end: kafel gwiazd, statek, chromowy napis, podtytul,
+pas-goniec ze strzalka, tablica ogloszen z 6 migajacymi ozdobami, druk wstepny
+`ALEKSANDRA` readOnly, przycisk-uciekinier, dwa delfiny rogowe, pas
+`UNDER CONSTRUCTION`, ceremonia wejscia z ekranem ladowania 3D. Shell (goniec
+gorny, PassOMetr, straz etapu, stopka-webring) stoi nad wszystkimi widokami.
+
+**Preview na zywo:** https://j-word-pass-numze2ovx-enkidu-pngs-projects.vercel.app
+Produkcja NIE zostala tknieta (`j-word-pass-mhtj52hct...` bez zmian). Bramka F8
+nadal nalezy do Aleksandry.
 
 ## Nastepne issue
 
-**F2-01** (`ui`, shell: PasGoniec gorny, PassOMetr, StrazEtapu, stopka-webring).
-CZYTAJ: `05→A`; `04→B,C,H`; `01→F`.
-
-Pozostale w fazie F2: F2-02a (⚠ HARD), F2-02b, F2-03, F2-04, F2-05 (deploy preview).
+**F3-01** (pierwsze issue fazy F3, EGZAMIN). Sprawdz jego `CZYTAJ:` w backlogu.
 
 ## Stan srodowiska
 
-- `pnpm dev` chodzi na `localhost:3000`. `pnpm run check` zielony,
-  `pnpm build` zielony (first load 102 kB, playground 106 kB),
-  `npx playwright test` = 68 passed, 0 failed, 8 skipped na obu viewportach.
-- Biblioteka assetow domknieta: `data/assety.json` ma 43 pozycje (30 `ozdoba`,
-  5 `kafel`, 3 `pas`, 3 `plakietka`, 2 `kursor`), `ATTRIBUTION.md` ma wiersz na
-  kazdy plik, roznica zbiorow pusta w obie strony.
-- Silnik sceny gotowy w `components/scena/`: `Ozdoba`, `StworRogowy`, `Pas`,
-  `NapisObrazek`, `PlonacyNapis`, `PasGoniec`, `EkranLadowania`, plus hook
-  `uzyjKlatki` i `lib/assety.ts`. Playground `/dev/scena` pokazuje wszystko
-  i w produkcji oddaje 404.
-- Cztery route'y to nadal stuby `<h1 tabIndex={-1}>`. Warstwa wizualna widokow
-  zaczyna sie dopiero w F2.
+- `pnpm dev` chodzi na `localhost:3000`. `pnpm run check` zielony, `pnpm build`
+  zielony (brama 107 kB first load, playground 107 kB), `npx playwright test`
+  = 118 passed, 0 failed, 8 skipped, TRZY pelne przebiegi z rzedu.
+- Nowe pliki tej fazy: `components/shell/` (`PassOMetr`, `StrazEtapu`,
+  `StopkaWebring`, `FokusNaNaglowku`, `uzyjStanu`), `components/brama/`
+  (`DrukWstepny`, `PrzyciskUciekinier`, `PierwszeWejscie`),
+  `components/scena/KafelTla`, `app/style/shell.css`, `app/style/brama.css`,
+  `tests/pomoc.ts`.
+- `KafelTla id="..."` to sposob na Z9 w kazdym kolejnym widoku: renderuje jedna
+  regule `html:root{background-image:...}` ze sciezka z manifestu. Uzyj go w F3-F6
+  zamiast wpisywac kafel do arkusza.
+- `FokusNaNaglowku` w shellu fokusuje `main.tresc h1` po KAZDEJ zmianie sciezki.
+  Naglowki etapow musza miec `tabIndex={-1}`. Naglowek bramy CELOWO go nie ma.
+- `EkranLadowania` renderuje sie portalem do `<body>`. Nie wkladaj go w scene
+  widoku - wpadnie w pomiary tego widoku.
 
 ## Pulapki zmierzone w tym przebiegu (nie tracic na nie czasu drugi raz)
 
-1. **`npx playwright test | tail -3` UKRYWA czerwone.** Reporter `list` wypisuje
-   `N failed` PRZED `N skipped` i `N passed`. Jeden commit poszedl na czerwonym
-   drzewie. Czytaj `tail -12` albo `grep -E "failed|passed"`. (DECISIONS #16)
-2. **`bash ~/.claude/agent-context.sh` zwraca `STALE-TRANSCRIPT` przez CALY
-   przebieg workera** i nigdy nie odda liczby. Warunek sztafety „konczy przy
-   55% okna" jest tym narzedziem niemierzalny. Szczegoly i rekomendacja:
-   DECISIONS #14. **To czeka na decyzje Aleksandry.**
-3. **Selektory `.first()` i liczenie po calym dokumencie sa kruche.**
-   Playground rosnie z kazdym issue; plonacy napis dolozyl kilkanascie kopii
-   ozdoby `ogien` i popsul trzy wczesniejsze testy. Zawezaj do sekcji albo do
-   `aria-label`. (DECISIONS #16)
-4. **Wyszukiwarka GifCities trafia w motyw mniej wiecej w polowie przypadkow.**
-   Kazdy nowy asset MUSI przejsc przez arkusz stykowy renderowany na `--kosmos`
-   I na `--papier` przed wpisaniem do manifestu. Dwa tla, bo druga najczestsza
-   wada po zlym motywie to nieprzezroczysta ramka. (DECISIONS #13)
+1. **Wchodzac testem na `/` uzywaj `wejdz(page)` z `tests/pomoc.ts`**, nie
+   `page.goto`. Ceremonia wejscia zaslania brame na 1200-2600 ms przy pierwszym
+   wejsciu w sesji, a Playwright daje kazdemu testowi swiezy kontekst, czyli
+   swieza sesje. Samo „poczekaj az nakladka zniknie" NIE wystarcza: przechodzi,
+   zanim nakladka zdazy sie zamontowac. Bariera to klucz `jwp.ladowanie`
+   w `sessionStorage`.
+2. **Jeden zielony przebieg testow niczego nie dowodzi.** Dwa bledy tej fazy
+   (wyscig z ceremonia, prog czasu przy reduced motion) pojawialy sie WYLACZNIE
+   przy pelnym przebiegu na czterech workerach i znikaly przy uruchomieniu
+   pojedynczego pliku. Przed odhaczeniem: `npx playwright test` co najmniej dwa
+   razy z rzedu.
+3. **Nie mierz czasu przez `MutationObserver` z ciasnym progiem.** Do 400 ms
+   kontraktu dochodzi narzut dwoch commitow Reacta i obciazenia serwera dev
+   (425-456 ms w izolacji, ponad 700 ms przy czterech workerach). Prog ma
+   pilnowac wyboru galezi kontraktu, nie szumu. Dokladny czas mierz
+   znacznikami STRONY, jak w F1-04.
+4. **Pozycje elementu mierz `offsetLeft`/`offsetTop`, nie `boundingBox()`**,
+   jesli w tescie jest `hover()` albo `focus()` - jedno i drugie dowija strone
+   i wspolrzedne ekranowe zmieniaja sie takze wtedy, gdy element stoi w miejscu.
+   Dwa testy uciekiniera padaly wylacznie z tego powodu.
 5. **`pnpm build` psuje dzialajacy `pnpm dev`.** Kolejnosc zawsze: testy, build,
-   restart dev. Potwierdzone w tym przebiegu.
-6. **Pomiar czasu z `page.evaluate` mierzy wlasny narzut.** Ekran ladowania
-   pokazywal 790 ms tam, gdzie realnie bylo 405. Znaczniki `performance.now()`
-   stawia strona, nie test.
+   restart dev. Potwierdzone drugi raz w tym przebiegu.
+6. **Zrzut z PREVIEW pokazuje rzeczy, ktorych nie widzi lokalne uruchomienie.**
+   Obwodka fokusu na naglowku i ucinanie tekstu w goncu wyszly dopiero tam.
+7. **`bash ~/.claude/agent-context.sh` oddaje `STALE-TRANSCRIPT`** przez caly
+   przebieg (raz na starcie oddal `40`, potem juz nigdy liczby). Warunek
+   sztafety „konczy przy 55%" jest tym narzedziem niemierzalny. DECISIONS #14.
+   Ta paczka zostala domknieta NA GRANICY FAZY, zgodnie z dyspozycja.
+
+## Otwarte issues w F7-ZNALEZISKA
+
+- **F7-01** dwa testy w `tests/f5-02.spec.ts` sparkowane, odpiac po F5-02.
+- **F7-02** naglowek `h1` przyciety przy lewej krawedzi okna (Caveat ma ujemny
+  wysiew, `body` ma `margin: 0`). Dotyczy wszystkich widokow z `h1`.
+- **F7-03** plakietki webringu nie maja klatki statycznej, wiec animuja sie mimo
+  reduced motion. Przez to `tests/f1-01.spec.ts` skanuje tylko `main.tresc`.
+- **F7-04** kontrast tekstu w zamknietym polu PassOMetr okolo 3,8:1 (spec kaze
+  `--tusz` na `--chrom-b`). Konflikt spec kontra dostepnosc, czeka na decyzje.
+- **F7-05** wariant `odbijany` pasa-gonca liczy droge od szerokosci OKNA, nie
+  kontenera, wiec na bramie ucina `ALEKSANDRO`. Widoczne na zrzucie z preview.
 
 ## Decyzje w toku
 
 - **D-kontekst (do Aleksandry):** `agent-context.sh` nie mierzy okna workera.
-  Rekomendacja: konczyc paczke na granicy fazy albo na ustalonej liczbie issues,
-  zamiast na procencie okna. Opis: `DECISIONS.md` #14.
-- Otwarte issue **F7-01**: dwa testy w `tests/f5-02.spec.ts` sa sparkowane przez
-  `test.skip`, bo steruja formularzem `/proba-ognia` usunietym w F0-01. Odpiac
-  po ukonczeniu F5-02. Pelne AC w `plan/11-BACKLOG.md`, faza F7.
-- Swiadome odstepstwa od planu, opisane i zamkniete: `NapisObrazek` ma inny
-  wzor na `viewBox` niz `plan/04 D` (DECISIONS #15), lista kasacji z `plan/02 C`
-  byla niepelna (DECISIONS #12).
+  Rekomendacja: konczyc paczke na granicy fazy. Opis: `DECISIONS.md` #14.
+- **F7-04 (do Aleksandry):** kontrast pola zamknietego. Albo zmieniamy tlo/tekst,
+  albo swiadomie zostawiamy kicz i zapisujemy to w `DECISIONS.md`.
+- Swiadome odstepstwa opisane i zamkniete: `DECISIONS.md` #15 (viewBox
+  `NapisObrazek`), #16 (kruche selektory), #17 (klatka reduced-motion
+  synchronicznie), **#18** (AC F2-02a jest kopia AC F2-02b).
