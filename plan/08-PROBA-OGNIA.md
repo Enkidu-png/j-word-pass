@@ -42,9 +42,10 @@ Drganie to `translateX`, **nie obrót** (Z6). Zero czerwonych obwódek bez stemp
 | 1 | 0-900 ms | Druk zjeżdża w dół do ogniska (`transform: translateY`), POST do `/api/zgloszenie` startuje równolegle |
 | 2 | 900-2400 ms | Nad drukiem pojawia się rząd `Ozdoba id="ogien"` (8 sztuk), druk traci `opacity` do 0 skokowo (`steps(6)`) |
 | 3 | 2400-3200 ms | Popiół: 20 kwadratów 6x6 px koloru `--chrom-b` opada `translateY` z różnymi opóźnieniami |
-| 4 | 3200 ms | Pojawia się `Ozdoba id="stwor-butelka"` na środku, z `PasGoniec` pod spodem: `KLIKNIJ BUTELKĘ, ALEKSANDRO` |
+| 4 | 3200 ms | **Ekran WYZWANIA** (F9-06): druk Komisji z `NapisObrazek` `WYZWANIE`, treścią zadania z `data/komisja.json` i przyciskiem `PRZYJMUJĘ WYZWANIE` |
+| 5 | po kliknięciu | Pojawia się `Ozdoba id="stwor-butelka"` na środku, z `PasGoniec` pod spodem: `KLIKNIJ BUTELKĘ, ALEKSANDRO` |
 
-`Escape` w krokach 1-3: skok do kroku 4.
+`Escape` w krokach 1-3: skok do kroku 4 (ekran wyzwania).
 `prefers-reduced-motion`: kroki 1-3 zastąpione dwoma krokami po 300 ms.
 
 ## D. LIST W BUTELCE

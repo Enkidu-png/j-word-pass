@@ -961,10 +961,16 @@ Kolejność liniowa jak wszędzie. Fazę wykonujemy PRZED bramką F8.
   Negatywne: żądań do `youtube.com`/`youtube-nocookie.com` przed pierwszym `WŁĄCZ` = 0, `iframe` w DOM = 0 (także po przełączaniu strzałkami); zero plików audio w `public/`.
   Znalezisko z pierwszego zrzutu: trzy przyciski w jednym rzędzie zawijały się krzywo w obudowie 220 px - strzałki zjechały do własnego rzędu pod `WŁĄCZ`.
   Tytuł `iframe` niesie nazwę bieżącego materiału (`Odtwarzacz radia Komisji: ...`); zaktualizowany spec `plan/09` A, B, D i asercja w `tests/f5-03.spec.ts` plus trzy nowe testy F9-05.
-- [ ] **F9-06** `ui` ⚠ HARD Etap 3: po zatwierdzeniu druku i ceremonii spalenia dochodzi ekran z ZADANIEM próby ognia, przedstawiony jako druk Komisji.
+- [x] **F9-06** `ui` ⚠ HARD Etap 3: po zatwierdzeniu druku i ceremonii spalenia dochodzi ekran z ZADANIEM próby ognia, przedstawiony jako druk Komisji.
   CZYTAJ: 08→C,D,E,F; 04→B,D.
   Treść zadania (dosłownie): `PRÓBA OGNIA: stanąć na głowie, ze skarpetkami na dłoniach, nogami w śpiworze i w okularach przeciwsłonecznych. Punkty bonusowe za piankę marshmallow w buzi. Wykonanie udowodnić zdjęciem albo filmem.`
   AC: ekran pojawia się po ceremonii spalenia a PRZED listem w butelce (kolejność sprawdzona w teście); zadanie stoi na druku z ramką `ridge`, ma `NapisObrazek` z nagłówkiem i minimum 3 ozdoby z manifestu, w tym `ogien`; przycisk `PRZYJMUJĘ WYZWANIE` prowadzi do butelki; zrzuty desktop i 390 px OBEJRZANE - cały tekst zadania czytelny bez przewijania w poziomie; negatywne: treść w `data/komisja.json`, nie w komponencie; nic nie jest przekrzywione (Z6); zero pola na wgranie pliku (dowód wysyła się poza stroną, nie budujemy uploadu).
+  ✓ WYKONANE (przejście ceremonii w przeglądarce na 390 i 1280, zrzuty `screenshots/f9-06-wyzwanie-{mobile,desktop}.png` OBEJRZANE):
+  Kolejność zmierzona na żywo: `skladanie` -> `ogien` -> `popiol` -> **`wyzwanie`** -> (klik) -> `butelka`. W chwili pokazania wyzwania `[data-butelka]` i `[data-pergamin]` mają count 0, więc ekran stoi PRZED listem w butelce; `Escape` w kroku 1 skacze na koniec ceremonii, czyli też do wyzwania.
+  Druk: `border-style: ridge`, `transform: none` (b = 0, c = 0, Z6), `NapisObrazek` z `aria-label="WYZWANIE"`, cztery ozdoby z manifestu: `ogien`, `stwor-klepsydra`, `stwor-kot`, `ogien`.
+  Czytelność: `scrollWidth - clientWidth` = 0 na obu szerokościach, cały tekst zadania mieści się bez przewijania w poziomie.
+  Negatywne: treść w `data/komisja.json` pod kluczem `wyzwanie` (`git grep "skarpetkami"` = `data/komisja.json` i backlog), `input[type=file]` count 0.
+  Straże: nowy test `F9-06 ekran wyzwania` w `tests/f5-02.spec.ts`, zaktualizowane cztery kroki ceremonii, Escape i przepływ klawiaturowy w `tests/f6-01.spec.ts` (20 kroków). Zaktualizowany spec `plan/08` C.
 
 ## F8 - BRAMKA DECYZYJNA
 

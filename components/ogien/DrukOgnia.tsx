@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import komisja from "@/data/komisja.json";
 import ListWButelce from "@/components/ogien/ListWButelce";
+import NapisObrazek from "@/components/scena/NapisObrazek";
 import Ozdoba from "@/components/scena/Ozdoba";
 import { czytajStan, zapiszTeraz } from "@/lib/stan";
 
@@ -13,12 +15,14 @@ import { czytajStan, zapiszTeraz } from "@/lib/stan";
 
 // Ceremonia spalenia (plan/08 C). Progi liczone od kliku, nie sklejane
 // z opoznien - inaczej kazdy timer nakladalby swoj blad na nastepny.
-const KROKI = { ogien: 900, popiol: 2400, butelka: 3200 };
-const KROKI_SKROCONE = { ogien: 300, popiol: 300, butelka: 600 };
+// F9-06: po popiele ceremonia konczy sie EKRANEM WYZWANIA, a butelka wchodzi
+// dopiero po klikniecie `PRZYJMUJĘ WYZWANIE`.
+const KROKI = { ogien: 900, popiol: 2400, wyzwanie: 3200 };
+const KROKI_SKROCONE = { ogien: 300, popiol: 300, wyzwanie: 600 };
 const POPIOL = Array.from({ length: 20 }, (_, i) => i);
 const OGNIE_CEREMONII = Array.from({ length: 8 }, (_, i) => i);
 
-type Faza = "druk" | "skladanie" | "ogien" | "popiol" | "butelka";
+type Faza = "druk" | "skladanie" | "ogien" | "popiol" | "wyzwanie" | "butelka";
 
 const WZOR_ADRESU = /.+@.+\..+/;
 const BUT_MIN = 10;
@@ -71,14 +75,15 @@ export default function DrukOgnia() {
     }
   }, []);
 
-  // Escape w krokach 1-3 skaczy do butelki (plan/08 C).
+  // Escape w krokach 1-3 skaczy do konca ceremonii, czyli do ekranu wyzwania
+  // (plan/08 C plus F9-06).
   useEffect(() => {
-    if (faza === "druk" || faza === "butelka") return;
+    if (faza === "druk" || faza === "wyzwanie" || faza === "butelka") return;
     const naKlawisz = (z: KeyboardEvent) => {
       if (z.key !== "Escape") return;
       timery.current.forEach(clearTimeout);
       timery.current = [];
-      ustawFaze("butelka");
+      ustawFaze("wyzwanie");
     };
     window.addEventListener("keydown", naKlawisz);
     return () => window.removeEventListener("keydown", naKlawisz);
@@ -123,7 +128,7 @@ export default function DrukOgnia() {
     timery.current = [
       setTimeout(() => ustawFaze("ogien"), kroki.ogien),
       setTimeout(() => ustawFaze("popiol"), kroki.popiol),
-      setTimeout(() => ustawFaze("butelka"), kroki.butelka),
+      setTimeout(() => ustawFaze("wyzwanie"), kroki.wyzwanie),
     ];
 
     wyslij({ email, rozmiarButa: Number(but), srednicaUchaMm: Number(ucho), punktyEgzamin, punktyQuiz });
@@ -186,8 +191,39 @@ export default function DrukOgnia() {
         <p className="ceremonia__opis" aria-live="polite">
           {faza === "butelka"
             ? "ALEKSANDRO, ZOSTAŁA BUTELKA."
-            : "ALEKSANDRO, TWÓJ DRUK PŁONIE."}
+            : faza === "wyzwanie"
+              ? "ALEKSANDRO, KOMISJA MA DO CIEBIE JESZCZE JEDNĄ SPRAWĘ."
+              : "ALEKSANDRO, TWÓJ DRUK PŁONIE."}
         </p>
+
+        {/* F9-06: zadanie proby ognia jako druk Komisji. Tresc idzie WYLACZNIE
+            z data/komisja.json, nic tu nie jest przekrzywione (Z6). */}
+        {faza === "wyzwanie" ? (
+          <section className="druk wyzwanie" data-wyzwanie>
+            <NapisObrazek
+              tekst={komisja.wyzwanie.naglowek}
+              wariant="chrom"
+              klasa="wyzwanie__napis"
+            />
+            <div className="wyzwanie__ozdoby" aria-hidden="true">
+              <Ozdoba id="ogien" klasa="wyzwanie__ozdoba" />
+              <Ozdoba id="stwor-klepsydra" klasa="wyzwanie__ozdoba" />
+              <Ozdoba id="stwor-kot" klasa="wyzwanie__ozdoba" />
+              <Ozdoba id="ogien" klasa="wyzwanie__ozdoba" />
+            </div>
+            <p className="wyzwanie__tresc" data-wyzwanie-tresc>
+              {komisja.wyzwanie.tresc}
+            </p>
+            <button
+              className="druk__cta"
+              type="button"
+              data-cta="przyjmuje-wyzwanie"
+              onClick={() => ustawFaze("butelka")}
+            >
+              {komisja.wyzwanie.cta}
+            </button>
+          </section>
+        ) : null}
 
         {faza === "butelka" ? (
           <>

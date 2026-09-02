@@ -181,5 +181,10 @@
   "gonce": {
     "gora": "KOMISJA CZUWA - ALEKSANDRO, KOMISJA CZUWA ### PIĘKNIE DZIŚ WYGLĄDASZ ### POZDRO DLA GEJUF ###",
     "narada": "ZAJĘCIA Z CHEMII NA UNIWERSYTECIE WARSZAWSKIM ROZPOCZYNAJĄ SIĘ OD 2 PAŹDZIERNIKA ### KACPER ZABRAŁ MI 3 PARY GACI ### PRZEPRASZAM JESZCZE NIE POLICZYŁEM ILE WYDAŁEM ZROBIĘ TO OBIECUJĘ"
+  },
+  "wyzwanie": {
+    "naglowek": "WYZWANIE",
+    "tresc": "PRÓBA OGNIA: stanąć na głowie, ze skarpetkami na dłoniach, nogami w śpiworze i w okularach przeciwsłonecznych. Punkty bonusowe za piankę marshmallow w buzi. Wykonanie udowodnić zdjęciem albo filmem.",
+    "cta": "PRZYJMUJĘ WYZWANIE"
   }
 }

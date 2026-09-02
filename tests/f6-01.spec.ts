@@ -304,8 +304,14 @@ test("przeplyw brama-pergamin sama klawiatura", async ({ page }) => {
   await tabDo(page, "[data-cta='skladam']");
   kroki.push(`ogien: Tab do SKŁADAM, fokus ${await fokusWidoczny(page)}`);
   await page.keyboard.press("Enter");
+  // F9-06: ceremonia konczy sie ekranem wyzwania, butelka o jedno klikniecie dalej
+  await page.locator("[data-wyzwanie]").waitFor({ timeout: 30_000 });
+  kroki.push("ogien: ceremonia spalenia -> ekran wyzwania");
+  await tabDo(page, "[data-cta='przyjmuje-wyzwanie']");
+  kroki.push(`wyzwanie: Tab do PRZYJMUJĘ WYZWANIE, fokus ${await fokusWidoczny(page)}`);
+  await page.keyboard.press("Enter");
   await page.locator("[data-butelka]").waitFor({ timeout: 30_000 });
-  kroki.push("ogien: ceremonia spalenia -> butelka");
+  kroki.push("wyzwanie: Enter -> butelka");
 
   // 5. PERGAMIN
   await tabDo(page, "[data-butelka]");

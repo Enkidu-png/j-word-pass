@@ -341,3 +341,37 @@
     animation-name: none;
   }
 }
+
+/* F9-06: ekran z zadaniem proby ognia. Druk Komisji, ramka `ridge` z klasy
+   `.druk`, zero przekrzywienia (Z6, anty-spec plan/08 F punkt 3). */
+.wyzwanie {
+  max-width: 620px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.wyzwanie__napis {
+  width: min(70%, 320px);
+  height: auto;
+  margin: 0 auto 8px;
+}
+
+.wyzwanie__ozdoby {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.wyzwanie__ozdoba {
+  width: 40px;
+  height: auto;
+}
+
+.wyzwanie__tresc {
+  margin: 0 0 12px;
+  font-family: var(--font-czytany);
+  font-size: var(--stopien-tresc);
+  text-align: left;
+}

@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import komisja from "../data/komisja.json";
 
 // AC F5-02: poprawny POST tworzy blob zgloszenia/...json; email "x" -> 400 z komunikatem
 // Komisji; payload 3 KB -> 400/413; brak tokena -> 200 tryb "dev-log" (mierzone osobno,
@@ -83,6 +84,7 @@ test("pierwszy submit wysyla POST, powrot z flaga wyslano juz nie (07 D2)", asyn
   await page.locator("[data-pole='ucho']").fill("240");
   await page.locator("[data-pokora]").check();
   await page.locator("[data-cta]").click();
+  await przyjmijWyzwanie(page);
   await expect(page.locator("[data-butelka]")).toBeVisible({ timeout: 9000 });
   await expect.poll(() => posty.length).toBe(1);
 
@@ -115,6 +117,7 @@ test("awaria Bloba nie psuje druku: stempel o pamieci ulotnej po jednym ponowien
 
   // teatr rusza NATYCHMIAST, nie po odpowiedzi serwera
   await expect(page.locator("[data-faza='skladanie']")).toBeVisible({ timeout: 400 });
+  await przyjmijWyzwanie(page);
   await expect(page.locator("[data-butelka]")).toBeVisible({ timeout: 9000 });
   await expect(page.locator("[data-ulotna]")).toContainText("KOMISJA ZAPISAŁA W PAMIĘCI ULOTNEJ");
   expect(prob).toBe(2);                                          // retry dokladnie 1x (07 B)
@@ -133,6 +136,11 @@ async function zloz(page: import("@playwright/test").Page) {
   await page.locator("[data-cta]").click();
 }
 
+// F9-06: miedzy ceremonia a butelka stoi ekran z zadaniem proby ognia.
+async function przyjmijWyzwanie(page: import("@playwright/test").Page) {
+  await page.locator("[data-cta='przyjmuje-wyzwanie']").click({ timeout: 12_000 });
+}
+
 test("cztery kroki ceremonii ida po kolei w kontraktowych czasach", async ({ page }) => {
   await page.addInitScript(WPUSC);
   const start = Date.now();
@@ -144,9 +152,12 @@ test("cztery kroki ceremonii ida po kolei w kontraktowych czasach", async ({ pag
   await expect(page.locator(".ceremonia__plomien")).toHaveCount(8);
   await expect(ceremonia).toHaveAttribute("data-faza", "popiol", { timeout: 3000 });
   await expect(page.locator("[data-popiol] .popiol__ziarno")).toHaveCount(20);
-  await expect(page.locator("[data-butelka]")).toBeVisible({ timeout: 3000 });
-  // butelka nie moze pojawic sie przed kontraktowymi 3200 ms (plan/08 C)
+  // F9-06: krok 4 to ekran wyzwania, butelka wchodzi dopiero po jego przyjeciu
+  await expect(page.locator("[data-wyzwanie]")).toBeVisible({ timeout: 3000 });
   expect(Date.now() - start).toBeGreaterThanOrEqual(3200);
+  await expect(page.locator("[data-butelka]")).toHaveCount(0);
+  await przyjmijWyzwanie(page);
+  await expect(page.locator("[data-butelka]")).toBeVisible({ timeout: 3000 });
   // Selektor zawezony do bloku butelki: F6-04 dolozyl na tym widoku drugiego
   // gonca (pod drukiem), wiec `.last()` lapal juz nie ten element.
   await expect(page.locator(".butelka-blok [data-goniec]")).toContainText(
@@ -154,18 +165,65 @@ test("cztery kroki ceremonii ida po kolei w kontraktowych czasach", async ({ pag
   );
 });
 
-test("Escape w kroku 1 skacze od razu do butelki", async ({ page }) => {
+test("Escape w kroku 1 skacze od razu na koniec ceremonii", async ({ page }) => {
   await page.addInitScript(WPUSC);
   await zloz(page);
   await expect(page.locator("[data-faza='skladanie']")).toBeVisible({ timeout: 400 });
   await page.keyboard.press("Escape");
+  // F9-06: koniec ceremonii to ekran wyzwania, butelka o jedno klikniecie dalej
+  await expect(page.locator("[data-wyzwanie]")).toBeVisible({ timeout: 600 });
+  await przyjmijWyzwanie(page);
   await expect(page.locator("[data-butelka]")).toBeVisible({ timeout: 600 });
+});
+
+test("F9-06 ekran wyzwania: druk Komisji miedzy ceremonia a butelka", async ({ page }) => {
+  await page.addInitScript(WPUSC);
+  await zloz(page);
+  const wyzwanie = page.locator("[data-wyzwanie]");
+  await expect(wyzwanie).toBeVisible({ timeout: 12_000 });
+
+  // kolejnosc: wyzwanie PRZED listem w butelce
+  await expect(page.locator("[data-butelka]")).toHaveCount(0);
+  await expect(page.locator("[data-pergamin]")).toHaveCount(0);
+
+  // tresc WYLACZNIE z data/komisja.json
+  await expect(page.locator("[data-wyzwanie-tresc]")).toHaveText(komisja.wyzwanie.tresc);
+  // naglowek jako NapisObrazek plus minimum 3 ozdoby z manifestu, w tym `ogien`
+  await expect(wyzwanie.locator("svg[role='img']")).toHaveAttribute(
+    "aria-label",
+    komisja.wyzwanie.naglowek,
+  );
+  const ozdoby = await wyzwanie
+    .locator("img[data-ozdoba]")
+    .evaluateAll((e) => e.map((x) => (x as HTMLElement).dataset.ozdoba));
+  expect(ozdoby.length).toBeGreaterThanOrEqual(3);
+  expect(ozdoby).toContain("ogien");
+
+  // druk z ramka ridge, nic nie jest przekrzywione (Z6)
+  await expect(wyzwanie).toHaveCSS("border-style", "ridge");
+  const m = await wyzwanie.evaluate((e) => getComputedStyle(e).transform);
+  const [, bb, cc] = m === "none" ? [0, 0, 0] : m.match(/-?[\d.]+/g)!.map(Number);
+  expect(bb).toBe(0);
+  expect(cc).toBe(0);
+  // caly tekst czytelny bez przewijania w poziomie
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    ),
+  ).toBe(0);
+  // zero pola na wgranie pliku
+  expect(await page.locator("input[type='file']").count()).toBe(0);
+
+  await page.locator("[data-cta='przyjmuje-wyzwanie']").click();
+  await expect(page.locator("[data-butelka]")).toBeVisible();
+  await expect(page.locator("[data-wyzwanie]")).toHaveCount(0);
 });
 
 test("Enter na butelce rozwija pergamin z e-mailem i suma 27/35, pergamin bez przekrzywienia", async ({ page }) => {
   await page.addInitScript(WPUSC);
   await zloz(page);
   const butelka = page.locator("[data-butelka]");
+  await przyjmijWyzwanie(page);
   await expect(butelka).toBeVisible({ timeout: 9000 });
   await expect(page.locator("[data-pergamin]")).toHaveCount(0);
 
@@ -190,6 +248,7 @@ test("Enter na butelce rozwija pergamin z e-mailem i suma 27/35, pergamin bez pr
 test("OD NOWA czysci sessionStorage i wraca na brame", async ({ page }) => {
   await page.addInitScript(WPUSC);
   await zloz(page);
+  await przyjmijWyzwanie(page);
   await page.locator("[data-butelka]").click({ timeout: 9000 });
   await page.locator("[data-cta='od-nowa']").click();
   await expect(page).toHaveURL(/\/$/);
@@ -199,6 +258,7 @@ test("OD NOWA czysci sessionStorage i wraca na brame", async ({ page }) => {
 test("negatywne: zero konfetti i zero fajerwerkow po wyslaniu", async ({ page }) => {
   await page.addInitScript(WPUSC);
   await zloz(page);
+  await przyjmijWyzwanie(page);
   await expect(page.locator("[data-butelka]")).toBeVisible({ timeout: 9000 });
   const klasy = await page.evaluate(() =>
     Array.from(document.querySelectorAll("*")).map((e) => e.className.toString()).join(" "),
