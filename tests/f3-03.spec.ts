@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import komisja from "../data/komisja.json";
+import egzamin from "../data/egzamin.json";
 
 // AC F3-03 (plan/06 C). Ceremonia oceny. Wszystkie scenariusze poza jednym
 // przechwytuja /api/ocena, zeby nie palic wywolan modelu ani limitu 5/min.
@@ -75,12 +76,77 @@ test("werdykt: NapisObrazek ZDANE, wynik N/10 i komentarz modelu", async ({ page
   await expect(page.locator("[data-wynik]")).toHaveText("8/10");
   await expect(page.locator("[data-komentarz]")).toHaveText(WERDYKT_OK.komentarz);
   await expect(page.locator("[data-wynik]")).toHaveCSS("font-family", /Courier New/);
-  // krok 4 (plan/06 C): przycisk na etap 2 i odblokowany etap 2 w PassOMetr
-  await expect(page.locator("[data-cta='do-etapu-2']")).toBeVisible({ timeout: 3000 });
-  await expect(page.locator("[data-etap='quiz'] [data-ozdoba='nowe']")).toBeVisible();
+  // krok 4 po czesci 1 (F9-04): przycisk na CZESC 2, a etap 2 nadal ZAMKNIETY
+  await expect(page.locator("[data-cta='do-czesci-2']")).toBeVisible({ timeout: 3000 });
+  await expect(page.locator("[data-cta='do-etapu-2']")).toHaveCount(0);
+  await expect(page.locator("[data-etap='quiz'] [data-ozdoba='stwor-klodka']")).toBeVisible();
   // druk odpowiedzi zostaje na stronie, tylko zamkniety (plan/06 C krok 1)
   await expect(page.locator("[data-pole='odpowiedz']")).toHaveAttribute("readonly", "");
   await expect(page.locator("[data-cta='oddaj']")).toBeDisabled();
+});
+
+test("F9-04 czesc 2: wlasny druk, wlasna ocena, dopiero potem etap 2", async ({ page }) => {
+  const czesci: unknown[] = [];
+  await page.route("**/api/ocena", async (route) => {
+    czesci.push(JSON.parse(route.request().postData() ?? "{}").czesc);
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(WERDYKT_OK),
+    });
+  });
+
+  await page.goto("/egzamin");
+  await page.locator("[data-pole='odpowiedz']").fill("Zebry wygrywaja przez masę.");
+  await page.locator("[data-cta='oddaj']").click();
+  await page.locator("[data-cta='do-czesci-2']").click({ timeout: 12000 });
+
+  // wlasny druk czesci 2, tresc WYLACZNIE z data/egzamin.json
+  await expect(page.locator("[data-czesc-2] .pytanie__tresc")).toHaveText(egzamin.czesc2.tresc);
+  await expect(page.locator("form[data-czesc='2']")).toBeVisible();
+  await expect(page.locator("[data-licznik-znakow]")).toHaveText("ZNAKÓW: 0 Z 8000");
+  await expect(page.locator("[data-pole='odpowiedz']")).toHaveAttribute("maxlength", "8000");
+
+  await page.locator("[data-pole='odpowiedz']").fill("Potencjał wpierdolu rośnie liniowo.");
+  await page.locator("[data-cta='oddaj']").click();
+  await expect(page.locator("[data-cta='do-etapu-2']")).toBeVisible({ timeout: 12000 });
+
+  expect(czesci).toEqual([1, 2]);
+  // oba werdykty w sessionStorage, PassOMetr pokazuje sume z 20
+  const stan = await page.evaluate(
+    () => JSON.parse(sessionStorage.getItem("jwp.v1") ?? "{}").egzamin,
+  );
+  expect(stan.punkty).toBe(WERDYKT_OK.punkty);
+  expect(stan.punkty2).toBe(WERDYKT_OK.punkty);
+  await expect(page.locator("[data-etap='egzamin'] .pass-o-metr__stan")).toHaveText("16/20");
+  // dopiero teraz straz etapu wpuszcza na /quiz
+  await page.locator("[data-cta='do-etapu-2']").click();
+  await expect(page.locator(".karta__pytanie")).toBeVisible({ timeout: 9000 });
+  await expect(page.locator(".straz")).toHaveCount(0);
+});
+
+test("F9-04 pusta odpowiedz w czesci 2: 0/10 bez zadania do API", async ({ page }) => {
+  const zadania: string[] = [];
+  page.on("request", (r) => {
+    if (r.url().includes("/api/ocena")) zadania.push(r.url());
+  });
+  await podstaw(page, WERDYKT_OK);
+
+  await page.goto("/egzamin");
+  await page.locator("[data-pole='odpowiedz']").fill("Cos tam.");
+  await page.locator("[data-cta='oddaj']").click();
+  await page.locator("[data-cta='do-czesci-2']").click({ timeout: 12000 });
+
+  await page.locator("[data-cta='oddaj']").click();
+  await expect(page.locator("[data-wynik]")).toHaveText("0/10");
+  await expect(page.locator("[data-komentarz]")).toContainText("ALEKSANDRO, PUSTKA");
+  await page.waitForTimeout(600);
+  // jedyne zadanie to ocena czesci 1
+  expect(zadania).toHaveLength(1);
+  // pusta czesc 2 NIE otwiera etapu 2
+  expect(
+    await page.evaluate(() => JSON.parse(sessionStorage.getItem("jwp.v1") ?? "{}")?.egzamin?.punkty2),
+  ).toBeUndefined();
 });
 
 test("padniete /api/ocena: werdykt awaryjny z data/komisja.json w mniej niz 16 s", async ({

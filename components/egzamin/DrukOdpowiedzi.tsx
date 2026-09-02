@@ -10,6 +10,10 @@ import { czytajStan, zapiszStan, zapiszTeraz } from "@/lib/stan";
 
 // Druk odpowiedzi i ceremonia oceny (plan/06 B punkty 8-9, plan/06 C).
 //
+// Od F9-04 etap 1 ma DWIE czesci. Ten sam druk, ta sama ceremonia i ten sam
+// `/api/ocena` obsluguja obie - rozniaca je jest tresc zadania (z
+// data/egzamin.json) i pola stanu (`odpowiedz2`, `punkty2`, `komentarz2`).
+//
 // Wartosc pola startuje pusta i wjezdza z sessionStorage dopiero po montazu.
 // Odczyt storage w pierwszym renderze rozjechalby sie z HTML-em z serwera,
 // ktory tego stanu nie zna (blad hydracji z v1, plan/06 D).
@@ -40,7 +44,9 @@ function werdyktAwaryjny(): Werdykt {
 }
 
 export default function DrukOdpowiedzi() {
+  const [czesc, ustawCzesc] = useState<1 | 2>(1);
   const [odpowiedz, ustawOdpowiedz] = useState("");
+  const [odpowiedz2, ustawOdpowiedz2] = useState("");
   const [faza, ustawFaze] = useState<"pisanie" | "narada" | "werdykt">(
     "pisanie",
   );
@@ -53,17 +59,21 @@ export default function DrukOdpowiedzi() {
   useEffect(() => {
     const zapisany = czytajStan()?.egzamin;
     if (zapisany?.odpowiedz) ustawOdpowiedz(zapisany.odpowiedz);
-    // Powrot na /egzamin po zdanym etapie: werdykt odtworzony z sessionStorage,
-    // zero ponownego pytania modelu (plan/06 C).
-    if (zapisany?.punkty != null) {
-      const odtworzony = {
-        punkty: zapisany.punkty,
-        komentarz: zapisany.komentarz ?? "",
-      };
-      wynik.current = odtworzony;
-      ustawWerdykt(odtworzony);
+    if (zapisany?.odpowiedz2) ustawOdpowiedz2(zapisany.odpowiedz2);
+    // Powrot na /egzamin: werdykt odtworzony z sessionStorage, zero ponownego
+    // pytania modelu (plan/06 C). Zamknieta czesc 2 wygrywa nad czescia 1.
+    const odtworz = (punkty: number, komentarz: string, nr: 1 | 2) => {
+      const w = { punkty, komentarz };
+      wynik.current = w;
+      ustawCzesc(nr);
+      ustawWerdykt(w);
       ustawFaze("werdykt");
       ustawKrok4(true);
+    };
+    if (zapisany?.punkty2 != null) {
+      odtworz(zapisany.punkty2, zapisany.komentarz2 ?? "", 2);
+    } else if (zapisany?.punkty != null) {
+      odtworz(zapisany.punkty, zapisany.komentarz ?? "", 1);
     }
   }, []);
 
@@ -75,15 +85,20 @@ export default function DrukOdpowiedzi() {
     return () => clearInterval(id);
   }, [faza]);
 
+  const tresc = czesc === 1 ? odpowiedz : odpowiedz2;
+
   const zapiszWerdykt = (w: Werdykt) => {
     wynik.current = w;
     ustawWerdykt(w);
     // Zero punktow zostaje TYLKO w pamieci komponentu. Zapisane przeszlyby
-    // przez `etapUkonczony` (punkty != null) i otworzylyby quiz, a pusta
-    // odpowiedz ma zostawiac bramke zamknieta (plan/02 E1).
+    // przez `etapUkonczony` i otworzylyby quiz, a pusta odpowiedz ma
+    // zostawiac bramke zamknieta (plan/02 E1).
     if (w.punkty >= egzamin.punktyMin) {
       zapiszTeraz({
-        egzamin: { odpowiedz, punkty: w.punkty, komentarz: w.komentarz },
+        egzamin:
+          czesc === 1
+            ? { odpowiedz, punkty: w.punkty, komentarz: w.komentarz }
+            : { odpowiedz2, punkty2: w.punkty, komentarz2: w.komentarz },
       });
       setTimeout(() => {
         ustawKrok4(true);
@@ -94,18 +109,20 @@ export default function DrukOdpowiedzi() {
   };
 
   const oddaj = () => {
-    if (odpowiedz.trim() === "") {
+    if (tresc.trim() === "") {
       zapiszWerdykt({ punkty: egzamin.punktyPuste, komentarz: PUSTKA });
       ustawFaze("werdykt");
       return;
     }
-    zapiszTeraz({ egzamin: { odpowiedz } });
+    zapiszTeraz({
+      egzamin: czesc === 1 ? { odpowiedz } : { odpowiedz2 },
+    });
     startNarady.current = performance.now();
     ustawFaze("narada");
     fetch("/api/ocena", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ odpowiedz }),
+      body: JSON.stringify({ odpowiedz: tresc, czesc }),
     })
       .then((r) =>
         r.ok ? r.json() : Promise.reject(new Error(String(r.status))),
@@ -116,20 +133,44 @@ export default function DrukOdpowiedzi() {
       .catch(() => zapiszWerdykt(werdyktAwaryjny()));
   };
 
-  const alarm = odpowiedz.length > PROG_ALARMU;
+  const przejdzDoCzesci2 = () => {
+    ustawCzesc(2);
+    ustawFaze("pisanie");
+    ustawWerdykt(null);
+    wynik.current = null;
+    ustawKrok4(false);
+    // Bez tego przegladarka zostaje na pozycji przycisku (1384 px), czyli PONIZEJ
+    // nowego zadania i pola odpowiedzi - blad rozpoznania z F7-08 w nowym miejscu.
+    requestAnimationFrame(() =>
+      document.querySelector("[data-czesc-2]")?.scrollIntoView({ block: "start" }),
+    );
+  };
+
+  const alarm = tresc.length > PROG_ALARMU;
   const zamkniete = faza !== "pisanie";
   const zdane = werdykt != null && werdykt.punkty >= egzamin.punktyMin;
 
   return (
     <>
+      {czesc === 2 ? (
+        <section className="druk druk--pytanie" data-czesc-2>
+          <p className="druk__naglowek">TREŚĆ PYTANIA, CZĘŚĆ 2</p>
+          <p className="pytanie__tytul">{egzamin.czesc2.tytul}</p>
+          <p className="pytanie__tresc">{egzamin.czesc2.tresc}</p>
+        </section>
+      ) : null}
+
       <form
         className="druk druk--odpowiedz"
+        data-czesc={czesc}
         onSubmit={(z) => {
           z.preventDefault();
           oddaj();
         }}
       >
-        <p className="druk__naglowek">TWOJA ODPOWIEDŹ, ALEKSANDRO</p>
+        <p className="druk__naglowek">
+          TWOJA ODPOWIEDŹ, ALEKSANDRO{czesc === 2 ? " (CZĘŚĆ 2)" : ""}
+        </p>
         <label className="druk__etykieta" htmlFor="odpowiedz">
           PISZ W RAMCE. KOMISJA CZYTA WSZYSTKO.
         </label>
@@ -140,11 +181,17 @@ export default function DrukOdpowiedzi() {
           data-pole="odpowiedz"
           rows={10}
           maxLength={LIMIT}
-          value={odpowiedz}
+          value={tresc}
           readOnly={zamkniete}
           onChange={(z) => {
-            ustawOdpowiedz(z.target.value);
-            zapiszStan({ egzamin: { odpowiedz: z.target.value } });
+            const w = z.target.value;
+            if (czesc === 1) {
+              ustawOdpowiedz(w);
+              zapiszStan({ egzamin: { odpowiedz: w } });
+            } else {
+              ustawOdpowiedz2(w);
+              zapiszStan({ egzamin: { odpowiedz2: w } });
+            }
           }}
         />
         <p
@@ -152,7 +199,7 @@ export default function DrukOdpowiedzi() {
           data-licznik-znakow
           data-alarm={alarm ? "tak" : "nie"}
         >
-          ZNAKÓW: {odpowiedz.length} Z {LIMIT}
+          ZNAKÓW: {tresc.length} Z {LIMIT}
         </p>
         <button
           className="druk__cta"
@@ -209,9 +256,20 @@ export default function DrukOdpowiedzi() {
                 {werdykt.komentarz}
               </p>
               {zdane && krok4 ? (
-                <Link className="druk__cta" href="/quiz" data-cta="do-etapu-2">
-                  PRZEJDŹ DO ETAPU 2
-                </Link>
+                czesc === 1 ? (
+                  <button
+                    className="druk__cta"
+                    type="button"
+                    data-cta="do-czesci-2"
+                    onClick={przejdzDoCzesci2}
+                  >
+                    PRZEJDŹ DO CZĘŚCI 2
+                  </button>
+                ) : (
+                  <Link className="druk__cta" href="/quiz" data-cta="do-etapu-2">
+                    PRZEJDŹ DO ETAPU 2
+                  </Link>
+                )
               ) : null}
             </>
           )}

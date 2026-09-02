@@ -28,8 +28,12 @@
     }
   ],
   "polecenie": "Zastosować odpowiednie wzory i udowodnić swój wynik.",
-  "liczbaPodzadan": 1,
+  "liczbaPodzadan": 2,
   "punktyMin": 6,
   "punktyMax": 10,
-  "punktyPuste": 0
+  "punktyPuste": 0,
+  "czesc2": {
+    "tytul": "EGZAMIN PAŃSTWOWY Z FIZYKI STOSOWANEJ NR F-7/BIS, CZĘŚĆ 2",
+    "tresc": "Zakładając, że siła wkurwienia myszy wynosi 12 megawatów, a przeciętny debil generuje 15 idiotycznych pytań na minutę oraz 5 cringowych tekstów co 10 minut: jaki jest potencjał wpierdolu oraz po jakim czasie najszybciej nastąpi wpierdol? Zastosować odpowiednie wzory i uzasadnić odpowiedź."
+  }
 }

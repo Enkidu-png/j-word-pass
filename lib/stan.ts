@@ -3,11 +3,16 @@
 
 type StanJWP = {
   v: 1;
+  // Etap 1 ma DWIE czesci (F9-04). Pola bez sufiksu to czesc 1, z sufiksem 2
+  // to czesc 2. Etap liczy sie za ukonczony dopiero, gdy obie maja werdykt.
   egzamin: {
     odpowiedz: string;
     zalaczone: string[];
     punkty: number | null;
     komentarz: string | null;
+    odpowiedz2: string;
+    punkty2: number | null;
+    komentarz2: string | null;
   } | null;
   quiz: { odpowiedzi: Record<number, string>; punkty: number | null } | null;
   ogien: {
@@ -39,7 +44,8 @@ export function czytajStan(): StanJWP | null {
 // gdy zgloszenie poszlo. To ta wiedza rzadzi PassOMetrem i strazami etapow.
 export function etapUkonczony(stan: StanJWP | null, etap: Etap): boolean {
   if (!stan) return false;
-  if (etap === "egzamin") return stan.egzamin?.punkty != null;
+  if (etap === "egzamin")
+    return stan.egzamin?.punkty != null && stan.egzamin?.punkty2 != null;
   if (etap === "quiz") return stan.quiz?.punkty != null;
   return stan.ogien?.wyslano === true;
 }

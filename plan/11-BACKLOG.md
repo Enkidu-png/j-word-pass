@@ -934,10 +934,20 @@ Kolejność liniowa jak wszędzie. Fazę wykonujemy PRZED bramką F8.
   Etykieta checkboxa etapu 3 = `Potwierdzam, że rozumiem powagę sytuacji.` (zrzut).
   Negatywne: `git grep -n "kandydat" -- app components data` daje wyłącznie id `imie-kandydatki`, komentarze techniczne i ZAKAZ w prompcie `/api/ocena` - zero formy urzędowej w copy. `pnpm run check` zielony, `tests/kanon.spec.ts`, `f3-01`, `f3-02`, `f4-01`, `f5-01` przechodzą.
   Zaktualizowany spec `plan/08` (etykieta klauzuli).
-- [ ] **F9-04** `dane` ⚠ HARD Etap 1 dostaje DRUGĄ CZĘŚĆ, pokazywaną po zamknięciu części pierwszej.
+- [x] **F9-04** `dane` ⚠ HARD Etap 1 dostaje DRUGĄ CZĘŚĆ, pokazywaną po zamknięciu części pierwszej.
   CZYTAJ: 06→A,B,C; 02→B,E1.
   Treść zadania (dosłownie, bezosobowo): `Zakładając, że siła wkurwienia myszy wynosi 12 megawatów, a przeciętny debil generuje 15 idiotycznych pytań na minutę oraz 5 cringowych tekstów co 10 minut: jaki jest potencjał wpierdolu oraz po jakim czasie najszybciej nastąpi wpierdol? Zastosować odpowiednie wzory i uzasadnić odpowiedź.`
   AC: po werdykcie części 1 pojawia się przycisk `PRZEJDŹ DO CZĘŚCI 2`, a nie od razu przejście do etapu 2; część 2 ma własny druk z treścią wyżej, własną `<textarea>` z licznikiem 8000 znaków i własny przycisk oddania; ocena idzie tym samym `/api/ocena` (payload z polem rozróżniającym część, prompt dostaje treść zadania z `data/egzamin.json`); wynik etapu 1 w `sessionStorage` trzyma OBA werdykty, a PassOMetr pokazuje sumę; `StrazEtapu` przepuszcza na `/quiz` dopiero po zamknięciu części 2; pusta odpowiedź w części 2 zachowuje się jak w części 1 (0/10 bez żądania do API); zrzuty desktop i 390 px OBEJRZANE; negatywne: treść zadania NIE jest zaszyta w komponencie (`git grep` na fragmencie zwraca tylko `data/egzamin.json`), zero `Aleksandro` w treści zadania (Z16).
+  ✓ WYKONANE (przejście całej ścieżki w przeglądarce, zrzuty `screenshots/f9-04-werdykt1-{desktop,mobile}.png` i `screenshots/f9-04-czesc2-{desktop,mobile}.png` OBEJRZANE):
+  Po werdykcie części 1 stoi `[data-cta='do-czesci-2']` `PRZEJDŹ DO CZĘŚCI 2`, a `[data-cta='do-etapu-2']` w DOM NIE MA (count 0) i pole `ETAP 2` w PassOMetr jest dalej `zamkniety`.
+  Część 2 ma własny druk `[data-czesc-2]` (tytuł plus treść z `data/egzamin.json`), własną `<textarea>` z `maxlength=8000` i licznikiem `ZNAKÓW: 0 Z 8000` oraz własny `ODDAJ PRACĘ KOMISJI`.
+  Payloady do `/api/ocena` zebrane z przeglądarki: `[{czesc:1},{czesc:2}]`; prompt składany funkcją `promptSystemowy(czesc)` z `data/egzamin.json` (część 1: `tytul` + `tresc` + `polecenie` + sześć założeń, część 2: `czesc2.tytul` + `czesc2.tresc`), zero treści zadania w kodzie route'a.
+  `sessionStorage` po obu ocenach: `{"punkty":8,"komentarz":"...","odpowiedz2":"...","punkty2":7,"komentarz2":"..."}`; PassOMetr pokazuje `15/20` (suma, `zMaks` etapu 1 podniesiony z 10 na 20).
+  `StrazEtapu`: klik `PRZEJDŹ DO ETAPU 2` po części 2 wchodzi na `/quiz` bez druku odmownego (`.straz` = 0); przed częścią 2 `etapUkonczony` oddaje `false`, bo wymaga `punkty != null && punkty2 != null`.
+  Pusta część 2: `0/10`, komentarz `ALEKSANDRO, PUSTKA...`, liczba żądań do `/api/ocena` = 1 (tylko za część 1), `punkty2` niezapisane.
+  Negatywne: `git grep -n "wkurwienia myszy"` = `data/egzamin.json` i ten backlog, zero trafień w komponentach; treść zadania bez `Aleksandro`.
+  Znalezisko w trakcie: część 2 dokładana POD zamknięty druk części 1 spychała `<textarea>` na 1804 px od góry na 390 px, czyli dokładnie błąd z F7-08. Naprawione regułą `:has()` w `app/style/egzamin.css` (druk części 1 i `DANE DO ZADANIA` schodzą ze sceny, gdy otwarta jest część 2) plus `scrollIntoView` na przejściu. Po poprawce: druk części 2 na 252 px, `<textarea>` na 1217 px, `scrollY` po kliknięciu = 252.
+  Straże: `tests/f3-03.spec.ts` (dwa nowe testy), zaktualizowany przepływ klawiaturowy w `tests/f6-01.spec.ts` (18 kroków, część 2 w środku) i ziarna `sessionStorage` w 12 plikach testów.
 - [ ] **F9-05** `ui` Radio: usunięcie podpisu `LECI: POST MALONE, TINY DESK CONCERT`, dodanie przełączania między trzema materiałami strzałkami.
   CZYTAJ: 09 (cały).
   Lista materiałów (kolejność wiążąca): 1. `oCcks-fwq2c` (Post Malone, Tiny Desk Concert, NPR Music), 2. `RLmx3KMNuRM` (Top Gun Niesiołowice, czasem łowię ryby), 3. `wj2jITPprLw` (tak puszysty jak almette, ebr cypisz).

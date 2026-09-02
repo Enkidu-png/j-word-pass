@@ -10,7 +10,8 @@ import { uzyjStanu } from "./uzyjStanu";
 // ze stopka - zadnego sticky headera i zadnego hamburgera (anty-spec globalna 2).
 
 const ETAPY: { etap: Etap; numer: string; nazwa: string; adres: string; zMaks: number }[] = [
-  { etap: "egzamin", numer: "ETAP 1", nazwa: "EGZAMIN", adres: "/egzamin", zMaks: 10 },
+  // F9-04: etap 1 to dwie czesci po 10 punktow, wiec PassOMetr pokazuje SUME z 20.
+  { etap: "egzamin", numer: "ETAP 1", nazwa: "EGZAMIN", adres: "/egzamin", zMaks: 20 },
   { etap: "quiz", numer: "ETAP 2", nazwa: "QUIZ", adres: "/quiz", zMaks: 15 },
   { etap: "ogien", numer: "ETAP 3", nazwa: "PRÓBA OGNIA", adres: "/proba-ognia", zMaks: 0 },
 ];
@@ -48,7 +49,13 @@ export default function PassOMetr() {
           const otwarty = i === 0 || zdane[i - 1];
           const stanPola = zdane[i] ? "zdany" : otwarty ? "otwarty" : "zamkniety";
           const punkty =
-            e.etap === "egzamin" ? stan?.egzamin?.punkty : e.etap === "quiz" ? stan?.quiz?.punkty : null;
+            e.etap === "egzamin"
+              ? stan?.egzamin?.punkty != null && stan?.egzamin?.punkty2 != null
+                ? stan.egzamin.punkty + stan.egzamin.punkty2
+                : null
+              : e.etap === "quiz"
+                ? stan?.quiz?.punkty
+                : null;
           const podpis =
             awaria === i
               ? TEKST_AWARII

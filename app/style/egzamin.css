@@ -297,3 +297,12 @@
 .druk--dane[open] .dane__summary {
   margin-bottom: 10px;
 }
+
+/* F9-04: gdy otwarta jest CZĘŚĆ 2, druk czesci 1 i jej DANE schodza ze sceny.
+   Czesc 1 jest juz zamknieta werdyktem, a zostawiona na gorze spychala pole
+   odpowiedzi czesci 2 na 1804 px od gory strony - dokladnie blad z F7-08.
+   `:has()` zamiast stanu w JS: strona jest serwerowa, a czesc 2 zyje w kliencie. */
+.egzamin:has([data-czesc-2]) .druk--pytanie:not([data-czesc-2]),
+.egzamin:has([data-czesc-2]) .druk--dane {
+  display: none;
+}

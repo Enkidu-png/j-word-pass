@@ -1,6 +1,7 @@
 // Ocena odpowiedzi egzaminacyjnej przez OpenRouter. Kontrakt: plan/08 sekcja B.
 // Klucz zyje wylacznie tutaj, po stronie serwera (Z12).
 
+import egzamin from "@/data/egzamin.json";
 import { adresZadania, limitPrzekroczony } from "@/lib/limit";
 
 const ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
@@ -8,11 +9,19 @@ const MODEL_PRIMARY = "google/gemini-2.5-flash-lite";
 const MODEL_FALLBACK = "mistralai/mistral-small-3.2-24b-instruct";
 const LIMIT_BAJTOW = 8 * 1024;
 
-const PROMPT_SYSTEMOWY = `Jesteś trzyosobową Międzygalaktyczną Komisją Egzaminacyjną oceniającą odpowiedź na
-absurdalne zadanie z fizyki: pojedynek w kosmosie między 2000 biało-żółtych zebr
-z jetpackami (300 km/h, zasięg 1000 km, potem pęd; jedna zebra ma raka trzustki
-i skończyła akademię wojskową) a 1 słoniem (10 t, sokole oko, karabin na trąbie,
-5000 naboi, +1 km/h przyspieszenia na strzał od odrzutu).
+// Tresc zadania NIE jest przepisana do promptu (F9-04) - obie czesci ida
+// z data/egzamin.json, wiec zmiana zadania nie wymaga dotykania tego pliku.
+function zadanie(czesc: 1 | 2): string {
+  if (czesc === 2) return `${egzamin.czesc2.tytul}\n${egzamin.czesc2.tresc}`;
+  const dane = egzamin.zalozenia.map((z) => `- ${z.tekst}`).join("\n");
+  return `${egzamin.tytul}\n${egzamin.tresc}\n${egzamin.polecenie}\nDANE DO ZADANIA:\n${dane}`;
+}
+
+function promptSystemowy(czesc: 1 | 2): string {
+  return `Jesteś trzyosobową Międzygalaktyczną Komisją Egzaminacyjną oceniającą odpowiedź
+na absurdalne zadanie egzaminacyjne. Treść zadania, na które odpowiadała Aleksandra:
+
+${zadanie(czesc)}
 
 Do egzaminu podchodzi JEDNA osoba i ma na imię Aleksandra. Komisja mówi wyłącznie
 DO NIEJ, drugą osobą liczby pojedynczej, w rodzaju żeńskim. W komentarzu MUSISZ
@@ -25,10 +34,12 @@ fizyczna nie istnieje i nie obowiązuje). 10 = odpowiedź, którą Komisja opraw
 
 Napisz komentarz Komisji: po polsku, 2-4 zdania, śmieszny i absurdalny, w tonie
 przesadnie urzędowym (paragrafy, protokoły, wnioski formalne). Cytuj lub parafrazuj
-NAJLEPSZY fragment jej odpowiedzi.
+NAJLEPSZY fragment jej odpowiedzi. Wulgaryzmy w treści zadania są celowe i Komisja
+się nimi nie gorszy.
 
 Zakazy formalne: nie używaj długiego myślnika, nie używaj znaku wypunktowania kropką
 środkową, nie używaj emoji. Zwróć wyłącznie JSON zgodny ze schematem.`;
+}
 
 const SCHEMA = {
   name: "werdykt",
@@ -56,7 +67,7 @@ function sanitizeDash(tekst: string): string {
 }
 
 
-async function zapytajModel(model: string, odpowiedz: string, klucz: string) {
+async function zapytajModel(model: string, odpowiedz: string, klucz: string, czesc: 1 | 2) {
   const res = await fetch(ENDPOINT, {
     method: "POST",
     headers: { Authorization: `Bearer ${klucz}`, "Content-Type": "application/json" },
@@ -66,7 +77,7 @@ async function zapytajModel(model: string, odpowiedz: string, klucz: string) {
       temperature: 1.1,
       response_format: { type: "json_schema", json_schema: SCHEMA },
       messages: [
-        { role: "system", content: PROMPT_SYSTEMOWY },
+        { role: "system", content: promptSystemowy(czesc) },
         {
           role: "user",
           content: `Odpowiedź Aleksandry:\n${odpowiedz}`,
@@ -91,13 +102,15 @@ export async function POST(request: Request) {
     return Response.json({ blad: "Aleksandro, Twój wniosek przekracza dopuszczalną objętość akt." }, { status: 413 });
   }
 
-  let cialo: { odpowiedz?: unknown };
+  let cialo: { odpowiedz?: unknown; czesc?: unknown };
   try {
     cialo = JSON.parse(surowy);
   } catch {
     return Response.json({ blad: "Aleksandro, Komisja nie potrafi odczytać Twojego formularza." }, { status: 400 });
   }
   const odpowiedz = typeof cialo.odpowiedz === "string" ? cialo.odpowiedz : null;
+  // Granica zaufania: wszystko poza jawna dwojka to czesc 1.
+  const czesc: 1 | 2 = cialo.czesc === 2 || cialo.czesc === "2" ? 2 : 1;
   if (odpowiedz === null) {
     return Response.json({ blad: "Aleksandro, Komisja nie znalazła w druku pola z Twoją odpowiedzią." }, { status: 400 });
   }
@@ -121,7 +134,7 @@ export async function POST(request: Request) {
 
   for (const model of [MODEL_PRIMARY, MODEL_FALLBACK]) {
     try {
-      const werdykt = await zapytajModel(model, odpowiedz, klucz);
+      const werdykt = await zapytajModel(model, odpowiedz, klucz, czesc);
       return Response.json({
         punkty: Math.min(10, Math.max(6, Math.round(werdykt.punkty))),
         komentarz: sanitizeDash(werdykt.komentarz),

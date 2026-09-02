@@ -12,7 +12,16 @@ const WPUSC = () => {
     "jwp.v1",
     JSON.stringify({
       v: 1,
-      egzamin: { odpowiedz: "x", zalaczone: [], punkty: 8, komentarz: "ok" },
+      // F9-04: etap 1 ma dwie czesci, wiec straz wpuszcza dopiero po OBU werdyktach
+      egzamin: {
+        odpowiedz: "x",
+        zalaczone: [],
+        punkty: 8,
+        komentarz: "ok",
+        odpowiedz2: "y",
+        punkty2: 7,
+        komentarz2: "ok2",
+      },
       quiz: { odpowiedzi: {}, punkty: 12 },
       ogien: null,
     }),
@@ -226,8 +235,20 @@ test("przeplyw brama-pergamin sama klawiatura", async ({ page }) => {
   await tabDo(page, "[data-cta='oddaj']");
   kroki.push(`egzamin: Tab do ODDAJ, fokus ${await fokusWidoczny(page)}`);
   await page.keyboard.press("Enter");
+  // F9-04: etap 1 ma dwie czesci, wiec ta sama sciezka przechodzi ja dwa razy
+  await page.locator("[data-cta='do-czesci-2']").waitFor({ timeout: 30_000 });
+  kroki.push("egzamin: Enter -> werdykt czesci 1");
+  await tabDo(page, "[data-cta='do-czesci-2']");
+  await page.keyboard.press("Enter");
+  await page.locator("[data-czesc-2]").waitFor();
+  kroki.push("egzamin: Enter na PRZEJDŹ DO CZĘŚCI 2 -> druk czesci 2");
+  await tabDo(page, "textarea");
+  await page.keyboard.type("Potencjal wpierdolu liczony z wzoru komisji, dostatecznie dlugo.");
+  await tabDo(page, "[data-cta='oddaj']");
+  kroki.push(`egzamin czesc 2: Tab do ODDAJ, fokus ${await fokusWidoczny(page)}`);
+  await page.keyboard.press("Enter");
   await page.locator("[data-cta='do-etapu-2']").waitFor({ timeout: 30_000 });
-  kroki.push("egzamin: Enter -> werdykt 9/10");
+  kroki.push("egzamin czesc 2: Enter -> werdykt");
   await tabDo(page, "[data-cta='do-etapu-2']");
   await page.keyboard.press("Enter");
   await page.waitForURL("**/quiz");

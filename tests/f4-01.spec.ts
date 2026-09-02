@@ -14,7 +14,16 @@ const WPUSC = () => {
     "jwp.v1",
     JSON.stringify({
       v: 1,
-      egzamin: { odpowiedz: "x", zalaczone: [], punkty: 8, komentarz: "ok" },
+      // F9-04: etap 1 ma dwie czesci, wiec straz wpuszcza dopiero po OBU werdyktach
+      egzamin: {
+        odpowiedz: "x",
+        zalaczone: [],
+        punkty: 8,
+        komentarz: "ok",
+        odpowiedz2: "y",
+        punkty2: 7,
+        komentarz2: "ok2",
+      },
       quiz: null,
       ogien: null,
     }),
