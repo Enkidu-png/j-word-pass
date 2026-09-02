@@ -185,7 +185,9 @@ body {
   width: 300px;
   margin: 12px auto 0;
   padding: 8px;
-  background: var(--chrom-b);
+  /* F6-01: --chrom-b (#6e6e6e) dawal 4,48:1 pod --papier i 4,03:1 pod --cyjan.
+     Ciemniejsza obudowa podnosi oba do ~9:1 i nie rusza chromowanej ramki. */
+  background: var(--ramka-ciemna);
   border: 5px outset var(--chrom-a);
   text-align: center;
 }

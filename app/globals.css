@@ -56,6 +56,6 @@ body {
 }
 
 :focus-visible {
-  outline: 3px solid var(--fokus);
+  outline: 3px dashed var(--fokus);
   outline-offset: 2px;
 }
