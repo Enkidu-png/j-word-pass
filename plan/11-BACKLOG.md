@@ -1021,6 +1021,23 @@ to jeden proces z jedną `Mapą` na cały przebieg. Na buildzie produkcyjnym
 puszczaj pojedyncze pliki, nie całą suitę.
 
 
+## F10 - ZBIERANIE PRAC I BRAMA WSTĘPU (zamówione 2026-09-02, po wdrożeniu na produkcję)
+
+- [ ] **F10-01** `infra` ⚠ HARD Zapis ocenionych odpowiedzi, żeby Jan mógł osobiście sprawdzić test.
+  CZYTAJ: 02→B,D; 08→B; 09 nie dotyczy.
+  Kontrakt: po każdej udanej ocenie `/api/ocena` zapisuje do prywatnego store'a `jwp-zgloszenia` plik `odpowiedzi/<ISO-timestamp>-czesc<N>-<losowe6>.json` z polami `{ czesc, odpowiedz, punkty, komentarz, model, ts }`. Odpowiedź zapisujemy w CAŁOŚCI, nieprzyciętą. Dodatkowo `/api/zgloszenie` przyjmuje i zapisuje komplet: obie odpowiedzi z obydwoma werdyktami plus wynik quizu, żeby jeden plik dawał pełny obraz podejścia.
+  AC: POST do `/api/ocena` na produkcji tworzy plik w `odpowiedzi/` (potwierdzić listingiem `vercel blob list --rw-token`, wynik w dowodzie); plik zawiera pełną treść odpowiedzi, punkty i komentarz modelu; `/api/zgloszenie` zapisuje obiekt z polami obu części i wynikiem quizu; **poza produkcją zapis NIE następuje** (`NODE_ENV !== "production"` schodzi na `console.log`, tak jak dotychczasowy `dev-log` - inaczej każdy przebieg testów zaśmieci płatny store, błąd F7-16 z v1); awaria zapisu do Bloba NIE psuje oceny (kandydatka dostaje werdykt, błąd tylko w logu); negatywne: zero nowych zależności, zero endpointu odczytu (panelu nie budujemy, odczyt przez dashboard i CLI).
+  Po wykonaniu: dopisz do `WERYFIKACJA.md` sekcję `JAK PRZECZYTAĆ PRACE` z gotowym przepisem CLI (`vercel env pull` do pliku tymczasowego, `vercel blob list --rw-token`, `vercel blob get`), bo `VERCEL_OIDC_TOKEN` sam nie wystarcza.
+- [ ] **F10-02** `ui` ⚠ HARD Brama wstępu: pytanie kontrolne przed wejściem na stronę.
+  CZYTAJ: 05→A,B; 04→B,D,F; 01→E (Z10, Z11, Z16).
+  Kontrakt: pełnoekranowa nakładka przy pierwszym wejściu, PRZED ekranem ładowania. Pytanie brzmi dokładnie: `Jak na drugie imię ma Janek?`. Poprawna odpowiedź: `Franciszek`. Porównanie po normalizacji (`trim`, małe litery, usunięcie znaków diakrytycznych), więc `franciszek`, `Franciszek` i `FRANCISZEK` przechodzą.
+  AC: bez poprawnej odpowiedzi żadna z czterech stron nie pokazuje treści (nakładka zasłania i trzyma fokus); poprawna odpowiedź zdejmuje nakładkę i zapisuje `jwp.wstep` w `localStorage`, po reloadzie nakładka się nie pokazuje; błędna odpowiedź daje stempel `KOMISJA NIE ROZPOZNAJE PETENTA` i pole zostaje z fokusem, bez przeładowania; pełna obsługa klawiaturą (Tab, Enter), `:focus-visible` widoczny (Z10); nakładka utrzymuje charakter strony - kafel tła, minimum 3 ozdoby z manifestu, `NapisObrazek` z nagłówkiem; `prefers-reduced-motion` bez animacji wejścia; zrzuty desktop i 390 px OBEJRZANE; negatywne: nic nie jest przekrzywione (Z6), pytanie i odpowiedź NIE są zaszyte w komponencie tylko w `data/komisja.json`.
+- [ ] **F10-03** `infra` Brama chroni też płatny endpoint, nie tylko widok.
+  CZYTAJ: 02→B; wynik F10-02.
+  Kontrakt: klient wysyła do `/api/ocena` i `/api/zgloszenie` nagłówek `x-jwp-klucz` z odpowiedzią po normalizacji. Serwer porównuje ze zmienną `JWP_KLUCZ_WSTEPU` (już ustawiona w env Vercela dla trzech środowisk). Brak albo zła wartość: **401** z komunikatem Komisji, przed wywołaniem modelu.
+  AC: `curl -X POST <produkcja>/api/ocena` BEZ nagłówka zwraca 401 i NIE wywołuje modelu (brak kosztu); ten sam curl z `-H "x-jwp-klucz: franciszek"` zwraca 200 z punktami; to samo dla `/api/zgloszenie`; przepływ w przeglądarce po przejściu bramy działa bez zmian (test end-to-end); negatywne: klucz nie pojawia się w repo ani w commicie (`git grep -ci franciszek` = 0 poza `data/komisja.json`, gdzie siedzi pytanie i odpowiedź bramy).
+  UWAGA DO ZAPISANIA w `DECISIONS.md`: to jest PRÓG ZWALNIAJĄCY, nie uwierzytelnienie. Odpowiedź na pytanie bramy jest w kodzie klienta, więc ktoś zdeterminowany ją odczyta. Chroni przed przypadkowym ruchem i botami, a przed uporczywym nadużyciem broni dopiero limit 5/min i limit kwotowy klucza OpenRouter.
+
 ## F8 - BRAMKA DECYZYJNA
 
 - [x] **F8-01** `deploy` STOP-GATE przed wykonaniem: pokaż Aleksandrze URL preview plus `WERYFIKACJA.md`, zapytaj o zgodę na `vercel deploy --prod` (podmiana żywej produkcji z wersji 1).
