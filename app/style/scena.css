@@ -108,8 +108,13 @@ button,
   background: var(--papier);
 }
 
-/* NAPIS-OBRAZEK (plan/04 D). Zero rotacji i skosu - napis stoi prosto (Z6). */
-.napis {
+/* NAPIS-OBRAZEK (plan/04 D). Zero rotacji i skosu - napis stoi prosto (Z6).
+   F7-07: `:where` zeruje specyficznosc calej reguly (0,0,0), wiec to jest
+   wartosc DOMYSLNA, a nie zawodnik w wyscigu kaskady. Wczesniej `.napis`
+   mial (0,1,0) i byl importowany po arkuszach widokow, wiec bil kazda
+   szerokosc zadana na `.werdykt__napis`, `.maszyna__napis` itd. Napis bez
+   klasy widoku (np. `/dev/scena`) dalej dostaje 100%. */
+:where(.napis) {
   display: block;
   width: 100%;
   height: auto;

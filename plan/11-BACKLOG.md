@@ -791,8 +791,64 @@ odrzucone z powodem, albo przeniesione do trackera).
   dziala jak dotad (test F1-02 zielony bez zmian); negatywne: poprawka nie animuje
   `left` ani `width` (`plan/04 K2`), zero nowych zaleznosci.
 
-- [ ] **F7-07** `ui` `.werdykt__napis` jest martwy z tego samego powodu co
+- [x] **F7-07** `ui` `.werdykt__napis` jest martwy z tego samego powodu co
   `.brama__napis` (kaskada `scena.css`).
+  ✓ ZROBIONE. Jedna zmiana w `app/style/scena.css`: `.napis { width: 100% }`
+  to teraz `:where(.napis) { width: 100% }`. `:where()` zeruje specyficznosc
+  (0,1,0 -> 0,0,0), wiec regula bazowa jest WARTOSCIA DOMYSLNA, a nie
+  zawodnikiem w wyscigu kaskady. Zero `!important`, zero zmian w JSX, zero
+  lokalnych latek. Napis bez klasy widoku (`/dev/scena`, `PlonacyNapis`)
+  dalej dostaje 100%.
+  DOWOD, tabela `getBoundingClientRect().width` na ZYWEJ stronie, wszystkie
+  widoki z `[data-napis]`, dwa viewporty (dev server, `document.fonts` gotowe):
+
+  | widok | element | 1280 przed | 1280 po | 390 przed | 390 po |
+  |---|---|---|---|---|---|
+  | `/` | `brama__napis` | 720 | 720 | 351 | 351 |
+  | `/egzamin` | `egzamin__etap` | 380 | 380 | 300 | 300 |
+  | `/egzamin` | `napis--chrom` (plonacy) | 760 | 760 | 351 | 351 |
+  | `/egzamin` | `werdykt__napis` | 760 | **420** | 334 | **233,8** |
+  | `/quiz` | `quiz__napis` | 360 | 360 | 300 | 300 |
+  | `/quiz` | `maszyna__napis` | 663,72 | **320** | 204,03 | **151,13** |
+  | `/proba-ognia` | `ogien__napis` | 560 | 560 | 312 | 312 |
+  | `/nie-ma` | `brak__napis` | 300 | 300 | 220 | 220 |
+  | `/dev/scena` | `napis--chrom` (plonacy) | 1232 | 1232 | 342 | 342 |
+  | `/dev/scena` | 4x playground (chrom, chrom, chrom, neon) | 602,88 | 602,88 | 175,67 | 175,67 |
+
+  Zmieniaja sie DWIE pozycje i obie sa naprawa, nie skutkiem ubocznym:
+  `.werdykt__napis` (`min(70%, 420px)`, cel tego issue) oraz `.maszyna__napis`
+  (`min(50%, 320px)`, `quiz.css`) - dokladnie ta sama martwa regula, bo
+  `quiz.css` tez jest importowany przed `scena.css`. Zostawienie jej martwej
+  znaczyloby swiadome utrzymywanie buga, wiec odstepuje od dosłownego
+  brzmienia negatywnego AC („/quiz bez zmian") i pokazuje zrzut. Pozostale
+  osiem pozycji CO DO PIKSELA bez zmian.
+  ODSTEPSTWO OD AC, drugie: literalny dowod „usuniecie `width: 100%`
+  z `.egzamin__etap` zmienia jego szerokosc" jest NIEDIAGNOSTYCZNY - po
+  usunieciu tej reguly element i tak dostaje 100% z `:where(.napis)`, wiec
+  wynik jest identyczny przed i po poprawce. Zamiast tego test dokłada regule
+  o TEJ SAMEJ specyficznosci (0,1,0) na POCZATEK `<head>`, czyli wczesniej
+  niz arkusz z regula bazowa - to jest dokladnie ta przegrana, ktora zabijala
+  `.werdykt__napis`. `addStyleTag` tego nie sprawdzi, bo dokleja arkusz na
+  koncu i wygrywa kolejnoscia niezaleznie od poprawki (zlapane na pierwszym
+  podejsciu: test przechodzil takze z cofnietym fixem).
+  ✓ `npx playwright test tests/f7-07.spec.ts` = 20 passed. Werdykt: 420 <= 420
+  i <= 70% wnetrza rodzica, srodek napisu 1 px od srodka rodzica, `x >= 0`
+  i prawa krawedz w oknie (1280 i 390); dowod kaskady `760 -> 111`
+  i `351 -> 111`; zero `!important` w `document.styleSheets`.
+  ✓ test REALNIE lapie regresje: po cofnieciu `:where(.napis)` na `.napis`
+  8 z 20 pada, w tym dowod kaskady (`760 -> 760`).
+  ✓ ZRZUTY OBEJRZANE, `screenshots/F7/`: `f7-07-werdykt-{desktop,mobile}.png`
+  (ZDANE wysrodkowane, w calosci widoczne, nie rozjezdza sie na `8/10`),
+  `f7-07-maszyna-{desktop,mobile}.png` (`0/15` wysrodkowany miedzy dwoma
+  ognikami, nie rozpycha ich juz na krawedzie),
+  `f7-07-{brama,egzamin,quiz,proba-ognia,nie-ma,dev-scena}-{desktop,mobile}.png`
+  (bez roznic wizualnych).
+  ✓ `pnpm run check` czysto; `pnpm build` OK; pelny `npx playwright test`
+  366 passed, 6 skipped.
+  UWAGA: `tests/f7-06.spec.ts` ma wpisana tabele „przed poprawki" - dwie
+  wartosci (`werdykt__napis`, `maszyna__napis`) zaktualizowane, bo to ten sam
+  pomiar tej samej rzeczy. Commit: `F7-07`.
+  <!-- oryginalny opis znaleziska -->
   Znalezisko z F7-06, zmierzone na zywym `/egzamin` z werdyktem w sesji.
   `app/style/egzamin.css` ma `.werdykt__napis { width: min(70%, 420px);
   margin: 0 auto }`, ale `.napis { width: 100% }` z `scena.css` ma te sama

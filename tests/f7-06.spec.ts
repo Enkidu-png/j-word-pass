@@ -47,14 +47,17 @@ test("napis na bramie miesci sie w min(90vw, 720px)", async ({ page }, info) => 
 
 // Negatywne AC: szerokosci napisow na pozostalych widokach BEZ ZMIAN.
 // Wartosci wpisane recznie z pomiaru SPRZED poprawki (probe na zywej stronie).
+// F7-07 przestawil DWIE z nich CELOWO (`werdykt__napis`, `maszyna__napis`):
+// tamto issue zdjelo `.napis` z wyscigu specyficznosci, wiec martwe reguly
+// widokow wreszcie dzialaja. Pelna tabela przed/po siedzi w `f7-07.spec.ts`.
 const PRZED: Record<string, Record<number, Record<string, number>>> = {
   "/egzamin": {
-    1280: { egzamin__etap: 380, "napis--chrom": 760, werdykt__napis: 760 },
-    390: { egzamin__etap: 300, "napis--chrom": 351, werdykt__napis: 334 },
+    1280: { egzamin__etap: 380, "napis--chrom": 760, werdykt__napis: 420 },
+    390: { egzamin__etap: 300, "napis--chrom": 351, werdykt__napis: 233.8 },
   },
   "/quiz": {
-    1280: { quiz__napis: 360, maszyna__napis: 664 },
-    390: { quiz__napis: 300, maszyna__napis: 204 },
+    1280: { quiz__napis: 360, maszyna__napis: 320 },
+    390: { quiz__napis: 300, maszyna__napis: 151.13 },
   },
   "/proba-ognia": {
     1280: { ogien__napis: 560 },
