@@ -253,3 +253,82 @@
     font-size: var(--stopien-tresc);
   }
 }
+
+/* --- Reakcje ozdob na hover wariantu (tabela plan/07 B) ---
+   Ozdoba stoi w drzewie PRZED wariantami, wiec zwykly selektor rodzenstwa jej
+   nie dosiega. `:has` na karcie robi to bez ani jednej linii JS. Kazda regula
+   jest przypieta do numeru pytania przez `data-karta`, bo reakcja jest cecha
+   pytania, a nie karty w ogole. */
+
+/* Baza: ozdoba pytania oddycha. Bez wlasnej animacji nie dalo by sie zmierzyc
+   skrocenia `animation-duration` z wierszy 1 i 7 tabeli. */
+.karta__gif {
+  animation: karta-oddech 1200ms steps(2) infinite;
+}
+
+@keyframes karta-oddech {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.82;
+  }
+}
+
+/* 1: wariant B przyspiesza ozdobe o polowe */
+.karta[data-karta="1"]:has([data-wariant="B"]:hover) .karta__gif {
+  animation-duration: 600ms;
+}
+
+/* 3: wariant A odbija ozdobe w lustrze (scaleX(-1) to jedyny transform z Z6a) */
+.karta[data-karta="3"]:has([data-wariant="A"]:hover) .karta__gif {
+  transform: scaleX(-1);
+}
+
+/* 5: wariant D odwraca kolory ozdoby */
+.karta[data-karta="5"]:has([data-wariant="D"]:hover) .karta__gif {
+  filter: invert(1);
+}
+
+/* 7: wariant A skraca oddech do 400 ms */
+.karta[data-karta="7"]:has([data-wariant="A"]:hover) .karta__gif {
+  animation-duration: 400ms;
+}
+
+/* 9: wariant C obwodzi ozdobe przerywana ramka */
+.karta[data-karta="9"]:has([data-wariant="C"]:hover) .karta__gif {
+  border: 3px dashed var(--magenta);
+}
+
+/* 12: wariant A dokłada druga kopie ozdoby obok pierwszej.
+   Selektor z rodzicem, bo `.ozdoba { display: block }` ze scena.css wchodzi
+   PO tym arkuszu i przy rownej specyficznosci wygrywalby kolejnoscia. */
+.karta__ozdoba .karta__gif--kopia {
+  display: none;
+}
+
+.karta[data-karta="12"]:has([data-wariant="A"]:hover) .karta__gif--kopia {
+  display: block;
+}
+
+/* 14: poprawny wpis blyska krysztalem (opacity 1/0.3, steps(2), 300 ms) */
+.karta__ozdoba[data-blysk="tak"] .karta__gif {
+  animation: karta-blysk 300ms steps(2) infinite;
+}
+
+@keyframes karta-blysk {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.3;
+  }
+}
+
+/* Z11 bez wyjatkow: przy zredukowanym ruchu ozdoby stoja, takze ta z pytania 14. */
+@media (prefers-reduced-motion: reduce) {
+  .karta__gif,
+  .karta__ozdoba[data-blysk="tak"] .karta__gif {
+    animation-name: none;
+  }
+}

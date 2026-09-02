@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import pytania from "@/data/quiz.json";
 import Ozdoba from "@/components/scena/Ozdoba";
+import { dopasujOtwarte } from "@/lib/quiz";
 import { czytajStan, zapiszStan } from "@/lib/stan";
 
 // ARKUSZ QUIZU (plan/07 A, D). Jedno pytanie na ekranie, rzad 15 kwadratow jako
@@ -11,7 +12,9 @@ import { czytajStan, zapiszStan } from "@/lib/stan";
 // ani zadnej klasy, ktora by ja sugerowala.
 
 // Ozdoba pytania: tabela plan/07 B. Piętnascie ROZNYCH id z manifestu, to jest
-// caly wyroznik bliznaczych kart (S7). Reakcje na hover dochodza w F4-02.
+// caly wyroznik bliznaczych kart (S7). Reakcje na hover wariantow siedza w
+// app/style/quiz.css, wybierane przez `data-karta` - CSS wystarczy, bo `:has`
+// dosiega ozdobe stojaca PRZED wariantem w drzewie.
 const OZDOBY: Record<number, string> = {
   1: "stwor-osmiornica",
   2: "planeta",
@@ -88,8 +91,22 @@ export default function Arkusz() {
       </p>
 
       <div className="karta" data-karta={pytanie.id} tabIndex={-1} ref={karta}>
-        <div className="karta__ozdoba">
+        {/* `data-blysk` to jedyna reakcja quizu na TRESC odpowiedzi przed oddaniem
+            arkusza. Zamowiona wprost w tabeli plan/07 B (pytanie 14) i celowo
+            bezimienna: nie mowi „dobrze", tylko blyska krysztalem. */}
+        <div
+          className="karta__ozdoba"
+          data-blysk={
+            pytanie.typ === "otwarte" && dopasujOtwarte(wybrany, pytanie.kluczOtwarte)
+              ? "tak"
+              : "nie"
+          }
+        >
           <Ozdoba id={OZDOBY[pytanie.id]} klasa="karta__gif" />
+          {/* druga kopia ozdoby pytania 12, pokazywana na hover wariantu A */}
+          {pytanie.id === 12 ? (
+            <Ozdoba id={OZDOBY[12]} klasa="karta__gif karta__gif--kopia" />
+          ) : null}
         </div>
         <div className="karta__tresc">
           <p className="karta__kategoria">{pytanie.kategoria}</p>

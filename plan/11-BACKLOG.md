@@ -291,9 +291,30 @@ i anty-spec z `plan/01 G`, wpis raportu fazy, zero znalezisk bez issue w F7-ZNAL
   ZRZUT POPRAWIL BLAD, KTOREGO ASERCJA NIE WIDZIALA: pudelko ozdoby rozciagalo sie na
   cala wysokosc karty i zostawialo pod GIF-em pusty bialy pas okolo 150 px; `align-self:
   flex-start` w `.karta__ozdoba` to zamknelo.
-- [ ] **F4-02** `ui` Ozdoby 15 pytań wg tabeli `plan/07 B` plus reakcje na hover.
+- [x] **F4-02** `ui` Ozdoby 15 pytań wg tabeli `plan/07 B` plus reakcje na hover.
   CZYTAJ: 07→B; 04→B; 03→D.
   AC: zbiór `id` ozdób użytych w 15 pytaniach ma dokładnie 15 elementów (wypisać listę w dowodzie); pytanie 1 na hover wariantu B zmienia `animation-duration` ozdoby (odczyt przed i po); pytanie 14 przy poprawnym wpisie błyska (`animation-name` się zmienia); zrzut-kolaż 15 ozdób w `screenshots/F4/` OBEJRZANY - ozdoby realnie się różnią, nie są 15 wariantami tego samego; negatywne: zero ozdób bez pozycji w manifeście.
+  ✓ `npx playwright test tests/f4-02.spec.ts` = 10 passed (desktop plus mobile).
+  Zbior id ozdob z 15 pytan ma 15 elementow, wypisany przez test:
+  `stwor-osmiornica, planeta, stwor-ptak, stwor-mlotek, stwor-slimak, stwor-zegar,
+  stwor-kropla, ogien, stwor-kosc, stwor-mysz, stwor-dyskietka, stwor-nuta,
+  stwor-kula-ziemska, stwor-krysztal, stwor-gwiazdka` - dokladnie tabela plan/07 B.
+  Pytanie 1: `animation-duration` ozdoby `1.2s`, po hover wariantu B `0.6s` (polowa),
+  po hover wariantu A z powrotem `1.2s` (tabela ma tam pusto). Pytanie 7 hover A:
+  `0.4s`. Pytanie 3 hover A: `transform: matrix(-1, 0, 0, 1, 0, 0)` (lustro, Z6a).
+  Pytanie 5 hover D: `filter: invert(1)`. Pytanie 9 hover C: ramka `dashed`.
+  Pytanie 12 hover A: druga kopia ozdoby widoczna, dwa `[data-ozdoba='stwor-nuta']`.
+  Pytanie 14: `animation-name` `karta-oddech` -> `karta-blysk`, `0.3s`, a bledny wpis
+  (`skala richtera`) wraca do `karta-oddech`. Negatywne: kazde uzyte id ma pozycje
+  w `data/assety.json`. Zrzuty OBEJRZANE: `screenshots/F4/F4-02-kolaz-15-ozdob.png`
+  (pietnascie realnie roznych obrazkow, nie warianty jednego),
+  `F4-02-pytanie-12-kopia.png` (dwie nuty obok siebie),
+  `F4-02-pytanie-07-kropla.png`. `pnpm run check` czysty, `pnpm build` `/quiz`
+  8,18 kB i 110 kB first load, pelny `npx playwright test` = 174 passed, 10 skipped.
+  PUŁAPKA Z CASCADE: `.ozdoba { display: block }` ze `scena.css` wchodzi PO `quiz.css`,
+  wiec `.karta__gif--kopia { display: none }` przegrywalo kolejnoscia przy rownej
+  specyficznosci - kopia z pytania 12 byla widoczna bez hovera. Zlapal to zrzut i test,
+  naprawia selektor z rodzicem `.karta__ozdoba .karta__gif--kopia`.
 - [ ] **F4-03** `ui` Maszyna prawdy wg `plan/07 C` plus tryb rewizji.
   CZYTAJ: 07→C,D,E; 04→D.
   AC: pełna ceremonia <= 9000 ms (pomiar `performance.now()`, wynik w dowodzie); `Escape` pokazuje wszystkie werdykty naraz; nieodpowiedziane liczą się jako błędne po potwierdzeniu druku; tryb rewizji: poprawna ma ramkę `--jad`, błędnie wybrana `line-through` i ramkę `--alarm`; wynik zapisany w `sessionStorage`; przejście prowadzi na `/proba-ognia`; negatywne: zero przekreśleń pod kątem, zero animacji przewracania kartek 3D.
