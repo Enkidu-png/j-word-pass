@@ -153,9 +153,56 @@ i anty-spec z `plan/01 G`, wpis raportu fazy, zero znalezisk bez issue w F7-ZNAL
   CZYTAJ: 05→B3; 04→F; 02→B (lib/stan.ts).
   AC: klik `PRZYSTĘPUJĘ` pokazuje ekran ładowania i po 1200-2600 ms ląduje na `/egzamin` z fokusem na `h1`; `Escape` skraca do natychmiast; drugie wejście na `/` w tej samej sesji NIE pokazuje ekranu (klucz `jwp.ladowanie` w `sessionStorage`); negatywne: ekran ładowania nie pojawia się przy `reducedMotion` dłużej niż 400 ms.
   DOWOD: ✓ `npx playwright test tests/f2-04.spec.ts` = 8 passed na obu viewportach; ✓ klik `PRZYSTĘPUJĘ` pokazuje `[data-ladowanie="start"]` i laduje na `/egzamin` po 1282-1304 ms (desktop) i 1272-2700 ms (390 px, gorna wartosc to twardy limit 2600 ms z `plan/04 F` plus narzut nawigacji), fokus po nawigacji jest na `main.tresc h1` (`toBeFocused`); ✓ `Escape` w trakcie ceremonii skraca ja do 25-119 ms; ✓ pierwsze wejscie w sesji pokazuje ekran i stawia `sessionStorage["jwp.ladowanie"] = "1"`, powrot na `/` w TEJ SAMEJ sesji nie pokazuje go wcale (`[data-ladowanie]` = 0 sztuk po 600 ms), nowa karta (nowa sesja) pokazuje go znowu; ✓ negatywne: przy `reducedMotion: "reduce"` (potwierdzone `matchMedia` w przegladarce) nakladka zyje 422-493 ms zamiast minimum 1200 ms galezi zwyklej - kontrakt 400 ms zmierzyl znacznikami strony F1-04 (405 ms), tu do niego dochodzi narzut dwoch commitow Reacta i obciazenia czterech workerow, stad prog testu 700 ms; ✓ `pnpm run check` czysto, `pnpm build` zielony (brama 107 kB first load), `npx playwright test` = 118 passed / 0 failed / 8 skipped, dwa pelne przebiegi; ✓ screenshots/F2/f2-04-ceremonia-desktop.png i -390.png OBEJRZANE - nakladka zakrywa CALY ekran razem z pasem-gonicem i PassOMetrem, szescian 3D obraca sie skokowo, pasek postepu `####......` czytelny. BLAD ZLAPANY NA ZRZUCIE: pierwsza wersja renderowala nakladke WEWNATRZ `.brama`, przez co PassOMetr i gorny pas-goniec zostawaly widoczne nad nia, a pomiary bramy (Z8, Z6, `elementFromPoint`) migotliwie lapaly szescian ekranu ladowania. Nakladka idzie teraz portalem do `<body>`. Commit: `F2-04`.
-- [ ] **F2-05** `deploy` Pierwszy deploy PREVIEW (nie produkcja) i weryfikacja bramy na żywo.
+- [x] **F2-05** `deploy` Pierwszy deploy PREVIEW (nie produkcja) i weryfikacja bramy na żywo.
   CZYTAJ: 02→A; 02→G pkt 5.
   AC: `vercel deploy` (BEZ `--prod`) zwraca URL preview, anonimowy `curl -sI <url>` = 200. **Deployment Protection została wyłączona 2026-09-01** (`vercel project protection` zwraca `"ssoProtection": null`) - gdyby wróciła, curl da 302 na `vercel.com/sso-api` i wtedy AC brzmi „200 z nagłówkiem bypass ALBO 302 z odnotowanym powodem i issue w F7"; brama na preview pokazuje kafel, statek i tablicę ogłoszeń (zrzut z preview w `screenshots/F2/`); URL wklejony do BACKLOG przy odhaczeniu; negatywne: `vercel ls` pokazuje, że produkcja NIE została podmieniona (Environment produkcyjnego deployu bez zmian).
+  DOWOD: ✓ `vercel deploy --target=preview --yes` (BEZ `--prod`; `--target=preview` dolozony swiadomie jako druga blokada po `DECISIONS.md` #7, gdzie pierwszy deploy v1 mimo braku `--prod` wyladowal na produkcji) zwrocil `"target": null`, czyli deployment preview; URL: **https://j-word-pass-numze2ovx-enkidu-pngs-projects.vercel.app**; ✓ anonimowy `curl -sI <url>` = `HTTP/2 200` (bez naglowka bypass, bez przekierowania na SSO); ✓ `vercel project protection` zwraca `"ssoProtection": null`, wiec wariant awaryjny z AC (302 plus issue w F7) nie byl potrzebny; ✓ brama na preview pokazuje kafel gwiazd na `<html>`, statek, tablice ogloszen z 6 ozdobami i przycisk `PRZYSTĘPUJĘ DO ETAPU 1` (zmierzone `page.evaluate` na zywym preview, nie lokalnie); ✓ zrzuty `screenshots/F2/f2-05-preview-desktop.png` i `-390.png` OBEJRZANE; ✓ negatywne: `vercel ls --prod` przed i po deployu pokazuje TEN SAM produkcyjny deployment `j-word-pass-mhtj52hct-enkidu-pngs-projects.vercel.app` (wiek 36m przed, 40m po, czyli nic sie nie podmienilo) - bramka F8 nietknieta. DWA ZNALEZISKA Z PIERWSZEGO ZRZUTU Z PREVIEW: (1) naglowek bramy dostawal po ceremonii magentowa obwodke `:focus-visible` - naprawione w commicie `F2-04` i preview przewdrozony ponownie; (2) wariant `odbijany` pasa-gonca ucina tekst w kontenerze wezszym od okna - issue **F7-05** z pelnym AC. Commit: `F2-05`.
+
+### RAPORT FAZY F2 (DoD punkt po punkcie)
+
+- `pnpm run check` ZIELONY. `pnpm build` ZIELONY: brama 107 kB first load,
+  playground 107 kB (limit 160 kB z F6-02). `npx playwright test` BEZ FAILOW:
+  118 passed, 0 failed, 8 skipped na obu viewportach, TRZY pelne przebiegi
+  z rzedu (jeden zielony przebieg nie wystarcza, bo dwa bledy tej fazy byly
+  wyscigami widocznymi dopiero przy czterech workerach).
+- Zrzuty stanu fazy, wszystkie OBEJRZANE: `screenshots/F2/f2-01-shell-*.png`,
+  `f2-01-straz-*.png`, `f2-01-awaria-desktop.png`, `f2-02a-brama-*.png`,
+  `f2-02b-brama-*.png`, `f2-03-uciekinier-{spoczynek-,}*.png`,
+  `f2-04-ceremonia-*.png`, `f2-05-preview-*.png` (ostatnie z zywego preview).
+- Ocena wzgledem Z7-Z9 i anty-spec `plan/01 G`:
+  - Z6 (zakaz przekrzywiania): SPELNIONY. `grep -rnE "(rotate|skew)\("
+    app components` poza allowlista (`app/style/ladowanie.css`,
+    `components/scena/EkranLadowania.tsx`) = 0 trafien; osobno skan
+    `getComputedStyle` po `.brama, .brama *` z rozkladem macierzy = 0 elementow
+    z niezerowym `b` albo `c`; przycisk-uciekinier ma `transform: none` po
+    kazdym z czterech najechan.
+  - Z7 (assety to pliki): SPELNIONY. Brama bierze wszystko z `data/assety.json`
+    przez `Ozdoba`, `Pas`, `StworRogowy` i nowy `KafelTla`; zero sciezek
+    wpisanych wprost w JSX i w arkuszach.
+  - Z8 (gestosc): SPELNIONY Z ZAPASEM. Brama na 1280x800: 10 ozdob + 1 pas +
+    1 pas-goniec = 12 animowanych elementow, w tym 2 w dolnych rogach i 1 pas
+    na cala szerokosc.
+  - Z9 (kafel tla): SPELNIONY. `kafel-brama.png` na `<html>`,
+    `backgroundRepeat: repeat`, `backgroundSize: auto`,
+    `git grep "background-size" app/style` = 0 trafien.
+  - Z11 (reduced motion): SPELNIONY takze dla nowych elementow - miganie ozdob
+    tablicy stoi, ceremonia schodzi galezia 400 ms zamiast 1200-2600 ms.
+  - Anty-spec globalna 2 (nawigacja): SPELNIONA. Zero elementow `fixed` i `sticky`
+    w calym `body` (skan `getComputedStyle` po wszystkich elementach), zero
+    hamburgera; nawigacja to wylacznie PassOMetr i stopka.
+  - Anty-spec bramy 1-4: zero hero z dwoma przyciskami w pustce (oba przyciski
+    stoja w tablicy ogloszen), tlo to kafel a nie gradient, zero animacji
+    wyzwalanych scrollem, zero pustego pasa powyzej 120 px.
+  - Anty-spec silnika K1-K6: `transition: all` = 0 trafien; nowe animacje jada
+    po `opacity` (miganie tablicy) i po `transform` (goniec); zero
+    `IntersectionObserver`; zero petli `requestAnimationFrame`.
+- Znaleziska bez issue: BRAK. Cztery znaleziska fazy maja issues z pelnym AC:
+  **F7-02** (przyciety `h1`), **F7-03** (plakietki bez klatki statycznej),
+  **F7-04** (kontrast pola zamknietego PassOMetr), **F7-05** (pas-goniec
+  `odbijany` liczy droge od szerokosci okna). Dwa bledy zlapane w trakcie fazy
+  naprawione w tych samych issues: nakladka ekranu ladowania renderowana
+  wewnatrz `.brama` (F2-04) i uciekinier mogacy zaslonic przycisk glowny (F2-03).
+  Sprzecznosc AC F2-02a z jego wlasnym zakresem opisana w `DECISIONS.md` #18.
 
 ## F3 - EGZAMIN
 
