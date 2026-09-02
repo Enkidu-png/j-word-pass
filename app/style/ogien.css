@@ -1,0 +1,175 @@
+/* ETAP 3: PROBA OGNIA (plan/08 A, B). Kafel tla siedzi na <html> przez
+   KafelTla - tu tylko uklad. Zero obrotu i skosu (Z6): drganie druku jest
+   wylacznie przesunieciem w poziomie. */
+
+.ogien {
+  position: relative;
+  /* gora: pas cienki 15 px; dol: miejsce na stwory rogowe, zeby nie lezaly
+     na przycisku SKLADAM WNIOSEK (test elementFromPoint z plan/04 B) */
+  padding: 30px 12px 260px;
+  text-align: center;
+}
+
+.ogien__naglowek {
+  margin: 0 auto 12px;
+  width: min(80vw, 560px);
+}
+
+.ogien__napis {
+  width: 100%;
+  height: auto;
+}
+
+/* --- Ognisko (plan/08 A punkt 4) --- */
+
+.ognisko {
+  position: relative;
+  height: 220px;
+  max-width: 900px;
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 12px;
+  /* dekoracja nie lapie klikniec ani nie zjada tabulacji */
+  pointer-events: none;
+}
+
+.ognisko__plomien {
+  width: 96px;
+  height: auto;
+  animation: ognisko-zar 900ms steps(2) infinite;
+}
+
+.ognisko__kot {
+  width: 120px;
+  height: auto;
+}
+
+@keyframes ognisko-zar {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.55;
+  }
+}
+
+/* --- Druk OGN-3/TAJ (plan/08 A punkty 5-7) --- */
+
+.druk--ogien {
+  max-width: 760px;
+}
+
+.druk__wiersz {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.druk__kolumna {
+  flex: 1 1 auto;
+  text-align: left;
+}
+
+.druk__stwor {
+  flex: 0 0 auto;
+  width: 56px;
+  height: auto;
+}
+
+/* Drganie odrzuconego druku: przesuniecie w poziomie, cztery skoki, 240 ms
+   (plan/08 B). Obrot bylby zlamaniem Z6. */
+.druk--drga {
+  animation: druk-drganie 240ms steps(4) 1;
+}
+
+@keyframes druk-drganie {
+  0% {
+    transform: translateX(0);
+  }
+  33% {
+    transform: translateX(-6px);
+  }
+  66% {
+    transform: translateX(6px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* Stempel Komisji zamiast czerwonej obwodki (anty-spec plan/08 F punkt 2). */
+.stempel {
+  margin: 6px 0 0;
+  padding: 4px 8px;
+  border: 3px double var(--alarm);
+  color: var(--alarm);
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-drobny);
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-align: left;
+}
+
+.stempel--podziw {
+  border-color: var(--tusz);
+  color: var(--tusz);
+}
+
+.klauzula {
+  margin: 14px 0 8px;
+  padding: 8px;
+  background: var(--papier);
+  border: 2px inset var(--chrom-a);
+  font-family: var(--font-czytany);
+  font-size: var(--stopien-drobny);
+  text-align: left;
+}
+
+.klauzula__zgoda {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-drobny);
+  letter-spacing: 1px;
+  text-align: left;
+}
+
+/* Z11 bez wyjatkow: zar stoi, klatki statyczne ozdob podaje Ozdoba. */
+@media (prefers-reduced-motion: reduce) {
+  .ognisko__plomien {
+    animation-name: none;
+  }
+
+  .druk--drga {
+    animation-name: none;
+  }
+}
+
+/* Mobile 390 px (plan/08 E): ognisko 140 px, pola druku pelna szerokosc. */
+@media (max-width: 480px) {
+  .ognisko {
+    height: 140px;
+    gap: 4px;
+  }
+
+  .ognisko__plomien {
+    width: 48px;
+  }
+
+  .ognisko__kot {
+    width: 64px;
+  }
+
+  .druk__wiersz {
+    flex-wrap: wrap;
+  }
+
+  .druk__kolumna {
+    flex: 1 0 100%;
+  }
+}

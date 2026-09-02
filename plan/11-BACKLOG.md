@@ -397,7 +397,19 @@ i anty-spec z `plan/01 G`, wpis raportu fazy, zero znalezisk bez issue w F7-ZNAL
 
 ## F5 - PRÓBA OGNIA I RADIO
 
-- [ ] **F5-01** `ui` Scena ogniska plus druk OGN-3/TAJ z walidacją stemplami wg `plan/08 A,B`.
+- [x] **F5-01** `ui` Scena ogniska plus druk OGN-3/TAJ z walidacją stemplami wg `plan/08 A,B`.
+  ✓ `npx playwright test tests/f5-01.spec.ts` = 12 passed (desktop + 390 px).
+  Bledny e-mail: stempel `ALEKSANDRO, TO NIE JEST ADRES`, klasa `druk--drga` na
+  druku, fokus wraca do `[data-pole='email']`, klatki `druk-drganie` czytane
+  z CSSOM zywej strony niosa WYLACZNIE `translateX` (zero `rotate`, Z6).
+  But 8 -> `ROZMIAR POZA SKALĄ KOMISJI (10-70)`. Ucho 900 -> stempel o skali
+  5-500, ucho 200 -> przechodzi z dopiskiem `KOMISJA WYRAŻA PODZIW` i druk
+  laduje w `sessionStorage`. Przycisk `disabled` plus `aria-disabled` bez
+  checkboxa. Obwodka pola po odrzuceniu NIE zmienia koloru (anty-spec F2).
+  ✓ zrzuty OBEJRZANE: `screenshots/F5/F5-01-{druk,stemple}-{desktop,mobile}.png`.
+  Znaleziska ze zrzutu naprawione przed odhaczeniem: rzad ogniska wychodzil poza
+  390 px (plomien 56->48 px, kot 72->64 px).
+  ✓ `pnpm run check` czysty, `pnpm build` zielony (`/proba-ognia` 107 kB).
   CZYTAJ: 08→A,B,E; 04→B,C; 01→D.
   AC: błędny e-mail powoduje drganie druku (`translateX`, nie obrót) plus stempel `ALEKSANDRO, TO NIE JEST ADRES` plus fokus wraca do pola; but 8 daje stempel o skali 10-70; ucho 200 przechodzi z dopiskiem podziwu; submit `disabled` bez checkboxa; zrzuty desktop i 390 px OBEJRZANE; negatywne: zero czerwonych obwódek bez stempla, zero steppera, zero `rotate` na drganiu.
 - [ ] **F5-02** `ui` ⚠ HARD Ceremonia spalenia plus list w butelce wg `plan/08 C,D`.
