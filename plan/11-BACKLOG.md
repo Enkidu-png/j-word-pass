@@ -698,7 +698,40 @@ odrzucone z powodem, albo przeniesione do trackera).
   i `/proba-ognia` (szerokosc `[data-napis]` na tych widokach bez zmian,
   pomiar przed i po w dowodzie); zero `!important`.
 
-- [ ] **F7-05** `ui` Wariant `odbijany` pasa-gonca liczy droge od szerokosci OKNA, nie kontenera.
+- [x] **F7-05** `ui` Wariant `odbijany` pasa-gonca liczy droge od szerokosci OKNA, nie kontenera.
+  ✓ ZROBIONE, i to na DWIE przyczyny, nie jedna.
+  (1) `100vw` w `@keyframes goniec-odbijany` zamienione na `100cqw`, a
+  `.pas-goniec--odbijany` dostal `container-type: inline-size`. `cqw` to 1%
+  szerokosci kontenera zapytania, czyli dokladnie ta liczba, o ktora prosi
+  `plan/04 H`. Natywna jednostka CSS, zero JS i zero zaleznosci (Z14).
+  (2) DRUGA, ukryta przyczyna: `.pas-goniec__tresc` to `inline-block`, wiec
+  `text-align: center` odziedziczone z `.brama` przesuwalo punkt startowy
+  o polowe wolnego miejsca ZANIM ruszyl `translateX`. Sama podmiana `vw` na
+  `cqw` zostawiala tekst 166 px za prawa krawedzia kontenera (zmierzone).
+  `.pas-goniec` ma teraz `text-align: left`, a blok reduced motion nizej
+  przywraca `center`, bo tam tekst stoi.
+  (3) Przy 390 px kontener ma 303 px, a napis w `--stopien-tresc` 313 px, wiec
+  CALY tekst nie miescil sie w zadnej fazie. `.brama__zjazd .pas-goniec` bierze
+  ponizej 480 px `--stopien-drobny` (tez token, Z3) i ma 244 px.
+  DOWOD: ✓ `npx playwright test tests/f7-05.spec.ts` = 4 passed. 40 probek na
+  pelnej drodze animacji (przewinietej na 0 przez Web Animations), najmniejszy
+  odstep tresci od lewej krawedzi kontenera = 0 px, od prawej = 5,73 px
+  (1280x800) i 0,99 px (390x844), `scrollWidth` tresci 313 <= 657 i 244 <= 303;
+  ✓ test REALNIE lapie regresje: po cofnieciu `100cqw` na `100vw` oba testy
+  na desktopie padaja; ✓ negatywne AC (`plan/04 K2`): `@keyframes
+  goniec-odbijany` czytane z `document.styleSheets` zawiera `transform`
+  i ZERO `left:`, `width:`, `top:`, `height:` oraz zero `vw`; ✓ `tests/f1-02`
+  (gorny pas-goniec shellu) 10 passed bez zmian; ✓ screenshots/F7/
+  f7-05-zjazd-{desktop,390}-{start,koniec}.png OBEJRZANE - w obu skrajnych
+  fazach i na obu viewportach widac CALY napis `< PRZEWIŃ W DÓŁ, ALEKSANDRO >`
+  razem z obiema strzalkami; ✓ screenshots/F7/f7-05-quiz-goniec-start.png
+  OBEJRZANY - gorny pas-goniec shellu startuje przy lewej krawedzi okna i nic
+  nie jest uciete. Commit: `F7-05`.
+  PULAPKA TESTU: restart animacji przez `style.animation = "none"` i `""` KASUJE
+  inline `animation-duration` ustawiany przez komponent. Animacja dostaje 0 s,
+  stoi w miejscu, a test przechodzi nie mierzac niczego. Przewijaj przez
+  `element.getAnimations()`, nie przez podmiane stylu.
+  <!-- oryginalny opis znaleziska -->
   Znalezisko z F2-05, zlapane na zrzucie z preview. `app/style/scena.css` ma
   `@keyframes goniec-odbijany { to { transform: translateX(calc(100vw - 100%)) } }`.
   W CSS `100%` w `translateX` znaczy „wlasna szerokosc elementu", wiec wzor dziala

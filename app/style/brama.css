@@ -61,6 +61,14 @@
   .brama__statek {
     width: 140px;
   }
+  /* F7-05: przy 390 px kontener gonca ma 303 px, a napis pisany
+     `--stopien-tresc` 313 px, wiec CALY tekst nie miesci sie w kontenerze
+     w zadnej fazie odbicia. Drobniejszy stopien (tez token, Z3) daje 244 px
+     i zostawia zapas. Ponizej 400 px okna to jedyne miejsce, gdzie ta roznica
+     wychodzi - powyzej kontener rosnie szybciej niz napis. */
+  .brama__zjazd .pas-goniec {
+    font-size: var(--stopien-drobny);
+  }
 }
 
 /* --- Tablica ogloszen (plan/05 B1 punkt 7) --- */

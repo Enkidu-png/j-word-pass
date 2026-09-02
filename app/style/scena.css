@@ -139,6 +139,12 @@ button,
 .pas-goniec {
   overflow: hidden;
   white-space: nowrap;
+  /* F7-05: tresc gonca to inline-block, wiec `text-align: center` odziedziczone
+     z widoku (`.brama`, `.egzamin`, `.quiz`) przesuwalo jej punkt startowy
+     o polowe wolnego miejsca, ZANIM zadzialal `translateX`. Droga animacji
+     liczy sie od lewej krawedzi kontenera, wiec punkt startowy tez musi tam
+     byc. Reduced motion nizej przywraca wysrodkowanie, bo tam tekst stoi. */
+  text-align: left;
   background: var(--tusz);
   color: var(--jad);
   font-family: var(--font-terminal);
@@ -161,6 +167,15 @@ button,
     transform: translateX(-100%);
   }
 }
+.pas-goniec--odbijany {
+  /* F7-05: `100%` w `translateX` znaczy „wlasna szerokosc elementu", wiec droga
+     odbijanego gonca musi byc liczona od szerokosci KONTENERA (plan/04 H),
+     a nie okna. `100vw` dzialalo tylko dla pasa pelnej szerokosci - w waskim
+     `.brama__zjazd` wypychalo tekst poza `overflow: hidden` i ucinalo
+     `ALEKSANDRO`. Jednostka `cqw` to 1% szerokosci kontenera zapytania,
+     czyli dokladnie ta liczba, ktorej brakowalo. Zero JS, zero zaleznosci. */
+  container-type: inline-size;
+}
 .pas-goniec--odbijany .pas-goniec__tresc {
   padding-left: 0;
   animation-name: goniec-odbijany;
@@ -171,7 +186,7 @@ button,
     transform: translateX(0);
   }
   to {
-    transform: translateX(calc(100vw - 100%));
+    transform: translateX(calc(100cqw - 100%));
   }
 }
 
