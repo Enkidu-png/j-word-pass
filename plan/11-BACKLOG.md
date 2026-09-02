@@ -1087,11 +1087,31 @@ puszczaj pojedyncze pliki, nie całą suitę.
   ✓ D10 Regresja: cała suita `npx playwright test` = **414 passed / 6 skipped / 0 failed**,
     czyli 388 sprzed zmiany plus 26 nowych. Obejście dla starych testów jest jedno
     i deterministyczne: `storageState` z `jwp.wstep` w `playwright.config.ts`.
-- [ ] **F10-03** `infra` Brama chroni też płatny endpoint, nie tylko widok.
+- [x] **F10-03** `infra` Brama chroni też płatny endpoint, nie tylko widok.
   CZYTAJ: 02→B; wynik F10-02.
   Kontrakt: klient wysyła do `/api/ocena` i `/api/zgloszenie` nagłówek `x-jwp-klucz` z odpowiedzią po normalizacji. Serwer porównuje ze zmienną `JWP_KLUCZ_WSTEPU` (już ustawiona w env Vercela dla trzech środowisk). Brak albo zła wartość: **401** z komunikatem Komisji, przed wywołaniem modelu.
   AC: `curl -X POST <produkcja>/api/ocena` BEZ nagłówka zwraca 401 i NIE wywołuje modelu (brak kosztu); ten sam curl z `-H "x-jwp-klucz: franciszek"` zwraca 200 z punktami; to samo dla `/api/zgloszenie`; przepływ w przeglądarce po przejściu bramy działa bez zmian (test end-to-end); negatywne: klucz nie pojawia się w repo ani w commicie (`git grep -ci franciszek` = 0 poza `data/komisja.json`, gdzie siedzi pytanie i odpowiedź bramy).
   UWAGA DO ZAPISANIA w `DECISIONS.md`: to jest PRÓG ZWALNIAJĄCY, nie uwierzytelnienie. Odpowiedź na pytanie bramy jest w kodzie klienta, więc ktoś zdeterminowany ją odczyta. Chroni przed przypadkowym ruchem i botami, a przed uporczywym nadużyciem broni dopiero limit 5/min i limit kwotowy klucza OpenRouter.
+
+  ✓ D1 POST na `/api/ocena` BEZ nagłówka: **401** z `Aleksandro, Komisja nie rozpoznaje
+    petenta.` i bez pól `punkty`/`komentarz` - handler kończy się PRZED czytaniem ciała
+    i przed `fetch` do OpenRoutera, więc żądanie nie kosztuje ani grosza.
+  ✓ D2 Ten sam POST z nagłówkiem: 200. Zmierzone na deployu preview
+    `j-word-pass-dr9r5ptdc` (to samo env produkcyjne): bez nagłówka `401`,
+    z `-H "x-jwp-klucz: franciszek"` na `/api/zgloszenie` -> `200 {"tryb":"blob",...}`.
+    Plik próbny skasowany.
+  ✓ D3 To samo dla `/api/zgloszenie` (401 bez nagłówka, 401 przy złej wartości,
+    200 z poprawną) - `tests/f10-03.spec.ts`, 10 testów.
+  ✓ D4 Przepływ w przeglądarce po przejściu bramy bez zmian: klient dokłada nagłówek
+    z `localStorage` (`DrukOdpowiedzi`, `DrukOgnia`), a pełny przepływ klawiaturowy
+    `tests/f6-01` przechodzi. Cała suita: **424 passed / 6 skipped / 0 failed**
+    (388 sprzed fazy + 26 z F10-02 + 10 z F10-03).
+  ✓ D5 Negatywne: `git grep -ci franciszek` = `data/komisja.json:1` oraz
+    `plan/11-BACKLOG.md:4` (cytat w treści samego issue, odstępstwo jak przy F9-01).
+    W kodzie, testach i konfiguracji klucza NIE MA - testy jadą na własnej,
+    umyślnie innej wartości wstrzykiwanej przez `webServer.env`.
+  ✓ D6 `DECISIONS.md` #24: próg zwalniający, zamek zamknięty przy braku zmiennej,
+    pięć zmierzonych pułapek.
 
 ## F8 - BRAMKA DECYZYJNA
 
