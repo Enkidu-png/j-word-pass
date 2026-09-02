@@ -972,6 +972,46 @@ Kolejność liniowa jak wszędzie. Fazę wykonujemy PRZED bramką F8.
   Negatywne: treść w `data/komisja.json` pod kluczem `wyzwanie` (`git grep "skarpetkami"` = `data/komisja.json` i backlog), `input[type=file]` count 0.
   Straże: nowy test `F9-06 ekran wyzwania` w `tests/f5-02.spec.ts`, zaktualizowane cztery kroki ceremonii, Escape i przepływ klawiaturowy w `tests/f6-01.spec.ts` (20 kroków). Zaktualizowany spec `plan/08` C.
 
+### RAPORT FAZY F9 (DoD punkt po punkcie)
+
+Sześć issues zamkniętych jednym commitem każde, plus dwa commity naprawcze
+(strażnik `f3-02` po `<details>` z F7-08, suma etapu 1 w pergaminie i zgłoszeniu
+po F9-04).
+
+1. **Każde AC zweryfikowane na URUCHOMIONEJ aplikacji, nie z kodu.** Pomiary
+   `getBoundingClientRect`, odczyty `textContent`, payloady przechwycone
+   `page.route`, `localStorage`/`sessionStorage` czytane z przeglądarki,
+   `player.getVideoData().video_id` z realnego odtwarzacza YouTube.
+2. **Zrzuty OBEJRZANE, nie tylko zrobione:** `f7-08-{mobile,desktop}`,
+   `f9-01-stopka`, `f9-03-{pytanie,klauzula}`, `f9-04-{werdykt1,czesc2}-{mobile,desktop}`,
+   `f9-05-radio-{mobile,desktop}`, `f9-06-wyzwanie-{mobile,desktop}`.
+   Trzy realne błędy wyszły dopiero z oglądania, nie z asercji:
+   pole odpowiedzi części 2 na 1804 px (F9-04), trzy przyciski radia zawijające
+   się krzywo w obudowie 220 px (F9-05) i dziura po znikniętej ozdobie
+   przy zwężonym płonącym napisie (F7-08).
+3. **`pnpm run check` zielony**, `pnpm build` zielony: `/quiz` 115 kB,
+   `/egzamin` 113 kB, `/proba-ognia` 109 kB, `/` 107 kB, `/dev/scena` 107 kB,
+   wspólne 102 kB, limit 160 kB.
+4. **`npx playwright test` = 388 passed / 0 failed / 6 skipped** na `pnpm dev`.
+5. **Kryteria klawiatury i nasłuchów sprawdzone na `pnpm build && pnpm start`:**
+   pełny przepływ brama-pergamin samą klawiaturą, 20 kroków, przechodzi na
+   buildzie produkcyjnym; `tests/f5-03` (nasłuchy radia), `f3-03` i `f7-08`
+   też zielone na produkcyjnym serwerze.
+6. **Z1-Z18 bez naruszeń:** zero `—` i `·` (`tests/kanon.spec.ts`), zero emoji,
+   zero `rotate`/`skew` poza ekranem ładowania, style tylko przez tokeny,
+   treści wyłącznie w `data/*.json`, zero nowych zależności runtime.
+   Z16 w nowej wersji: pytanie etapu 1 (obie części) bezosobowo, dokładnie
+   3 z 15 pytań quizu z imieniem, klauzula zgody bez imienia.
+7. **Specyfikacje zaktualizowane razem z kodem:** `plan/05` A3, `plan/08` C
+   i klauzula, `plan/09` A, B, D. Backlog nie rozjeżdża się z `plan/`.
+
+**Pułapka środowiskowa (do `DECISIONS.md`):** cała suita puszczona przeciwko
+`pnpm start` wywraca 9 testów `/api/zgloszenie` i `/api/ocena` na 429 - limiter
+z `lib/limit.ts` działa WYŁĄCZNIE przy `NODE_ENV=production`, a `next start`
+to jeden proces z jedną `Mapą` na cały przebieg. Na buildzie produkcyjnym
+puszczaj pojedyncze pliki, nie całą suitę.
+
+
 ## F8 - BRAMKA DECYZYJNA
 
 - [ ] **F8-01** `deploy` ⏳ STOP-GATE przed wykonaniem: pokaż Aleksandrze URL preview plus `WERYFIKACJA.md`, zapytaj o zgodę na `vercel deploy --prod` (podmiana żywej produkcji z wersji 1).

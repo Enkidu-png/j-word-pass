@@ -424,3 +424,44 @@ pakiet nie przewiduje. Zapis do Bloba to pamiątka z żartu, nie rejestr wynikó
 
 Konsekwencja: gdyby kiedyś liczyła się wiarygodność wpisu, trzeba najpierw
 dołożyć sesję po stronie serwera - dopiero wtedy walidacja punktów ma sens.
+
+## 23. Faza F9: trzy odstępstwa i dwie pułapki (2026-09-02)
+
+**Odstępstwo 1 (F7-08).** `DANE DO ZADANIA` siedzą w `<details>` zwiniętym
+domyślnie NA OBU szerokościach, nie "otwartym na desktopie, zamkniętym na
+mobile" jak sugerowała propozycja wykonania w backlogu. Powód: atrybut `open`
+jest wyłącznie HTML-owy, a CSS go nie przełącza. Wariant zależny od szerokości
+wymagałby `matchMedia` w kliencie i sprowadzałby ryzyko rozjazdu hydracji na
+stronie serwerowej. AC F7-08 nie wymagało otwartego desktopu, a `<details>`
+z natywnym markerem jest jednym kliknięciem od treści. Alternatywa do wzięcia,
+gdyby Aleksandra zgłosiła, że nie widzi założeń: `open` ustawiany w efekcie po
+montażu, przy `suppressHydrationWarning`.
+
+**Odstępstwo 2 (F9-01, F9-05).** AC każą doprowadzić `git grep -ci` starego
+napisu do zera. Nie da się tego spełnić dosłownie, bo stary napis jest CYTOWANY
+w treści samego issue w `plan/11-BACKLOG.md`, a przy F9-05 dodatkowo w asercji
+negatywnej `tests/f5-03.spec.ts`, która musi znać ciąg, żeby go pilnować.
+Zweryfikowane jako zero POZA tymi dwoma miejscami.
+
+**Odstępstwo 3 (F9-02).** Wymieniony został komunikat pasa quizu (dokładny ciąg
+z AC). Goniec ekranu ładowania `KOMISJA PRZYGOTOWUJE AKTA DLA ALEKSANDRY` NIE
+został ruszony - to osobny napis pinowany w `plan/04` F, nie "wariant" komunikatu
+z AC. Jeśli Aleksandra chciała także jego, to jedna linia w `data/komisja.json`.
+
+**Pułapka 1: limiter zapala się dopiero na produkcji.** `lib/limit.ts` wychodzi
+z funkcji przy `NODE_ENV !== "production"`. Cała suita przeciwko `pnpm start`
+to jeden proces i jedna `Mapa` liczników, więc 9 testów dotykających
+`/api/zgloszenie` pada na 429, a `tests/f6-01` przepływ klawiaturowy wywraca się
+z nimi w komplecie. To NIE jest regresja. Na buildzie produkcyjnym puszczaj
+pojedyncze pliki i odczekaj minutę między przebiegami.
+
+**Pułapka 2: `clientWidth` wewnątrz zamkniętego `<details>` to zero.** Zawartość
+zwiniętego `<details>` nie ma układu, więc `tests/f3-02` mierzące szerokość
+strzałki `24 px` zaczęło oddawać `0` - i, co gorsza, przeszło raz w pełnej suicie
+zanim zaczęło padać powtarzalnie. Pomiar wnętrza `<details>` zawsze po kliknięciu
+w `summary`.
+
+**Pułapka 3: `f4-01` „przechodne strzalka w prawo" potrafi migotać pod obciążeniem.**
+Nasłuch strzałek wchodzi po hydracji, a `pnpm dev` przy 12 równoległych workerach
+kompiluje `/quiz` wolniej niż test naciska klawisz. Pojedynczo test przechodzi
+zawsze. Nie naprawiane w tej paczce - kandydat na barierę hydracji w teście.
