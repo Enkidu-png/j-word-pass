@@ -131,13 +131,27 @@ export default function DrukOgnia() {
       setTimeout(() => ustawFaze("wyzwanie"), kroki.wyzwanie),
     ];
 
-    wyslij({ email, rozmiarButa: Number(but), srednicaUchaMm: Number(ucho), punktyEgzamin, punktyQuiz });
+    // F10-01: do akt idzie KOMPLET - obie odpowiedzi z obydwoma werdyktami plus
+    // wynik quizu, zeby jeden plik dawal pelny obraz podejscia.
+    wyslij({
+      email,
+      rozmiarButa: Number(but),
+      srednicaUchaMm: Number(ucho),
+      punktyEgzamin,
+      punktyQuiz,
+      odpowiedz: stan?.egzamin?.odpowiedz ?? "",
+      punkty: stan?.egzamin?.punkty ?? null,
+      komentarz: stan?.egzamin?.komentarz ?? "",
+      odpowiedz2: stan?.egzamin?.odpowiedz2 ?? "",
+      punkty2: stan?.egzamin?.punkty2 ?? null,
+      komentarz2: stan?.egzamin?.komentarz2 ?? "",
+    });
   };
 
   // Jedno ponowienie i tyle. Druga porazka konczy sie stemplem o pamieci
   // ulotnej, a flaga `wyslano` NIE zapada - inaczej powrot na adres pokazalby
   // butelke po zgloszeniu, ktorego nikt nie zapisal.
-  const wyslij = async (dane: Record<string, string | number>) => {
+  const wyslij = async (dane: Record<string, unknown>) => {
     for (let proba = 0; proba < 2; proba++) {
       try {
         const odp = await fetch("/api/zgloszenie", {

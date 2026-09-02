@@ -3,6 +3,7 @@
 
 import egzamin from "@/data/egzamin.json";
 import { adresZadania, limitPrzekroczony } from "@/lib/limit";
+import { losowe6, zapiszJSON } from "@/lib/zapis";
 
 const ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
 const MODEL_PRIMARY = "google/gemini-2.5-flash-lite";
@@ -135,10 +136,26 @@ export async function POST(request: Request) {
   for (const model of [MODEL_PRIMARY, MODEL_FALLBACK]) {
     try {
       const werdykt = await zapytajModel(model, odpowiedz, klucz, czesc);
-      return Response.json({
-        punkty: Math.min(10, Math.max(6, Math.round(werdykt.punkty))),
-        komentarz: sanitizeDash(werdykt.komentarz),
-      });
+      const punkty = Math.min(10, Math.max(6, Math.round(werdykt.punkty)));
+      const komentarz = sanitizeDash(werdykt.komentarz);
+      const ts = new Date().toISOString();
+      try {
+        // Praca Aleksandry ma przetrwac przegladarke - Jan czyta ja pozniej
+        // z prywatnego store'a (F10-01). Odpowiedz idzie W CALOSCI.
+        await zapiszJSON(`odpowiedzi/${ts}-czesc${czesc}-${losowe6()}.json`, {
+          czesc,
+          odpowiedz,
+          punkty,
+          komentarz,
+          model,
+          ts,
+        });
+      } catch (blad) {
+        // Awaria Bloba NIE moze zabrac werdyktu - kandydatka dostaje ocene,
+        // a slad zostaje w logu funkcji.
+        console.log(`[ocena zapis-nieudany] ${ts} ${String(blad)}`);
+      }
+      return Response.json({ punkty, komentarz });
     } catch {
       // primary padl - probujemy fallbacku; po nim oddajemy 502 i klient
       // pokazuje werdykt awaryjny (plan/05 B)

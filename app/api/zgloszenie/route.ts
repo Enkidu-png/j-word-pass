@@ -1,6 +1,5 @@
-import { put } from "@vercel/blob";
-
 import { adresZadania, limitPrzekroczony } from "@/lib/limit";
+import { losowe6, zapiszJSON } from "@/lib/zapis";
 
 // Zapis zgloszenia Aleksandry. Kontrakt: plan/02 sekcja D. Jeden plik JSON per
 // zgloszenie, zero panelu admina (odczyt przez dashboard Vercel Blob).
@@ -14,7 +13,9 @@ export const runtime = "nodejs";
 // Ten plik nie moze eksportowac NIC poza handlerami i konfiguracja segmentu -
 // `tsc --noEmit` tego nie lapie, wywala dopiero `pnpm build`.
 
-const LIMIT_BAJTOW = 2 * 1024;
+// F10-01: druk niesie teraz OBIE odpowiedzi egzaminacyjne w calosci, wiec 2 KB
+// juz nie starcza. Gorna granica to dwa razy limit `/api/ocena` plus metryczka.
+const LIMIT_BAJTOW = 24 * 1024;
 
 function liczbaWZakresie(wartosc: unknown, min: number, max: number): number | null {
   // Bez tego strażnika `null`, `true` i `[]` przechodzily przez `Number()` jako
@@ -25,9 +26,12 @@ function liczbaWZakresie(wartosc: unknown, min: number, max: number): number | n
   return n;
 }
 
-function losowe6(): string {
-  return Math.random().toString(36).slice(2, 8).padEnd(6, "0");
-}
+// F10-01: praca Aleksandry idzie do akt w calosci, ale nie bez konca.
+const tekst = (wartosc: unknown): string =>
+  typeof wartosc === "string" ? wartosc.slice(0, 8 * 1024) : "";
+
+const punktyLubNull = (wartosc: unknown): number | null =>
+  liczbaWZakresie(wartosc, 0, 10);
 
 export async function POST(request: Request) {
   // Druk bez auth zapisuje pliki do platnego store'a - limit jest tu jedyna
@@ -57,7 +61,13 @@ export async function POST(request: Request) {
 
   // Granica zaufania: te same trzy reguly co u klienta, tylko tu obowiazuja naprawde.
   const email = typeof cialo.email === "string" ? cialo.email.trim() : "";
-  if (!/.+@.+\..+/.test(email) || email.length > 254) {
+  if (email.length > 254) {
+    return Response.json(
+      { blad: "Aleksandro, Twój adres przekracza dopuszczalną objętość akt." },
+      { status: 413 },
+    );
+  }
+  if (!/.+@.+\..+/.test(email)) {
     return Response.json(
       { blad: "Aleksandro, ADRES NIE PRZYPOMINA ADRESU. Komisja odsyła Ci druk." },
       { status: 400 },
@@ -96,31 +106,34 @@ export async function POST(request: Request) {
     );
   }
 
+  // F10-01: jeden plik ma dawac PELNY obraz podejscia, czyli obie odpowiedzi
+  // z obydwoma werdyktami plus wynik quizu. Braki nie odsylaja druku - starsze
+  // podejscia (albo padniety sessionStorage) maja sie zapisac tak czy owak.
   const zgloszenie = {
     email,
     rozmiarButa,
     srednicaUchaMm,
     punktyEgzamin,
     punktyQuiz,
+    czesc1: {
+      odpowiedz: tekst(cialo.odpowiedz),
+      punkty: punktyLubNull(cialo.punkty),
+      komentarz: tekst(cialo.komentarz),
+    },
+    czesc2: {
+      odpowiedz: tekst(cialo.odpowiedz2),
+      punkty: punktyLubNull(cialo.punkty2),
+      komentarz: tekst(cialo.komentarz2),
+    },
     ts: new Date().toISOString(),
   };
   const sciezka = `zgloszenia/${zgloszenie.ts}-${losowe6()}.json`;
 
-  // Bez tokena (lokalny dev) formularz ma DZIALAC, nie wywalac sie na infrastrukturze.
-  // Poza produkcja NIE piszemy do Bloba nawet z tokenem: `.env.local` go ma, wiec kazdy
-  // przebieg suite dopisywal smieci do platnego store'a (332 pliki przed sprzatnieciem).
-  if (!process.env.BLOB_READ_WRITE_TOKEN || process.env.NODE_ENV !== "production") {
-    console.log(`[zgloszenie dev-log] ${sciezka} ${JSON.stringify(zgloszenie)}`);
-    return Response.json({ tryb: "dev-log", sciezka });
-  }
-
   try {
-    const blob = await put(sciezka, JSON.stringify(zgloszenie), {
-      access: "private",
-      contentType: "application/json",
-      addRandomSuffix: false,
-    });
-    return Response.json({ tryb: "blob", sciezka: blob.pathname });
+    // Bez tokena i poza produkcja `zapiszJSON` schodzi na log - inaczej kazdy
+    // przebieg suity dosypywalby smieci do platnego store'a (znalezisko F7-16).
+    const tryb = await zapiszJSON(sciezka, zgloszenie);
+    return Response.json({ tryb, sciezka });
   } catch {
     // Teatr w kliencie nie moze zalezec od Bloba - klient dostaje 502 i pokazuje
     // stempel o pamieci ulotnej, a zgloszenie zostaje w logu (plan/07 B).

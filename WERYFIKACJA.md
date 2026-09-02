@@ -240,3 +240,41 @@ Tu potwierdzasz, ze u Ciebie tez dzialaja.
       naprawione po recenzji, ale to Ty je odbierasz.
 - [ ] **10.3** Zgadzasz sie na `vercel deploy --prod`, czyli na podmiane zywej
       produkcji wersja druga. Bez tego checkboxa nikt nie wdraza.
+
+## 11. JAK PRZECZYTAC PRACE (dla Jana, nie dla Aleksandry)
+
+Oceniane odpowiedzi i zlozone druki leza w PRYWATNYM store'ie Vercel Blob
+`jwp-zgloszenia`. Panelu w aplikacji NIE MA i nie bedzie - czyta sie je
+dashboardem Vercela albo z linii polecen. Dwa katalogi:
+
+- `odpowiedzi/<ISO-timestamp>-czesc<N>-<losowe6>.json` - jedna oceniona
+  odpowiedz egzaminacyjna: `{ czesc, odpowiedz, punkty, komentarz, model, ts }`.
+  Powstaje przy KAZDEJ udanej ocenie, wiec sa tu tez podejscia porzucone
+  przed koncem.
+- `zgloszenia/<ISO-timestamp>-<losowe6>.json` - komplet z konca przeplywu:
+  e-mail, rozmiar buta, srednica ucha, punkty obu etapow oraz `czesc1`
+  i `czesc2` z pelna trescia odpowiedzi i werdyktami.
+
+Przepis CLI (`VERCEL_OIDC_TOKEN` z `.env.local` NIE wystarcza, komendy
+`vercel blob` wymagaja jawnego tokena zapisu):
+
+```bash
+# 1. token do pliku TYMCZASOWEGO poza repo
+vercel env pull /tmp/jwp.env --environment=production --yes
+TOK=$(grep '^BLOB_READ_WRITE_TOKEN=' /tmp/jwp.env | cut -d= -f2- | tr -d '"')
+
+# 2. listing (wszystko / tylko prace / tylko druki)
+vercel blob list --rw-token "$TOK"
+vercel blob list --prefix odpowiedzi/ --rw-token "$TOK"
+vercel blob list --prefix zgloszenia/ --rw-token "$TOK"
+
+# 3. pobranie jednego pliku po sciezce z listingu
+vercel blob get "odpowiedzi/2026-09-02T09:50:34.782Z-czesc2-0a75gi.json" --rw-token "$TOK"
+
+# 4. posprzataj token
+rm /tmp/jwp.env
+```
+
+Uwaga: zapis dziala WYLACZNIE na produkcji. Lokalny `pnpm dev` i testy
+wypisuja te same dane do konsoli z prefiksem `[blob dev-log]` i nie dotykaja
+platnego store'a.
