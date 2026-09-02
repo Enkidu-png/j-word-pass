@@ -184,7 +184,7 @@
   font-weight: bold;
 }
 
-.druk__cta:hover {
+.druk__cta:hover:not(:disabled) {
   border-style: inset;
   background: var(--jad);
 }
@@ -216,4 +216,60 @@
   .kosmos__gwiazdka:nth-of-type(n + 7) {
     display: none;
   }
+}
+
+/* --- Werdykt Komisji (plan/06 C krok 3). Prosty NapisObrazek, zero
+   przekrzywionej pieczatki (plan/06 E punkt 3). --- */
+
+.druk--werdykt {
+  text-align: center;
+}
+
+.werdykt__napis {
+  width: min(70%, 420px);
+  height: auto;
+  margin: 0 auto;
+}
+
+.werdykt__wynik {
+  margin: 4px 0 10px;
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-h2);
+  font-weight: bold;
+  letter-spacing: 4px;
+  color: var(--tusz);
+}
+
+.werdykt__komentarz {
+  margin: 0 0 12px;
+  padding: 10px;
+  background: var(--druk-tlo);
+  border: 3px inset var(--chrom-a);
+  font-family: var(--font-czytany);
+  font-size: var(--stopien-tresc);
+  text-align: left;
+}
+
+.werdykt__obraduje {
+  margin: 0;
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-h2);
+  letter-spacing: 3px;
+  color: var(--tusz);
+}
+
+/* Link wyglada tu jak przycisk druku, wiec dziedziczy .druk__cta;
+   inline-block, bo <a> bez tego ignoruje pionowy padding. */
+.druk--werdykt .druk__cta {
+  display: inline-block;
+  text-decoration: none;
+}
+
+/* Zamkniety druk ma WYGLADAC na zamkniety takze pod kursorem - bez `:not`
+   przy `:hover` przycisk po oddaniu pracy dalej zapalal sie na jadowicie
+   zielono, jakby czekal na klikniecie (widac na zrzucie narady). */
+.druk__cta:disabled {
+  border-style: inset;
+  background: var(--chrom-a);
+  color: var(--chrom-b);
 }

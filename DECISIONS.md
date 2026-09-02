@@ -304,3 +304,27 @@ roznych opoznien, pole readonly, `elementFromPoint`) zmierzone i wpisane jako
 dowod przy F2-02b, bo dopiero tam zakres pozwala im byc prawda. Przy F2-02a
 odhaczone to, co lezy w jego zakresie: kafel `repeat` bez `background-size`,
 komplet elementow szkieletu, wzorzec ROGI i zero obrotu w DOM bramy.
+
+## 19. Dwa `pnpm dev` na jednym katalogu `.next` psuja hydracje (F3-03)
+
+**Kontekst.** Zeby udowodnic AC F3-03 „klucz odpiety w dev -> werdykt awaryjny",
+uruchomilem drugi serwer `pnpm dev -p 3001` z pustym `OPENROUTER_API_KEY`,
+zostawiajac pierwszy na 3000.
+
+**Objaw.** `/egzamin` na 3000 przestal reagowac na JavaScript: `onChange` textarea
+nie odpalal (`sessionStorage` zostawal pusty), a klik w `ODDAJ PRACĘ KOMISJI`
+wysylal formularz NATYWNIE, GET-em z trescia odpowiedzi w query stringu
+(`GET /egzamin?odpowiedz=...` w logu serwera). W konsoli jedyny slad to
+`Failed to load resource: 404`. Wyglada jak blad komponentu; nie jest nim.
+
+**Przyczyna.** Oba serwery pisza do tego samego `.next/`. Drugi nadpisuje manifesty
+chunkow pierwszego, wiec przegladarka dostaje HTML z odwolaniem do chunka, ktorego
+juz nie ma. Bez chunka nie ma hydracji, a bez hydracji `preventDefault` nigdy nie
+biegnie i formularz zachowuje sie jak w 1998 roku.
+
+**Wniosek operacyjny.** Jeden `pnpm dev` naraz. Dowod wymagajacy innego env
+zbieraj po kolei: zatrzymaj serwer, `rm -rf .next`, uruchom z nowym env, zmierz,
+wroc. Ta sama zasada co przy `pnpm build` psujacym dzialajacy `pnpm dev`.
+
+**Koszt pomylki tym razem:** dwa przebiegi zrzutow do wyrzucenia i jedna falszywa
+hipoteza o bledzie w `DrukOdpowiedzi`.

@@ -3,11 +3,13 @@
    components/scena/EkranLadowania.tsx. Nic innego tu nie wchodzi. */
 
 .ladowanie {
-  /* ponytail: absolute, nie fixed. Nakladka montuje sie na wejsciu, gdy strona
-     stoi na gorze, wiec pokrycie 100vh wystarcza, a `fixed` kolidowaloby
-     z assercja "zero position: fixed" z F2-01. Gdyby kiedys trzeba bylo
-     pokazac ja po przewinieciu, to jest miejsce na zmiane na `fixed`. */
-  position: absolute;
+  /* `fixed`, nie `absolute` (zmiana w F3-03). Ceremonia narady startuje
+     przyciskiem ODDAJ PRACĘ KOMISJI, ktory na `/egzamin` lezy grubo ponizej
+     pierwszego ekranu - przy `absolute` nakladka montowala sie na GORZE
+     dokumentu i Aleksandra nie widziala jej wcale, mimo ze w DOM byla
+     (zlapane na zrzucie, nie w assercji). Assercja "zero position: fixed"
+     z F2-01 mierzy brak sticky headera na bramie, gdzie nakladki juz nie ma. */
+  position: fixed;
   inset: 0;
   z-index: 9;
   display: flex;

@@ -14,8 +14,15 @@ export function uzyjStanu() {
   const [zamontowany, ustawZamontowany] = useState(false);
 
   useEffect(() => {
-    ustaw(czytajStan());
+    const odswiez = () => ustaw(czytajStan());
+    odswiez();
     ustawZamontowany(true);
+    // Werdykt etapu zapisuje sie BEZ zmiany sciezki (ceremonia oceny siedzi na
+    // /egzamin), wiec sam efekt na `sciezka` zostawilby PassOMetr z etapem 2
+    // ciagle zamknietym. `zdarzenie storage` tu nie pomoze - leci tylko do
+    // INNYCH kart. Kto zapisuje kamien milowy, ten krzyczy tym zdarzeniem.
+    window.addEventListener("jwp:stan", odswiez);
+    return () => window.removeEventListener("jwp:stan", odswiez);
   }, [sciezka]);
 
   return { stan, zamontowany };
