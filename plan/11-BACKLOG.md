@@ -698,7 +698,7 @@ odrzucone z powodem, albo przeniesione do trackera).
   widoczne, klodka na swoim miejscu, pole otwarte dalej odcina sie jasnym
   papierem i zielona ramka. Commit: `F7-04`.
 
-- [ ] **F7-06** `ui` `.napis` zjada szerokosc zadana przez widok, `.brama__napis` jest martwy.
+- [x] **F7-06** `ui` `.napis` zjada szerokosc zadana przez widok, `.brama__napis` jest martwy.
   Znalezisko z F7-02, zlapane pomiarem `getBoundingClientRect` na zywej bramie.
   `app/style/scena.css` ma `.napis { width: 100% }`, a `app/style/brama.css` ma
   `.brama__napis { width: min(90vw, 720px) }`. Obie reguly maja te sama
@@ -715,6 +715,27 @@ odrzucone z powodem, albo przeniesione do trackera).
   negatywne: zero zmian w wygladzie napisow na `/egzamin`, `/quiz`
   i `/proba-ognia` (szerokosc `[data-napis]` na tych widokach bez zmian,
   pomiar przed i po w dowodzie); zero `!important`.
+  DOWOD: ✓ przyczyna potwierdzona pomiarem, nie czytaniem: `.napis` z
+  `scena.css` ma `width: 100%` przy tej samej specyficznosci (0,1,0) co
+  `.brama__napis`, a `globals.css` importuje `scena.css` PO `brama.css`, wiec
+  regula widoku byla martwa. Poprawka idzie wzorcem, ktory dziala juz na
+  `/egzamin` i `/quiz`: szerokosc niesie NAGLOWEK (`.brama__naglowek { width:
+  min(90vw, 720px); margin: 4px auto 0 }`), a `.brama__napis` wypelnia go
+  `width: 100%`. Zero `!important`, zero podbijania specyficznosci, zero zmian
+  w `scena.css`; ✓ pomiar `getBoundingClientRect().width` na zywej bramie
+  (`tests/f7-06.spec.ts`): 1280x800 **1256 px -> 720 px** (= min(90vw, 720px),
+  90vw = 1152), 390x844 **366 px -> 351 px** (= 0,9 * 390, prog spelniony
+  rownoscia); napis dalej zaczyna sie w oknie (`x >= 0`) i konczy przed jego
+  krawedzia; ✓ negatywne, pomiar PRZED i PO wpisany do testu jako tabela
+  odniesienia: `/egzamin` 380/760/760 px (desktop) i 300/351/334 px (390 px),
+  `/quiz` 360/664 px i 300/204 px, `/proba-ognia` 560 px i 312 px - po
+  poprawce co do piksela te same; ✓ `tests/f7-02.spec.ts` dalej zielony
+  (6 passed), cala para f7-02 plus f7-06 = 14 passed; ✓ `pnpm run check`
+  czysto; ✓ screenshots/F7/f7-06-brama-desktop.png, -mobile.png i
+  f7-06-brama-napis-desktop.png OBEJRZANE: `J-WORD PASS` w calosci widoczny,
+  wysrodkowany, wyraznie mniejszy niz przed poprawka, statek nad nim i
+  podtytul pod nim nietkniete. ZNALEZISKO UBOCZNE: **F7-07** (`.werdykt__napis`
+  martwy z tego samego powodu). Commit: `F7-06`.
 
 - [x] **F7-05** `ui` Wariant `odbijany` pasa-gonca liczy droge od szerokosci OKNA, nie kontenera.
   ✓ ZROBIONE, i to na DWIE przyczyny, nie jedna.
@@ -769,6 +790,29 @@ odrzucone z powodem, albo przeniesione do trackera).
   zrzut OBEJRZANY, slowo `ALEKSANDRO` widoczne w calosci; gorny pas-goniec shellu
   dziala jak dotad (test F1-02 zielony bez zmian); negatywne: poprawka nie animuje
   `left` ani `width` (`plan/04 K2`), zero nowych zaleznosci.
+
+- [ ] **F7-07** `ui` `.werdykt__napis` jest martwy z tego samego powodu co
+  `.brama__napis` (kaskada `scena.css`).
+  Znalezisko z F7-06, zmierzone na zywym `/egzamin` z werdyktem w sesji.
+  `app/style/egzamin.css` ma `.werdykt__napis { width: min(70%, 420px);
+  margin: 0 auto }`, ale `.napis { width: 100% }` z `scena.css` ma te sama
+  specyficznosc (0,1,0) i jest importowany pozniej, wiec wygrywa. Napis
+  `ZDANE`/`NIEZDANE` ma 760 px zamiast 420 px (desktop) i 351 px zamiast 334 px
+  (390 px). F7-06 naprawilo TYLKO brame, bo jego kryterium negatywne zakazywalo
+  ruszania szerokosci napisow na `/egzamin`. Ta sama pulapka czeka na kazda
+  przyszla regule `width` na `[data-napis]`, wiec lekarstwem jest zdjecie
+  `.napis` z wyscigu (np. `:where(.napis)`), a nie kolejna lokalna latka.
+  Uwaga: `.brak__napis` (`/nie-ma`, 300 px) dziala tylko dlatego, ze
+  `nieznalezione.css` jest importowany PO `scena.css` - to przypadek, nie plan.
+  CZYTAJ: 04→D; 06→C (werdykt); plan/11 wpis F7-06.
+  AC: na `/egzamin` z werdyktem w `sessionStorage`, na 1280x800, szerokosc
+  `.werdykt__napis` <= 420 px i <= 70% rodzica (pomiar
+  `getBoundingClientRect()` na zywej stronie, przed i po); regula bazowa
+  `.napis` przestaje wygrywac z klasami widoku (dowod: usuniecie
+  `width: 100%` z `.egzamin__etap` zmienia jego szerokosc, dzis nie zmienia);
+  zrzut werdyktu OBEJRZANY, napis wysrodkowany i w calosci widoczny;
+  negatywne: szerokosci `[data-napis]` na `/`, `/quiz`, `/proba-ognia`
+  i `/nie-ma` bez zmian (pomiar przed i po); zero `!important`.
 
 ## F8 - BRAMKA DECYZYJNA
 

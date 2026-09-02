@@ -15,12 +15,18 @@
   margin: 0 auto;
 }
 
+/* F7-06: szerokosc niesie NAGLOWEK, nie napis. `.napis` z scena.css ma
+   `width: 100%` przy tej samej specyficznosci (0,1,0) i jest importowany
+   pozniej, wiec kazda szerokosc zadana na `.brama__napis` przegrywala
+   w kaskadzie (napis mial 1256 px zamiast 720 px). Tak samo robia
+   `.egzamin__naglowek` i `.quiz__naglowek`. */
 .brama__naglowek {
-  margin: 4px 0 0;
+  margin: 4px auto 0;
+  width: min(90vw, 720px);
 }
 
 .brama__napis {
-  width: min(90vw, 720px);
+  width: 100%;
   height: auto;
 }
 
