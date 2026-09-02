@@ -378,3 +378,34 @@ miejscach i jego podmiana zmienilaby kontrast tam, gdzie problemu nie ma.
   w kodzie komentarz odsylajacy tutaj.
 - `tests/f7-04.spec.ts` mierzy kontrast na zywej stronie i pilnuje charakteru
   (tlo dalej szare, dalej `line-through`), zeby "naprawa" nie zjadla zartu.
+
+## 22. F7-07: dwa swiadome odstepstwa od AC przy zdejmowaniu `.napis` z kaskady
+
+**Kontekst.** F7-07 zamienil `.napis { width: 100% }` na `:where(.napis)`, czyli
+zdjal regule bazowa napisu-obrazka z wyscigu specyficznosci. Naprawa jest jedna
+linia, ale dotyka KAZDEGO `[data-napis]` w projekcie, wiec dwa punkty AC nie
+daly sie wykonac doslownie.
+
+**Odstepstwo 1: `/quiz` NIE jest "bez zmian".** Negatywne AC zadalo, zeby
+szerokosci napisow na `/quiz` nie drgnely. Drgnela jedna: `.maszyna__napis`
+(`width: min(50%, 320px)` w `quiz.css`) byl martwy z DOKLADNIE tego samego
+powodu co `.werdykt__napis` - `quiz.css` tez jest importowany przed `scena.css`.
+663,7 -> 320 px (1280) i 204 -> 151,1 px (390). Utrzymanie tej reguly martwej
+wymagaloby albo lokalnej latki, ktorej to issue wprost zakazuje, albo swiadomego
+zostawienia buga. Decyzja: naprawiamy, zrzut `screenshots/F7/f7-07-maszyna-*.png`
+obejrzany, wynik `0/15` wysrodkowany miedzy ognikami.
+
+**Odstepstwo 2: dowod kaskady inny niz w AC.** AC proponowalo dowod "usuniecie
+`width: 100%` z `.egzamin__etap` zmienia jego szerokosc". Ten dowod jest slepy:
+po usunieciu tej reguly element i tak dostaje 100% z `:where(.napis)`, wiec
+wynik jest identyczny przed i po poprawce. Zamiast tego test dokłada regule
+o tej samej specyficznosci (0,1,0) na POCZATEK `<head>` i mierzy, czy wygrywa.
+Przed poprawka `760 -> 760`, po poprawce `760 -> 111`.
+
+**Konsekwencje.**
+- `tests/f7-06.spec.ts` ma w tabeli "przed poprawki" dwie wartosci przestawione
+  (`werdykt__napis`, `maszyna__napis`). Zrodlem prawdy o tych liczbach jest
+  teraz `tests/f7-07.spec.ts`.
+- Kazda przyszla regula `width` na `[data-napis]` dziala juz normalnie i nie
+  zalezy od kolejnosci `@import` w `app/globals.css`. Dotyczy to takze
+  `.brak__napis`, ktory wczesniej wygrywal wylacznie przez ta kolejnosc.
