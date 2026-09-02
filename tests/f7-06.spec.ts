@@ -53,7 +53,9 @@ test("napis na bramie miesci sie w min(90vw, 720px)", async ({ page }, info) => 
 const PRZED: Record<string, Record<number, Record<string, number>>> = {
   "/egzamin": {
     1280: { egzamin__etap: 380, "napis--chrom": 760, werdykt__napis: 420 },
-    390: { egzamin__etap: 300, "napis--chrom": 351, werdykt__napis: 233.8 },
+    // F7-08 zwezilo blok dekoracyjny nad zadaniem na 390 px: egzamin__etap
+    // 300 -> 200, plonacy napis 351 -> 319,8. Zmiana ZAMIERZONA, opisana w F7-08.
+    390: { egzamin__etap: 200, "napis--chrom": 319.8, werdykt__napis: 233.8 },
   },
   "/quiz": {
     1280: { quiz__napis: 360, maszyna__napis: 320 },

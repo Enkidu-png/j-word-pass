@@ -42,6 +42,31 @@ export default function Strona() {
         <PlonacyNapis tekst="EGZAMIN JASIU" />
       </div>
 
+      <section className="druk druk--pytanie">
+        <p className="druk__naglowek">TREŚĆ PYTANIA</p>
+        <p className="pytanie__tytul">{egzamin.tytul}</p>
+        <p className="pytanie__tresc">{egzamin.tresc}</p>
+        <p className="pytanie__polecenie">{egzamin.polecenie}</p>
+      </section>
+
+      {/* F7-08: zalozenia siedza w <details> zwinietym domyslnie. Na 390 px
+          rozwinieta lista pchala <textarea> na 1462 px od gory strony, wiec
+          Aleksandra nie doscrollowala do pola odpowiedzi. Nic nie znika -
+          jedno klikniecie i lista jest z powrotem. */}
+      <details className="druk druk--dane">
+        <summary className="druk__naglowek dane__summary">DANE DO ZADANIA</summary>
+        <ul className="dane__lista">
+          {egzamin.zalozenia.map((z) => (
+            <li className="dane__pozycja" key={z.id}>
+              <Ozdoba id="stwor-strzalka" klasa="dane__strzalka" />
+              <span>{z.tekst}</span>
+            </li>
+          ))}
+        </ul>
+      </details>
+
+      <DrukOdpowiedzi />
+
       {/* Dekoracja i nic wiecej: `pointer-events: none` na calym bloku, wiec
           klik w planete trafia w to, co lezy pod scena (plan/06 B punkt 5). */}
       <div className="kosmos" data-kosmos aria-hidden="true">
@@ -57,27 +82,6 @@ export default function Strona() {
           </span>
         ))}
       </div>
-
-      <section className="druk druk--dane">
-        <p className="druk__naglowek">DANE DO ZADANIA</p>
-        <ul className="dane__lista">
-          {egzamin.zalozenia.map((z) => (
-            <li className="dane__pozycja" key={z.id}>
-              <Ozdoba id="stwor-strzalka" klasa="dane__strzalka" />
-              <span>{z.tekst}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="druk druk--pytanie">
-        <p className="druk__naglowek">TREŚĆ PYTANIA</p>
-        <p className="pytanie__tytul">{egzamin.tytul}</p>
-        <p className="pytanie__tresc">{egzamin.tresc}</p>
-        <p className="pytanie__polecenie">{egzamin.polecenie}</p>
-      </section>
-
-      <DrukOdpowiedzi />
 
       <StworRogowy id="stwor-osmiornica" rog="lewy-dol" />
       <StworRogowy id="stwor-osmiornica" rog="prawy-dol" lustro />

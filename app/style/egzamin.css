@@ -201,10 +201,21 @@
   .egzamin {
     /* F6-04: 200 px zostawialo na 390 px pusta plachte 160 px miedzy CTA
        a stworami rogowymi, ktore na tym ekranie maja tylko 72 px wysokosci. */
-    padding-bottom: 150px;
+    padding: 44px 12px 150px;
   }
   .egzamin__naglowek {
-    width: min(80vw, 300px);
+    width: min(55vw, 200px);
+  }
+  /* F7-08: blok dekoracyjny nad zadaniem schudl z 237 px do ~160 px. Oba
+     napisy zostaja widoczne, tylko przestaja zjadac pol ekranu przewijania. */
+  .egzamin__plonacy {
+    /* nie schodzic ponizej 301 px: PlonacyNapis liczy plomienie jako
+       ceil(szerokosc / 60), wiec wezszy napis ZABIERA jeden plomien ze sceny */
+    width: min(82vw, 320px);
+    margin: 6px auto 4px;
+  }
+  .druk {
+    margin-bottom: 10px;
   }
   .kosmos {
     height: 200px;
@@ -274,4 +285,15 @@
   border-style: inset;
   background: var(--chrom-a);
   color: var(--chrom-b);
+}
+
+/* F7-08: zalozenia w <details>. Marker zostaje natywny (klikalny wskaznik
+   stanu), summary dostaje kursor i te sama typografie co inne naglowki druku. */
+.dane__summary {
+  cursor: pointer;
+  list-style-position: inside;
+}
+
+.druk--dane[open] .dane__summary {
+  margin-bottom: 10px;
 }

@@ -121,7 +121,8 @@ const OCZEKIWANE: Record<string, Record<number, [string, number][]>> = {
   "/egzamin": {
     // werdykt__napis: 760 -> 420 i 334 -> 233.8 (naprawa tego issue)
     1280: [["egzamin__etap", 380], ["napis--chrom", 760], ["werdykt__napis", 420]],
-    390: [["egzamin__etap", 300], ["napis--chrom", 351], ["werdykt__napis", 233.8]],
+    // wartosci na 390 px zaktualizowane w F7-08 (zwezony blok nad zadaniem)
+    390: [["egzamin__etap", 200], ["napis--chrom", 319.8], ["werdykt__napis", 233.8]],
   },
 };
 

@@ -887,12 +887,22 @@ odrzucone z powodem, albo przeniesione do trackera).
   negatywne: szerokosci `[data-napis]` na `/`, `/quiz`, `/proba-ognia`
   i `/nie-ma` bez zmian (pomiar przed i po); zero `!important`.
 
-- [ ] **F7-08** `ui` Na etapie 1 pytanie i pole odpowiedzi leżą tak nisko, że Aleksandra na telefonie ich nie znalazła i zgłosiła jako brak. Nie jest to błąd renderowania - oba elementy istnieją i działają, ale są pod ~2 ekranami dekoracji.
+- [x] **F7-08** `ui` Na etapie 1 pytanie i pole odpowiedzi leżą tak nisko, że Aleksandra na telefonie ich nie znalazła i zgłosiła jako brak. Nie jest to błąd renderowania - oba elementy istnieją i działają, ale są pod ~2 ekranami dekoracji.
   ZNALEZIONE W: odbiór przez Aleksandrę na telefonie (2026-09-02), potwierdzone pomiarem na uruchomionej aplikacji.
   POMIAR: mobile 390x844 - strona ma 3014 px, `TREŚĆ PYTANIA` zaczyna się na 1024 px, `<textarea>` na 1688 px (2 pełne ekrany przewijania do pytania, prawie 3 do pola). Desktop 1280x800 - strona 2673 px, pytanie 1111 px, textarea 1467 px.
   DLACZEGO TESTY GO NIE ZŁAPAŁY: AC F3-02 sprawdzało ISTNIENIE elementów i gęstość ozdób (Z8), nigdy odległości od góry strony. Zrzuty dowodowe są kadrami viewportu, więc pokazywały wyłącznie dekorację i nikt nie zobaczył, jak głęboko siedzi samo zadanie.
   AC: na 390x844 górna krawędź `<textarea>` jest nie niżej niż **1000 px** od początku strony, a `TREŚĆ PYTANIA` nie niżej niż **600 px** (pomiar `getBoundingClientRect().top + scrollY`, obie liczby w dowodzie); gęstość Z8 nadal spełniona (>= 6 animowanych elementów, >= 2 stwory rogowe, >= 1 pas - policzyć po zmianie); płonący napis `EGZAMIN JASIU` nadal widoczny nad zadaniem; kryterium negatywne: nic nie zostało USUNIĘTE ze sceny - scena kosmiczna, założenia i ozdoby dalej są na stronie, tylko w innej kolejności albo w zwartszym układzie (porównanie liczby `img[data-ozdoba]` przed i po, wynik ten sam).
   PROPOZYCJA WYKONANIA (worker może wybrać inną, jeśli spełni AC): na 390 px scena kosmiczna schodzi z 200 px do 120 px i ląduje POD drukiem odpowiedzi, a `DANE DO ZADANIA` zwijają się w `<details>` otwarty domyślnie na desktopie i zamknięty na mobile. Dekoracja zostaje, kolejność się zmienia.
+  ✓ WYKONANE (pomiar `getBoundingClientRect().top + scrollY` na uruchomionej aplikacji, `tests/f7-08.spec.ts`, zrzuty `screenshots/f7-08-mobile.png` i `screenshots/f7-08-desktop.png` OBEJRZANE):
+  | pomiar | 390x844 przed | 390x844 po | 1280x800 przed | 1280x800 po |
+  |---|---|---|---|---|
+  | `TREŚĆ PYTANIA` top | 1040 | **268** | 1127 | **477** |
+  | `<textarea>` top | 1688 | **982** | 1467 | **895** |
+  | wysokość strony | 3014 | 2529 | 2673 | 2447 |
+  | `img[data-ozdoba]` | 35 | **35** | 42 | **42** |
+  Co zmienione: kolejność w DOM (`TREŚĆ PYTANIA` przed `DANE DO ZADANIA`, scena kosmiczna zeszła POD druk odpowiedzi), `DANE DO ZADANIA` w `<details>` zwiniętym domyślnie (lista sześciu założeń dalej w DOM, jedno kliknięcie od widoczności), a blok dekoracyjny nad zadaniem zwężony na 390 px (`egzamin__naglowek` 300 -> 200 px, `egzamin__plonacy` 351 -> 320 px z komentarzem, że poniżej 301 px `PlonacyNapis` gubi jeden płomień).
+  Z8 po zmianie: 12 gwiazdek + planeta + statek + 5 płomieni + 2 stwory rogowe + 1 pas, płonący napis `EGZAMIN JASIU` dalej nad zadaniem (asercja w teście). Nic nie usunięte.
+  Zaktualizowane tablice pomiarów w `tests/f7-06.spec.ts` i `tests/f7-07.spec.ts` (wartości `/egzamin` na 390 px), zmiana zamierzona i opisana w komentarzu.
 
 ## F9 - ZMIANY PO ODBIORZE (zamówione przez Aleksandrę 2026-09-02)
 
