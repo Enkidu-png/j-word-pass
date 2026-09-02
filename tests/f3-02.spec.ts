@@ -13,6 +13,10 @@ test("szesc zalozen z data/egzamin.json renderuje sie jako <li> w druku", async 
   }
   // kazda pozycja poprzedzona strzalka 24 px (plan/06 B punkt 6)
   await expect(page.locator(".druk--dane [data-ozdoba='stwor-strzalka']")).toHaveCount(6);
+  // F7-08: `DANE DO ZADANIA` to <details> zwiniety domyslnie, a wnetrze zamknietego
+  // <details> nie ma ukladu - `clientWidth` oddaje tam 0 niezaleznie od CSS.
+  // Szerokosc strzalki mierzymy po rozwinieciu.
+  await page.locator(".dane__summary").click();
   expect(await page.locator(".dane__strzalka").first().evaluate((e) => e.clientWidth)).toBe(24);
 });
 
