@@ -186,5 +186,13 @@
     "naglowek": "WYZWANIE",
     "tresc": "PRÓBA OGNIA: stanąć na głowie, ze skarpetkami na dłoniach, nogami w śpiworze i w okularach przeciwsłonecznych. Punkty bonusowe za piankę marshmallow w buzi. Wykonanie udowodnić zdjęciem albo filmem.",
     "cta": "PRZYJMUJĘ WYZWANIE"
+  },
+  "wstep": {
+    "naglowek": "KONTROLA WSTĘPU",
+    "wstepniak": "KOMISJA NIE WPUSZCZA NIKOGO Z ULICY. ODPOWIEDZ NA PYTANIE KONTROLNE, A DRZWI STANĄ OTWOREM.",
+    "pytanie": "Jak na drugie imię ma Janek?",
+    "odpowiedz": "Franciszek",
+    "cta": "MELDUJĘ SIĘ",
+    "stempel": "KOMISJA NIE ROZPOZNAJE PETENTA"
   }
 }

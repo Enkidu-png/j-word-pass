@@ -14,14 +14,24 @@ export default function PierwszeWejscie() {
   const [widoczny, ustawWidoczny] = useState(false);
 
   useEffect(() => {
-    try {
-      if (window.sessionStorage.getItem(KLUCZ)) return;
-      window.sessionStorage.setItem(KLUCZ, "1");
-    } catch {
-      // tryb prywatny: ceremonia po prostu sie nie pokazuje, strona dziala
+    // F10-02: brama wstepu idzie PRZED ekranem ladowania, wiec dopoki nakladka
+    // stoi, ceremonia sie nie zaczyna. Sygnal `jwp:wstep` przychodzi z niej.
+    const zacznij = () => {
+      try {
+        if (window.sessionStorage.getItem(KLUCZ)) return;
+        window.sessionStorage.setItem(KLUCZ, "1");
+      } catch {
+        // tryb prywatny: ceremonia po prostu sie nie pokazuje, strona dziala
+        return;
+      }
+      ustawWidoczny(true);
+    };
+    if (document.documentElement.dataset.wstep === "1") {
+      zacznij();
       return;
     }
-    ustawWidoczny(true);
+    window.addEventListener("jwp:wstep", zacznij, { once: true });
+    return () => window.removeEventListener("jwp:wstep", zacznij);
   }, []);
 
   if (!widoczny) return null;

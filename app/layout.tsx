@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import komisja from "@/data/komisja.json";
 import PasGoniec from "@/components/scena/PasGoniec";
+import BramaWstepu from "@/components/shell/BramaWstepu";
 import FokusNaNaglowku from "@/components/shell/FokusNaNaglowku";
 import PassOMetr from "@/components/shell/PassOMetr";
 import StrazEtapu from "@/components/shell/StrazEtapu";
@@ -32,7 +33,19 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pl">
+      <head>
+        {/* Petent z waznym wpisem nie moze zobaczyc nawet jednej klatki nakladki,
+            a nakladka MUSI byc w HTML-u z serwera (inaczej mignelaby tresc pod
+            nia). Rozstrzyga to atrybut postawiony przed pierwszym malowaniem;
+            reszta reguly siedzi w app/style/wstep.css. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if(localStorage.getItem("jwp.wstep"))document.documentElement.dataset.wstep="1"}catch(e){}`,
+          }}
+        />
+      </head>
       <body>
+        <BramaWstepu />
         <PasGoniec tekst={komisja.gonce.gora} wariant="odbijany" czas={12000} />
         <PassOMetr />
         <FokusNaNaglowku />

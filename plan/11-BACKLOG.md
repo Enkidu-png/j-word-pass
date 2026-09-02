@@ -1054,10 +1054,39 @@ puszczaj pojedyncze pliki, nie całą suitę.
     `npx playwright test` = 388 passed / 6 skipped, czyli tyle samo co przed zmianą.
   ✓ D7 `WERYFIKACJA.md` sekcja 11 `JAK PRZECZYTAC PRACE` z przepisem CLI.
     PUŁAPKA: `vercel blob get` wymaga JESZCZE `--access private`, samo `--rw-token` nie starcza.
-- [ ] **F10-02** `ui` ⚠ HARD Brama wstępu: pytanie kontrolne przed wejściem na stronę.
+- [x] **F10-02** `ui` ⚠ HARD Brama wstępu: pytanie kontrolne przed wejściem na stronę.
   CZYTAJ: 05→A,B; 04→B,D,F; 01→E (Z10, Z11, Z16).
   Kontrakt: pełnoekranowa nakładka przy pierwszym wejściu, PRZED ekranem ładowania. Pytanie brzmi dokładnie: `Jak na drugie imię ma Janek?`. Poprawna odpowiedź: `Franciszek`. Porównanie po normalizacji (`trim`, małe litery, usunięcie znaków diakrytycznych), więc `franciszek`, `Franciszek` i `FRANCISZEK` przechodzą.
   AC: bez poprawnej odpowiedzi żadna z czterech stron nie pokazuje treści (nakładka zasłania i trzyma fokus); poprawna odpowiedź zdejmuje nakładkę i zapisuje `jwp.wstep` w `localStorage`, po reloadzie nakładka się nie pokazuje; błędna odpowiedź daje stempel `KOMISJA NIE ROZPOZNAJE PETENTA` i pole zostaje z fokusem, bez przeładowania; pełna obsługa klawiaturą (Tab, Enter), `:focus-visible` widoczny (Z10); nakładka utrzymuje charakter strony - kafel tła, minimum 3 ozdoby z manifestu, `NapisObrazek` z nagłówkiem; `prefers-reduced-motion` bez animacji wejścia; zrzuty desktop i 390 px OBEJRZANE; negatywne: nic nie jest przekrzywione (Z6), pytanie i odpowiedź NIE są zaszyte w komponencie tylko w `data/komisja.json`.
+
+  ✓ D1 Cztery widoki (`/`, `/egzamin`, `/quiz`, `/proba-ognia`) bez wpisu w `localStorage`
+    nie pokazują treści: `elementFromPoint` w pięciu punktach ekranu trafia w nakładkę,
+    `getComputedStyle(body).overflow` = `hidden`, a arkusz chowa całą treść regułą
+    `:root:not([data-wstep="1"]) body > *:not(.wstep)` (8 testów, `tests/f10-02.spec.ts`).
+  ✓ D2 Nakładka trzyma fokus: po 8 razy Tab i po Shift+Tab `activeElement` dalej
+    siedzi w nakładce (pułapka: sam `focusin` nie wystarcza, Shift+Tab z pierwszego
+    pola oddaje fokus paskowi przeglądarki i nie leci żadne zdarzenie).
+  ✓ D3 Poprawna odpowiedź w czterech pisowniach (`Franciszek`, `franciszek`,
+    `FRANCISZEK`, `  FrAnCiSzEk  `) zdejmuje nakładkę, zapisuje `jwp.wstep`,
+    a po `reload()` nakładki nie ma i przewijanie wraca.
+  ✓ D4 Błędna odpowiedź (`Zenon`): stempel `KOMISJA NIE ROZPOZNAJE PETENTA`,
+    `activeElement` = pole wstępu, znacznik ustawiony w `window` przeżywa (zero
+    przeładowania), `jwp.wstep` dalej `null`.
+  ✓ D5 Sama klawiatura na `/egzamin`: pole ma fokus od razu, Tab przechodzi na
+    przycisk z `outline` zawierającym `dashed` (Z10), Shift+Tab wraca, wpis plus
+    Enter przepuszcza. Sprawdzone TAKŻE na `pnpm build && pnpm start` (26/26).
+  ✓ D6 Charakter: tło `kafel-brama` z `background-repeat: repeat` i `background-size: auto`
+    (Z9), 3 ozdoby z manifestu plus dwa pasy i goniec, `NapisObrazek` z `aria-label`
+    `KONTROLA WSTĘPU`. Skan `transform` po całym drzewie nakładki: zero obrotów i skosów (Z6).
+  ✓ D7 `prefers-reduced-motion: reduce`: zero animacji bez `paused` w nakładce.
+  ✓ D8 Zrzuty OBEJRZANE, desktop 1280 i mobile 390: `screenshots/F10/f10-02-brama-*.png`,
+    `f10-02-stempel-*.png`, `f10-02-po-wpuszczeniu-*.png`. Poprawka po obejrzeniu:
+    klepsydra rozpychała druk o połowę, ozdoby dostały wspólny sufit 110 px.
+  ✓ D9 Negatywne: pytanie, odpowiedź, nagłówek, CTA i stempel siedzą w
+    `data/komisja.json -> wstep`, w `BramaWstepu.tsx` nie ma ani jednego z tych tekstów.
+  ✓ D10 Regresja: cała suita `npx playwright test` = **414 passed / 6 skipped / 0 failed**,
+    czyli 388 sprzed zmiany plus 26 nowych. Obejście dla starych testów jest jedno
+    i deterministyczne: `storageState` z `jwp.wstep` w `playwright.config.ts`.
 - [ ] **F10-03** `infra` Brama chroni też płatny endpoint, nie tylko widok.
   CZYTAJ: 02→B; wynik F10-02.
   Kontrakt: klient wysyła do `/api/ocena` i `/api/zgloszenie` nagłówek `x-jwp-klucz` z odpowiedzią po normalizacji. Serwer porównuje ze zmienną `JWP_KLUCZ_WSTEPU` (już ustawiona w env Vercela dla trzech środowisk). Brak albo zła wartość: **401** z komunikatem Komisji, przed wywołaniem modelu.

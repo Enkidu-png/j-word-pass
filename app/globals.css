@@ -10,6 +10,7 @@
 @import "./style/scena.css";
 @import "./style/ladowanie.css";
 @import "./style/nieznalezione.css";
+@import "./style/wstep.css";
 
 /* Caveat self-hostowany (F0-04). Dwa podzbiory dokladnie takie, jakie serwuje
    Google: `latin` niesie ó, `latin-ext` reszte polskich znakow (aceilnszz).

@@ -1,0 +1,155 @@
+/* BRAMA WSTEPU (F10-02). Pelnoekranowa nakladka nad wszystkim, takze nad
+   ekranem ladowania (ladowanie.css ma z-index 9). Kafel tla jak w kazdym
+   widoku (Z9): plik z manifestu, background-repeat, bez background-size. */
+
+.wstep {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow-y: auto;
+  background-color: var(--kosmos);
+  background-repeat: repeat;
+  text-align: center;
+}
+
+/* Dopoki petent nie odpowiedzial, tresc widoku jest UKRYTA i nie przewija sie.
+   Atrybut `data-wstep` stawia skrypt z <head> (petent z waznym wpisem, jeszcze
+   przed malowaniem) albo sam komponent po poprawnej odpowiedzi. Ukrywanie robi
+   arkusz, a nie React, wiec zadna klatka - takze przed hydracja - nie pokazuje
+   tresci bez wstepu. */
+:root:not([data-wstep="1"]) body {
+  overflow: hidden;
+}
+
+:root:not([data-wstep="1"]) body > *:not(.wstep) {
+  visibility: hidden;
+}
+
+.wstep__druk {
+  position: relative;
+  z-index: 21;
+  width: min(92vw, 620px);
+  margin: 0 auto;
+  padding: 14px;
+  background: var(--papier);
+  border: 4px ridge var(--chrom-b);
+  color: var(--tusz);
+}
+
+.wstep__naglowek {
+  margin: 0 auto 8px;
+  width: min(80vw, 420px);
+}
+
+.wstep__napis {
+  width: 100%;
+  height: auto;
+}
+
+.wstep__wstepniak {
+  margin: 0 0 12px;
+  font-family: var(--font-czytany);
+  font-size: var(--stopien-drobny);
+  letter-spacing: 1px;
+}
+
+.wstep__ozdoby {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 14px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.wstep__pole {
+  display: flex;
+  align-items: flex-end;
+}
+
+/* Ozdoby z manifestu maja rozne wysokosci (klepsydra 160 px, reka 60 px).
+   Bez wspolnego sufitu klepsydra rozpychala druk o polowe. */
+.wstep__ozdoba {
+  max-width: 22vw;
+  max-height: 110px;
+  width: auto;
+  height: auto;
+  animation: wstep-mrug 900ms steps(2) infinite;
+}
+
+@keyframes wstep-mrug {
+  0% { opacity: 1; }
+  50% { opacity: 0.55; }
+  100% { opacity: 1; }
+}
+
+.wstep__formularz {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  padding: 10px;
+  background: var(--druk-tlo);
+  border: 3px inset var(--chrom-a);
+  text-align: left;
+}
+
+.wstep__etykieta {
+  font-family: var(--font-czytany);
+  font-size: var(--stopien-tresc);
+  font-weight: bold;
+}
+
+.wstep__pole-tekst {
+  padding: 8px;
+  background: var(--druk-tlo);
+  border: 3px inset var(--chrom-a);
+  color: var(--tusz);
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-tresc);
+}
+
+.wstep__stempel {
+  margin: 0;
+  padding: 4px 8px;
+  border: 3px double var(--alarm);
+  color: var(--alarm);
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-drobny);
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+.wstep__cta {
+  align-self: flex-start;
+}
+
+.wstep__goniec {
+  position: absolute;
+  z-index: 21;
+  right: 0;
+  bottom: 45px;
+  left: 0;
+}
+
+/* Z11: wejscie nakladki bez animacji, ozdoby na klatce statycznej (Ozdoba
+   podmienia sam plik), tu gasimy miganie. */
+@media (prefers-reduced-motion: reduce) {
+  .wstep__ozdoba {
+    animation-name: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .wstep__ozdoby {
+    gap: 8px;
+  }
+
+  .wstep__druk {
+    padding: 10px;
+  }
+}

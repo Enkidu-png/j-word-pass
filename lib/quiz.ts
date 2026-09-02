@@ -1,7 +1,7 @@
 // Reguly odpowiedzi quizu (plan/02 C2). Trzymane osobno od UI, bo maszyna
 // prawdy z F4-03 liczy punkty tym samym kodem, ktorym pytanie 14 sprawdza wpis.
 
-function normalizuj(tekst: string): string {
+export function normalizuj(tekst: string): string {
   return tekst
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "") // zdejmuje diakrytyki: "Mohsa" i "Móhsa" to to samo

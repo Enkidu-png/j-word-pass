@@ -4,7 +4,22 @@ export default defineConfig({
   testDir: "./tests",
   fullyParallel: true,
   reporter: "list",
-  use: { baseURL: "http://localhost:3000", trace: "off" },
+  // F10-02: brama wstepu zaslania kazdy widok, wiec cala istniejaca suita
+  // wchodzi z GOTOWYM wpisem `jwp.wstep` w localStorage. Sama brama testuje sie
+  // w tests/f10-02, gdzie ten wpis jest kasowany na starcie.
+  use: {
+    baseURL: "http://localhost:3000",
+    trace: "off",
+    storageState: {
+      cookies: [],
+      origins: [
+        {
+          origin: "http://localhost:3000",
+          localStorage: [{ name: "jwp.wstep", value: "franciszek" }],
+        },
+      ],
+    },
+  },
   projects: [
     {
       name: "desktop",
