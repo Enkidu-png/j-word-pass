@@ -1,3 +1,4 @@
+import DrukWstepny from "@/components/brama/DrukWstepny";
 import KafelTla from "@/components/scena/KafelTla";
 import NapisObrazek from "@/components/scena/NapisObrazek";
 import Ozdoba from "@/components/scena/Ozdoba";
@@ -5,8 +6,19 @@ import Pas from "@/components/scena/Pas";
 import PasGoniec from "@/components/scena/PasGoniec";
 import StworRogowy from "@/components/scena/StworRogowy";
 
-// BRAMA, etap 0 (plan/05 B1). Punkty 7 i 8 - tablica ogloszen i druk wstepny -
-// dokladane w F2-02b, ceremonia wejscia w F2-04.
+// BRAMA, etap 0 (plan/05 B1). Ceremonia wejscia dochodzi w F2-04,
+// przycisk-uciekinier w F2-03.
+
+// Tablica ogloszen: szesc roznych ozdob w dwoch rzedach po trzy, kazda z innym
+// opoznieniem migania, roznica minimum 120 ms (plan/05 B1 punkt 7).
+const TABLICA = [
+  { id: "stwor-nuta", opoznienie: "0ms" },
+  { id: "stwor-dyskietka", opoznienie: "120ms" },
+  { id: "stwor-kula-ziemska", opoznienie: "240ms" },
+  { id: "stwor-krysztal", opoznienie: "360ms" },
+  { id: "stwor-mysz", opoznienie: "480ms" },
+  { id: "stwor-zegar", opoznienie: "600ms" },
+];
 export default function Strona() {
   return (
     <div className="brama">
@@ -19,6 +31,17 @@ export default function Strona() {
       <div className="brama__zjazd">
         <PasGoniec tekst="&lt; PRZEWIŃ W DÓŁ, ALEKSANDRO &gt;" wariant="odbijany" />
         <Ozdoba id="strzalka-dol" klasa="brama__strzalka" />
+      </div>
+      <div className="tablica">
+        <p className="tablica__naglowek">OGŁOSZENIA KOMISJI</p>
+        <ul className="tablica__siatka">
+          {TABLICA.map((o) => (
+            <li key={o.id} className="tablica__pole">
+              <Ozdoba id={o.id} klasa="tablica__ozdoba" opoznienie={o.opoznienie} pierwszyEkran />
+            </li>
+          ))}
+        </ul>
+        <DrukWstepny />
       </div>
       <StworRogowy id="stwor-delfin" rog="lewy-dol" />
       <StworRogowy id="stwor-delfin" rog="prawy-dol" lustro />

@@ -62,3 +62,113 @@
     width: 140px;
   }
 }
+
+/* --- Tablica ogloszen (plan/05 B1 punkt 7) --- */
+
+.tablica {
+  position: relative;
+  z-index: 4;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 12px;
+  background: var(--papier);
+  border: 4px ridge var(--chrom-b);
+}
+
+.tablica__naglowek {
+  margin: 0 0 10px;
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-tresc);
+  letter-spacing: 3px;
+  color: var(--tusz);
+}
+
+.tablica__siatka {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 0 0 14px;
+  padding: 0;
+}
+
+.tablica__pole {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 90px;
+  background: var(--druk-tlo);
+  border: 2px inset var(--chrom-a);
+}
+
+/* Miganie na opacity - jedyne, co wolno animowac obok transformu (plan/04 K2).
+   Rozne animation-delay ustawia Ozdoba z propa, zeby tablica nie pulsowala
+   jednym rytmem jak pasek postepu. */
+.tablica__ozdoba {
+  max-width: 100%;
+  height: auto;
+  animation: tablica-miga 1400ms steps(2) infinite;
+}
+
+@keyframes tablica-miga {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.55;
+  }
+}
+
+/* --- Druk wstepny (plan/05 B1 punkt 8) --- */
+
+.druk-wstepny {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.druk-wstepny__etykieta {
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-drobny);
+  letter-spacing: 2px;
+  color: var(--tusz);
+}
+
+.druk-wstepny__pole {
+  padding: 6px 10px;
+  background: var(--druk-tlo);
+  border: 3px inset var(--chrom-a);
+  color: var(--tusz);
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-tresc);
+  letter-spacing: 2px;
+}
+
+.druk-wstepny__cta {
+  padding: 8px 16px;
+  background: var(--papier);
+  border: 4px outset var(--chrom-a);
+  color: var(--tusz);
+  font-family: var(--font-czytany);
+  font-size: var(--stopien-tresc);
+  font-weight: bold;
+}
+
+.druk-wstepny__cta:hover {
+  border-style: inset;
+  background: var(--jad);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tablica__ozdoba {
+    animation-name: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .tablica__siatka {
+    grid-template-columns: 1fr;
+  }
+}
