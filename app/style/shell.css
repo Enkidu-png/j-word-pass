@@ -176,3 +176,165 @@ body {
     flex-direction: column;
   }
 }
+
+/* --- RADIO KOMISJI (plan/09 B) --- */
+
+/* Zakaz `position: fixed`: w v1 radio na sztywno zaslanialo przyciski.
+   Obudowa siedzi w przeplywie stopki i tyle. */
+.radio {
+  width: 300px;
+  margin: 12px auto 0;
+  padding: 8px;
+  background: var(--chrom-b);
+  border: 5px outset var(--chrom-a);
+  text-align: center;
+}
+
+.radio__marka {
+  margin: 0 0 6px;
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-drobny);
+  letter-spacing: 3px;
+  color: var(--papier);
+}
+
+/* Ekran ma STALE wymiary odtwarzacza, wiec obudowa nie skacze w chwili,
+   w ktorej iframe zastepuje napis (plan/09 B). */
+.radio__ekran {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 260px;
+  height: 200px;
+  margin: 0 auto;
+  background: var(--kosmos);
+  border: 3px inset var(--chrom-a);
+}
+
+.radio__napis {
+  margin: 0;
+  padding: 0 8px;
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-drobny);
+  letter-spacing: 2px;
+  color: var(--jad);
+}
+
+.radio__strojenie {
+  position: relative;
+  width: 200px;
+  height: 14px;
+  margin: 8px auto;
+  overflow: hidden;
+}
+
+.radio__kreska {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 14px;
+  background: var(--alarm);
+  z-index: 4;
+}
+
+.radio__kreska[data-gra="tak"] {
+  animation: radio-strojenie 4000ms steps(20) infinite;
+}
+
+@keyframes radio-strojenie {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(197px);
+  }
+}
+
+.radio__przycisk {
+  padding: 6px 16px;
+  background: var(--papier);
+  border: 3px outset var(--chrom-a);
+  color: var(--tusz);
+  font-family: var(--font-czytany);
+  font-size: var(--stopien-drobny);
+  font-weight: bold;
+}
+
+.radio__przycisk:hover {
+  border-style: inset;
+  background: var(--zloto);
+}
+
+.radio__suwak {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.radio__suwak input {
+  width: 160px;
+}
+
+.radio__podpis {
+  margin: 0;
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-drobny);
+  letter-spacing: 1px;
+  color: var(--papier);
+}
+
+.radio__zrodlo {
+  font-family: var(--font-terminal);
+  font-size: var(--stopien-drobny);
+  color: var(--cyjan);
+}
+
+/* Z11: wskaznik strojenia stoi, dzwiek dziala normalnie (plan/09 C). */
+@media (prefers-reduced-motion: reduce) {
+  .radio__kreska[data-gra="tak"] {
+    animation-name: none;
+  }
+}
+
+/* Mobile 390 px: ekran schodzi do regulaminowego minimum 200x200,
+   suwak idzie pod przycisk pelna szerokoscia (plan/09 C). */
+@media (max-width: 480px) {
+  .radio {
+    width: 220px;
+  }
+
+  .radio__ekran {
+    width: 200px;
+    height: 200px;
+  }
+
+  .radio__strojenie {
+    width: 180px;
+  }
+
+  .radio__suwak {
+    flex-direction: column;
+  }
+
+  .radio__suwak input {
+    width: 100%;
+  }
+}
+
+/* Odtwarzacz dostaje wymiary z API (260x200), ale na 390 px obudowa ma 220 px,
+   wiec ekran schodzi do regulaminowego minimum 200x200 (plan/09 A). */
+.radio__ekran iframe {
+  display: block;
+  width: 260px;
+  height: 200px;
+  border: 0;
+}
+
+@media (max-width: 480px) {
+  .radio__ekran iframe {
+    width: 200px;
+  }
+}

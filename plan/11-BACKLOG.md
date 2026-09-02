@@ -432,7 +432,28 @@ i anty-spec z `plan/01 G`, wpis raportu fazy, zero znalezisk bez issue w F7-ZNAL
   ✓ `pnpm run check` czysty, `pnpm build` zielony (`/proba-ognia` 109 kB).
   CZYTAJ: 08→C,D,E,F; 04→B; 02→B (api/zgloszenie).
   AC: sekwencja czterech kroków udokumentowana czterema zrzutami faz w `screenshots/F5/` (OBEJRZANE); klik i `Enter` na butelce rozwijają pergamin z e-mailem i sumą `N/25`; `Escape` w krokach 1-3 skacze do butelki; `OD NOWA` czyści `sessionStorage` i wraca na `/`; powrót na URL po wysłaniu pokazuje od razu butelkę bez żądania POST; POST trafia do `/api/zgloszenie` i lokalnie zwraca `tryb: "dev-log"`; negatywne: pergamin nie jest przekrzywiony, zero konfetti.
-- [ ] **F5-03** `ui` `RadioTinyDesk` wg `plan/09` - obudowa, YouTube IFrame API po geście, wskaźnik strojenia, suwak.
+- [x] **F5-03** `ui` `RadioTinyDesk` wg `plan/09` - obudowa, YouTube IFrame API po geście, wskaźnik strojenia, suwak.
+  ✓ `npx playwright test tests/f5-03.spec.ts` = 12 passed (desktop + 390 px).
+  Przed gestem: zero zadan do `youtube.com` i `youtube-nocookie.com`
+  (`page.on('request')`), zero `iframe`, zero `script[src*=youtube]`.
+  Po kliknieciu `WŁĄCZ`: zadanie do `iframe_api`, `iframe` z `src` na
+  `youtube-nocookie.com` i `oCcks-fwq2c`, `title="Odtwarzacz koncertu Post
+  Malone Tiny Desk"`, ZMIERZONE `getBoundingClientRect`: **260x200 desktop,
+  200x200 na 390 px**. `localStorage.jwp.audio === "on"`.
+  `WYŁĄCZ`: `getPlayerState() === 2` po **16,7 ms** (desktop) i **6,5 ms**
+  (mobile), limit 100 ms. Suwak zapisuje `jwp.glosnosc` i przezywa reload.
+  Wejscie z `jwp.audio === "on"` NIE startuje samo, pokazuje `KLIKNIJ, ABY
+  WZNOWIĆ` i zero `iframe` (Z15). Radio nie ma `fixed` ani `sticky` i zero
+  przyciskow strony ma je na swoim srodku (`elementFromPoint`).
+  Negatywne: zero plikow audio w `public/`, `git grep -ciE
+  "youtube-dl|ytdl|yt-dlp"` po `app components lib public scripts package.json`
+  = 0.
+  ✓ zrzuty OBEJRZANE: `screenshots/F5/F5-03-radio-{wylaczone,gra}-{desktop,mobile}.png`.
+  Znalezisko ze zrzutu i testu naprawione przed odhaczeniem: `iframe` byl
+  odmontowywany przy `WYŁĄCZ` (pauza nie miala czego zatrzymac) - odtwarzacz
+  montuje sie raz i zostaje. DECISIONS #20 (wyjatek od Z14).
+  ✓ `pnpm run check` czysty, `pnpm build` zielony (shared first load 102 kB),
+  `npx playwright test` = 224 passed / 0 failed / 6 skipped.
   CZYTAJ: 09 (cały).
   AC: przed kliknięciem `WŁĄCZ` zero żądań do `youtube.com` i `youtube-nocookie.com` (assercja `page.on('request')`); po kliknięciu pojawia się żądanie do `iframe_api` i `iframe` z `src` zawierającym `oCcks-fwq2c`; `localStorage.jwp.audio === "on"`; `WYŁĄCZ` cichnie w < 100 ms; radio NIE ma `position: fixed` i nie zasłania żadnego przycisku (`elementFromPoint` na 390 px); zrzut obudowy w `screenshots/F5/` OBEJRZANY; negatywne: zero plików audio w `public/`, `git grep -ciE "youtube-dl|ytdl|yt-dlp"` = 0.
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import RadioTinyDesk from "@/components/RadioTinyDesk";
 import Ozdoba from "@/components/scena/Ozdoba";
 import Pas from "@/components/scena/Pas";
 
@@ -58,7 +59,9 @@ export default function StopkaWebring() {
         ))}
       </p>
       {/* Kontrakt miedzy fazami: RadioTinyDesk wchodzi tu w F5-03 (plan/05 A3). */}
-      <div data-radio-slot />
+      <div data-radio-slot>
+        <RadioTinyDesk />
+      </div>
       <p className="stopka__tekst">STRONA WYKONANA RĘCZNIE DLA ALEKSANDRY</p>
       <Ozdoba id="stwor-koperta" klasa="stopka__koperta" />
     </footer>

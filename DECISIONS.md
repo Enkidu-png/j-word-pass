@@ -328,3 +328,29 @@ wroc. Ta sama zasada co przy `pnpm build` psujacym dzialajacy `pnpm dev`.
 
 **Koszt pomylki tym razem:** dwa przebiegi zrzutow do wyrzucenia i jedna falszywa
 hipoteza o bledzie w `DrukOdpowiedzi`.
+
+## 20. Skrypt `iframe_api` YouTube jako jedyny wyjatek od Z14 (F5-03)
+
+**Kontekst.** Z14 zakazuje zaleznosci runtime spoza `next`, `react`, `react-dom`
+i `@vercel/blob`, a takze skryptow z obcych domen. Aleksandra zamowila koncert
+Post Malone Tiny Desk. Legalnie mozna go odtworzyc WYLACZNIE oficjalnym
+odtwarzaczem osadzonym (plan/09 A) - pobranie audio do repo to naruszenie
+regulaminu i prawa autorskiego.
+
+**Decyzja.** `https://www.youtube.com/iframe_api` jest jedynym dozwolonym
+skryptem zewnetrznym w projekcie. Laduje sie DOPIERO po kliknieciu `WLACZ`,
+wiec nie wchodzi w budzet pierwszego ladowania i nie generuje ani jednego
+zadania do YouTube przed gestem Aleksandry (dowod: `tests/f5-03.spec.ts`).
+
+**Konsekwencje.**
+- Odtwarzacz jest WIDOCZNY i ma minimum 200x200 px (260x200 desktop,
+  200x200 na 390 px). Ukrycie go lamaloby ten sam regulamin, ktorym uzasadniamy
+  cale osadzenie.
+- Konstruktor `YT.Player` dostaje jawny `host: "https://www.youtube-nocookie.com"`.
+  Bez tego `onReady` nigdy nie przychodzi i radio zawsze wpada w tryb awaryjny.
+- Odtwarzacz montuje sie RAZ i zostaje w DOM takze po `WYLACZ`. Pierwsza wersja
+  odmontowywala `iframe` razem ze stanem `gra`, przez co `pauseVideo()` nie mialo
+  czego zatrzymac (`getPlayerState()` nigdy nie wracalo `2`), a ponowne `WLACZ`
+  startowaloby koncert od poczatku.
+- `window.jwpRadio` to uchwyt diagnostyczny do odtwarzacza (wzorzec `jwpAwaria`
+  z F2-01). Bez niego kryterium "pauza ponizej 100 ms" jest niemierzalne.

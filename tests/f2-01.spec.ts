@@ -4,11 +4,13 @@ import { wejdz } from "./pomoc";
 // AC F2-01 (plan/11-BACKLOG.md). Shell: PasGoniec gorny, PassOMetr, StrazEtapu,
 // stopka-webring.
 
-test("stopka ma pusty slot na radio (kontrakt z F5-03)", async ({ page }) => {
+// Slot byl pusty do F5-03. Od F5-03 siedzi w nim RADIO KOMISJI i kontrakt
+// zmienia sie z "pusty" na "dokladnie jedno radio w stopce".
+test("stopka ma slot na radio i to w nim siedzi RADIO KOMISJI", async ({ page }) => {
   await wejdz(page);
   const slot = page.locator("footer [data-radio-slot]");
   await expect(slot).toHaveCount(1);
-  expect((await slot.innerHTML()).trim()).toBe("");
+  await expect(slot.locator("[data-radio]")).toHaveCount(1);
 });
 
 test("PassOMetr ma trzy pola, etapy 2 i 3 sa aria-disabled przed zdaniem", async ({ page }) => {
