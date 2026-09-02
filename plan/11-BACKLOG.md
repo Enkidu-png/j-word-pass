@@ -887,6 +887,13 @@ odrzucone z powodem, albo przeniesione do trackera).
   negatywne: szerokosci `[data-napis]` na `/`, `/quiz`, `/proba-ognia`
   i `/nie-ma` bez zmian (pomiar przed i po); zero `!important`.
 
+- [ ] **F7-08** `ui` Na etapie 1 pytanie i pole odpowiedzi leżą tak nisko, że Aleksandra na telefonie ich nie znalazła i zgłosiła jako brak. Nie jest to błąd renderowania - oba elementy istnieją i działają, ale są pod ~2 ekranami dekoracji.
+  ZNALEZIONE W: odbiór przez Aleksandrę na telefonie (2026-09-02), potwierdzone pomiarem na uruchomionej aplikacji.
+  POMIAR: mobile 390x844 - strona ma 3014 px, `TREŚĆ PYTANIA` zaczyna się na 1024 px, `<textarea>` na 1688 px (2 pełne ekrany przewijania do pytania, prawie 3 do pola). Desktop 1280x800 - strona 2673 px, pytanie 1111 px, textarea 1467 px.
+  DLACZEGO TESTY GO NIE ZŁAPAŁY: AC F3-02 sprawdzało ISTNIENIE elementów i gęstość ozdób (Z8), nigdy odległości od góry strony. Zrzuty dowodowe są kadrami viewportu, więc pokazywały wyłącznie dekorację i nikt nie zobaczył, jak głęboko siedzi samo zadanie.
+  AC: na 390x844 górna krawędź `<textarea>` jest nie niżej niż **1000 px** od początku strony, a `TREŚĆ PYTANIA` nie niżej niż **600 px** (pomiar `getBoundingClientRect().top + scrollY`, obie liczby w dowodzie); gęstość Z8 nadal spełniona (>= 6 animowanych elementów, >= 2 stwory rogowe, >= 1 pas - policzyć po zmianie); płonący napis `EGZAMIN JASIU` nadal widoczny nad zadaniem; kryterium negatywne: nic nie zostało USUNIĘTE ze sceny - scena kosmiczna, założenia i ozdoby dalej są na stronie, tylko w innej kolejności albo w zwartszym układzie (porównanie liczby `img[data-ozdoba]` przed i po, wynik ten sam).
+  PROPOZYCJA WYKONANIA (worker może wybrać inną, jeśli spełni AC): na 390 px scena kosmiczna schodzi z 200 px do 120 px i ląduje POD drukiem odpowiedzi, a `DANE DO ZADANIA` zwijają się w `<details>` otwarty domyślnie na desktopie i zamknięty na mobile. Dekoracja zostaje, kolejność się zmienia.
+
 ## F8 - BRAMKA DECYZYJNA
 
 - [ ] **F8-01** `deploy` ⏳ STOP-GATE przed wykonaniem: pokaż Aleksandrze URL preview plus `WERYFIKACJA.md`, zapytaj o zgodę na `vercel deploy --prod` (podmiana żywej produkcji z wersji 1).
