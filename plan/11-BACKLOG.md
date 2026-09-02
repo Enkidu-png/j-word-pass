@@ -219,6 +219,53 @@ i anty-spec z `plan/01 G`, wpis raportu fazy, zero znalezisk bez issue w F7-ZNAL
   AC: pusta odpowiedź daje werdykt 0/10 BEZ żądania do `/api/ocena` (assercja na `page.on('request')`); niepusta: narada trwa minimum 3500 ms i pokazuje >= 5 różnych dymków (zebrać teksty, sprawdzić rozmiar zbioru); werdykt pokazuje `NapisObrazek` ZDANE albo NIEZDANE plus wynik `N/10` plus komentarz modelu; klucz odpięty w dev -> werdykt awaryjny w <= 16 s; powrót na `/egzamin` po zdaniu: textarea `readOnly`, werdykt z `sessionStorage`, zero żądania; `Escape` w trakcie narady skacze do werdyktu; zrzut werdyktu OBEJRZANY (napis czytelny, nic nie jest przekrzywione).
   DOWOD: ✓ pusta odpowiedz: `[data-wynik]` = `0/10`, komentarz `ALEKSANDRO, PUSTKA TEŻ JEST ODPOWIEDZIĄ, ALE NIE NA TEN EGZAMIN.`, a nasluch `page.on("request")` po 600 ms zebral ZERO zadan do `/api/ocena`; punkty NIE ida do `sessionStorage` (`egzamin.punkty` = `undefined`) i etap 2 zostaje `pass-o-metr__pole--zamkniety`, zgodnie z `plan/02 E1` (`etapUkonczony` patrzy na `punkty != null`, wiec zapisane zero otworzyloby quiz); ✓ narada zmierzona: 3994 ms przy odpowiedzi modelu po 200 ms, dymkow ROZNYCH 6 (zbior tekstow), kazdy dopasowany do wpisu z `data/komisja.json` pola `ocenianie`, zaden nie jest wpisany w kod; ✓ werdykt: `svg[role="img"]` z `aria-label="ZDANE"`, `[data-wynik]` = `8/10`, `font-family` licznika zawiera `Courier New`, komentarz modelu w calosci; po 400 ms wchodzi `PRZEJDŹ DO ETAPU 2` i `[data-etap='quiz'] [data-ozdoba='nowe']` w PassOMetr; ✓ REALNY brak klucza (drugi serwer dev na 3001 wystartowany z `OPENROUTER_API_KEY=`, nie atrapa): `curl` oddaje `HTTP 502` i `Aleksandro, Komisja jest w tej chwili nieosiągalna.`, a przegladarka pokazuje werdykt awaryjny po 3895 ms (limit 16 s), komentarz wylosowany z `werdyktAwaryjny`, punkty `6/10`; ✓ `Escape` w trakcie narady: nakladka znika natychmiast, przed odpowiedzia modelu stoi `KOMISJA JESZCZE OBRADUJE`, a werdykt `8/10` wskakuje sam, gdy odpowiedz przyjdzie; ✓ powrot na `/egzamin` po zdaniu (reload): `[data-wynik]` = `8/10` i komentarz odtworzone z `sessionStorage`, textarea ma `readonly` i zapisana tresc, przycisk `disabled`, a nasluch zadan po 700 ms pusty; ✓ PELNY przebieg z ZYWYM modelem na `pnpm dev`: werdykt po 5465 ms, `7/10`, napis `ZDANE`, komentarz `Szanowna Aleksandro, dostrzegamy Pani wysiłek (...)`, etap 2 odblokowany; ✓ zrzuty OBEJRZANE: `screenshots/F3/F3-03-werdykt.png` (chromowe `ZDANE` stoi prosto i jest czytelne, `7/10` czcionka terminalowa, komentarz na `--druk-tlo`, przycisk na etap 2), `F3-03-werdykt-pustka.png` (`NIEZDANE` plus `0/10`), `F3-03-werdykt-awaryjny.png` (`6/10` z tabeli awaryjnej), `F3-03-werdykt-cala-strona.png` (PassOMetr pokazuje `7/10` przy etapie 1 i `OTWARTY` z ozdoba `nowe` przy etapie 2, druk odpowiedzi zamkniety) - nigdzie nic przekrzywionego, zero pieczatki pod katem (`plan/06 E` punkt 3); ✓ `pnpm run check` czysto; ✓ `npx playwright test` = 144 passed, 0 failed, 10 skipped, DWA pelne przebiegi z rzedu; ✓ `pnpm build` zielony (`/egzamin` first load 112 kB). PULAPKA: drugi `pnpm dev` na porcie 3001 dzieli katalog `.next` z pierwszym i psuje mu hydracje - `/egzamin` przestaje reagowac na JS, a formularz wysyla sie natywnie GET-em. Objaw wyglada jak blad aplikacji, jest bledem srodowiska; lekarstwo to `rm -rf .next` i JEDEN serwer. Opis w DECISIONS.md #19. DWA BLEDY ZLAPANE NA ZRZUCIE, NIE W ASSERCJI: (1) `.ladowanie` bylo `position: absolute`, wiec nakladka narady montowala sie na GORZE DOKUMENTU, a przycisk `ODDAJ PRACĘ KOMISJI` lezy grubo ponizej pierwszego ekranu - ceremonia byla w DOM, ale poza widokiem (`boundingBox().y` = -1090 przy `scrollY` = 1090); poprawione na `fixed` z komentarzem, dopisany test regresji, ktory KONTROLNIE PADA po cofnieciu na `absolute`; assercja `zero position: fixed` z F2-01 dalej zielona, bo mierzy brame, na ktorej nakladki juz nie ma; (2) przycisk `disabled` po oddaniu pracy dalej zapalal sie na jadowicie zielono pod kursorem, bo `.druk__cta:hover` bilo `:disabled` na tle - `:hover` zwezony do `:not(:disabled)`. Zrzut `F3-03-narada.png` OBEJRZANY po poprawce: sescian 3D, dymek Komisji, pasek `####......` i goniec, wszystko na srodku okna. Commit: `F3-03`.
 
+### RAPORT FAZY F3 (DoD punkt po punkcie)
+
+- `pnpm run check` ZIELONY: `samotest: czysto`, `lint-tokens: czysto`,
+  `tsc --noEmit` bez bledow. `pnpm build` ZIELONY: `/egzamin` 2,98 kB,
+  first load 112 kB (limit 160 kB z F6-02). `npx playwright test` BEZ FAILOW:
+  146 passed, 0 failed, 10 skipped na obu viewportach, DWA pelne przebiegi
+  z rzedu po kazdym issue (jeden zielony przebieg nie wystarcza, pulapka z F2).
+- Zrzuty stanu fazy, wszystkie OBEJRZANE: `screenshots/F3/F3-02-egzamin-desktop.png`,
+  `F3-02-egzamin-mobile.png`, `F3-02-licznik-alarm.png`, `F3-03-narada.png`,
+  `F3-03-werdykt.png`, `F3-03-werdykt-pustka.png`, `F3-03-werdykt-awaryjny.png`,
+  `F3-03-werdykt-cala-strona.png`. Dwa z nich pokazaly bledy, ktorych nie zlapala
+  ZADNA assercja: stykanie sie `ETAP 1` z `EGZAMIN JASIU` na 390 px oraz nakladke
+  narady renderowana na gorze dokumentu, poza widokiem. Oba naprawione, drugi
+  ma test regresji, ktory kontrolnie pada po cofnieciu zmiany.
+- Ocena wzgledem Z7-Z9 i anty-spec `plan/01 G`:
+  - Z6 (zakaz przekrzywiania): SPELNIONY. `grep -rnE "(rotate|skew)\(" app components`
+    poza allowlista `ladowanie` = 0 trafien; skan `getComputedStyle` po calym `body`
+    z rozkladem macierzy = 0 elementow z niezerowym `b` albo `c`. Werdykt to prosty
+    `NapisObrazek`, zero pieczatki pod katem (`plan/06 E` punkt 3).
+  - Z7 (assety to pliki): SPELNIONY. `git grep -n "/assets/" -- app components`
+    poza `app/style/scena.css` (kursory) = 0 trafien; scena bierze wszystko
+    z `data/assety.json` przez `Ozdoba`, `Pas`, `StworRogowy`, `KafelTla`.
+  - Z8 (gestosc): SPELNIONY Z ZAPASEM. `/egzamin` na 1280x800: 62 animowane
+    elementy w `main.tresc` (48 na 390 px), 2 stwory w dolnych rogach,
+    3 pasy na pelna szerokosc okna (goniec shellu, pas balonow, goniec stopki).
+  - Z9 (kafel tla): SPELNIONY. `kafel-egzamin.png` na `<html>`,
+    `backgroundRepeat: repeat`, `backgroundSize: auto`,
+    `git grep "background-size" app/style` = 0 trafien.
+  - Z11 (reduced motion): SPELNIONY takze dla nowych elementow - miganie gwiazdek
+    stoi, `Ozdoba` podaje klatki statyczne, plonacy napis gasi ogien i poswiate.
+  - Z16 (copy do Aleksandry): SPELNIONY w calej fazie. Tresc zadania, polecenie,
+    naglowek druku odpowiedzi, wszystkie kwestie komisji, prompt systemowy
+    i komunikaty obu route'ow API mowia do niej wprost. Model w dwoch niezaleznych
+    probach oddal komentarz z wolaczem `Aleksandro`.
+  - Anty-spec egzaminu `plan/06 E` 1-5: zero przeciagania (`[draggable]` = 0),
+    zalozenia wylacznie jako lista w druku `ridge` na `--papier`, werdykt prosty,
+    postep pokazuje szescian i pasek `#` a nie cienka linia u gory, zero oceny
+    "na zywo" przy pisaniu.
+  - Anty-spec globalna `plan/01 G` 1-10: zero `border-radius`, zero miekkich cieni,
+    zero `transition: all` (0 trafien), zero elementow `fixed`/`sticky` w spoczynku
+    (nakladka ladowania jest `fixed` TYLKO na czas ceremonii i jest modalem,
+    nie nawigacja), kazdy blok tekstu ma wlasne tlo (punkt 10).
+- Znaleziska bez issue: BRAK. Trzy bledy fazy naprawione w swoich issues
+  (stykanie napisow, nakladka poza widokiem, przycisk `disabled` zapalajacy sie
+  na hover). Pulapka srodowiskowa z dwoma serwerami dev opisana w
+  `DECISIONS.md` #19. Otwarte issues F7-01..F7-05 bez zmian.
+
 ## F4 - QUIZ
 
 - [ ] **F4-01** `ui` ⚠ HARD Karta pytania i nawigacja: 15 pytań, warianty A-D, pytanie 14 otwarte, rząd 15 kwadratów, zapis stanu.
