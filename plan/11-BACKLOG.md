@@ -340,6 +340,61 @@ i anty-spec z `plan/01 G`, wpis raportu fazy, zero znalezisk bez issue w F7-ZNAL
   `pnpm run check` czysty, `pnpm build` `/quiz` 9,22 kB i 115 kB first load
   (limit 160 kB), pelny `npx playwright test` = 186 passed, 10 skipped.
 
+### RAPORT FAZY F4 (DoD punkt po punkcie)
+
+- `pnpm run check` ZIELONY: `samotest: czysto`, `lint-tokens: czysto`, `tsc --noEmit`
+  bez bledow. `pnpm build` ZIELONY: `/quiz` 9,22 kB, first load 115 kB (limit 160 kB
+  z F6-02). `npx playwright test` BEZ FAILOW: 186 passed, 0 failed, 10 skipped na obu
+  viewportach, DWA pelne przebiegi z rzedu po ostatnim issue.
+- Zrzuty stanu fazy, wszystkie OBEJRZANE, w `screenshots/F4/`: `F4-01-quiz-desktop.png`,
+  `F4-01-quiz-mobile.png`, `F4-01-pytanie-14-desktop.png`, `F4-01-pytanie-14-mobile.png`,
+  `F4-02-kolaz-15-ozdob.png`, `F4-02-pytanie-12-kopia.png`, `F4-02-pytanie-07-kropla.png`,
+  `F4-03-oddaj-*`, `F4-03-potwierdzenie-*`, `F4-03-ceremonia-w-toku-*`, `F4-03-wynik-*`,
+  `F4-03-rewizja-*` (kazdy w wersji desktop i 390 px). Zrzut zlapal jeden blad, ktorego
+  nie widziala zadna assercja: pudelko ozdoby rozciagalo sie na cala wysokosc karty
+  i zostawialo pod GIF-em pusty bialy pas okolo 150 px (naprawione `align-self`).
+- Ocena wzgledem Z6-Z9, Z11, Z16 i anty-spec (pomiar `getComputedStyle` na zywej
+  stronie, viewporty 1280x800 i 390x844):
+  - Z6 (zakaz przekrzywiania): SPELNIONY. Skan wszystkich elementow `main.tresc`
+    z rozkladem macierzy = 0 elementow z niezerowym `b` albo `c`; jedyny transform
+    w widoku to `matrix(-1, 0, 0, 1, 0, 0)` (lustro stworow i reakcja pytania 3).
+    `git grep -nE "(rotate|skew)\(" -- app components` poza allowlista `ladowanie`
+    = 0 trafien. Przekreslenie w rewizji jest POZIOME (`line-through`, `transform: none`).
+  - Z7 (assety to pliki): SPELNIONY. `git grep -n "/assets/" -- app components` poza
+    `app/style/scena.css` (kursory) = 0 trafien. Wszystkie 15 ozdob, oba pasy, oba
+    stwory i kafel ida przez `data/assety.json`.
+  - Z8 (gestosc): SPELNIONY. `/quiz` ma 7 animowanych elementow w `main.tresc`
+    (identycznie na 1280x800 i 390x844): pas balonow, pas cienki, goniec shellu,
+    dwa stwory `stwor-kot` w dolnych rogach, ozdoba pytania i plakietka `nowe`
+    w liczniku, do tego animacja CSS neonowego `QUIZ`. Minimum 2 w rogach: 2.
+    Minimum 1 pas na pelna szerokosc: 3. Zapas jest MNIEJSZY niz na `/egzamin`
+    (62 elementy) - samoocena gestosci wszystkich pieciu widokow to zakres F6-04.
+  - Z9 (kafel tla): SPELNIONY. `kafel-quiz.png` na `<html>`, `background-repeat: repeat`,
+    `background-size: auto`, kafel inny niz na pozostalych widokach.
+  - Z11 (reduced motion): SPELNIONY. Przy `prefers-reduced-motion: reduce` licznik
+    animowanych elementow spada z 7 na 0, cztery `img` przechodza na klatki z
+    `/assets/statyczne/`, `karta-oddech` i `karta-blysk` maja `animation-name: none`,
+    a cala ceremonia skraca sie do 2000 ms (`CEREMONIA_ZREDUKOWANA_MS`).
+  - Z16 (copy do Aleksandry): SPELNIONY. Trzy zdania widoku mowia do niej po imieniu:
+    `ALEKSANDRO, WPISZ ODPOWIEDŹ`, `ALEKSANDRO, KOMISJA UZNAJE: ...`,
+    `ALEKSANDRO, PYTAŃ BEZ ODPOWIEDZI: N. LICZĄ SIĘ JAKO BŁĘDNE.`.
+  - Anty-spec quizu `plan/07 E` 1-5: (1) zero informacji o poprawnosci przed oddaniem
+    arkusza - test skanuje atrybuty na pytaniach 1, 8, 14, 15 i nie znajduje ani jednego
+    slowa o poprawnosci; jedyna reakcja na tresc to bezimienny `data-blysk` pytania 14,
+    zamowiony wprost tabela `plan/07 B`. (2) Postep to rzad 15 kwadratow, zero cienkiej
+    linii postepu w widoku. (3) Zero animacji 3D: `perspective` = `none` i
+    `transform-style` inny niz `preserve-3d` na kazdym elemencie. (4) Zero emoji
+    w `main.tresc` (pole `emojiZrodlowe` nie jest renderowane). (5) 15 pytan ma 15
+    roznych `id` ozdob, wypisanych w dowodzie F4-02.
+  - Anty-spec globalna `plan/01 G`: zero `border-radius` (0 elementow), zero cieni
+    (`box-shadow` = 0 elementow), zero `transition: all`, zero elementow `fixed`
+    i `sticky` w spoczynku, zero `[draggable]`, kazdy blok tekstu ma wlasne tlo
+    (karta i kwadraty na `--papier`, licznik i wynik na `--tusz`, warianty na
+    `--druk-tlo`).
+- Znaleziska bez issue: BRAK. Dwa bledy fazy naprawione w swoich issues (pusty pas
+  pod ozdoba; `.karta__gif--kopia` przegrywajaca kolejnoscia arkuszy z `.ozdoba`).
+  Otwarte issues F7-01..F7-05 bez zmian.
+
 ## F5 - PRÓBA OGNIA I RADIO
 
 - [ ] **F5-01** `ui` Scena ogniska plus druk OGN-3/TAJ z walidacją stemplami wg `plan/08 A,B`.
