@@ -604,7 +604,26 @@ odrzucone z powodem, albo przeniesione do trackera).
   z tymi, ktore realnie wystawia nowy widok proby ognia; negatywne: zero zmian
   w czterech testach kontraktu API i zero zmian w `app/api/zgloszenie/route.ts`.
 
-- [ ] **F7-02** `ui` Naglowek `h1` jest przyciety przy lewej krawedzi okna.
+- [x] **F7-02** `ui` Naglowek `h1` jest przyciety przy lewej krawedzi okna.
+  ✓ ZNALEZISKO NIEAKTUALNE, potwierdzone pomiarem na zywej stronie, nie z kodu.
+  Przyciecie bralo sie z naglowka pisanego Caveatem od `x = 0` (stub z F2-01).
+  Dzis `h1` na `/`, `/egzamin` i `/quiz` niesie `NapisObrazek`, czyli `<svg>`
+  z `preserveAspectRatio="xMidYMid meet"`, ktory z definicji nie wychodzi poza
+  swoje pudelko, a kazdy kontener ma padding boczny (`.brama` 12 px,
+  `.egzamin`/`.quiz` `width: min(60vw, 380px)` z `margin: 0 auto`).
+  DOWOD: ✓ `npx playwright test tests/f7-02.spec.ts` = 6 passed (3 widoki x 2
+  viewporty), lewa krawedz tresci: `/` 12 px, `/egzamin` 450 px (desktop) i
+  45 px (390), `/quiz` 460/45 px, wszedzie `x >= 0` i `scrollWidth <=
+  clientWidth` rodzica; ✓ `overflow-x` na `body` = `visible` (negatywne AC);
+  ✓ screenshots/F7/f7-02-{brama,egzamin,quiz}-{desktop,390}.png OBEJRZANE -
+  litera `J` w `J-WORD PASS` i `E` w `ETAP 1` widoczne w calosci, nic nie dotyka
+  lewej krawedzi okna. Test zostaje jako straznik regresji. Commit: `F7-02`.
+  PULAPKA POMIARU: `Range.getClientRects()` na `<svg>` z `<text textLength>`
+  oddaje szerokosc SUROWYCH glifow, PRZED skalowaniem viewBox - na bramie
+  wychodzilo 1404 px przy elemencie szerokim na 1256 px. Napisy-obrazki mierz
+  obrysem elementu, Range tylko dla wezlow tekstowych.
+  ZNALEZISKO UBOCZNE: `F7-06` (martwa szerokosc `.brama__napis`).
+  <!-- oryginalny opis znaleziska -->
   Znalezisko z F2-01: na zrzutach `screenshots/F2/f2-01-shell-desktop.png` i
   `-390.png` litera `J` w `J-WORD PASS` wychodzi poza lewa krawedz viewportu.
   `body` ma `margin: 0` (globals.css), a Caveat ma ujemny wysiew lewej krawedzi
@@ -640,6 +659,24 @@ odrzucone z powodem, albo przeniesione do trackera).
   zapisana w `DECISIONS.md`, ze pole zostaje jak jest; `@axe-core/playwright`
   na `/` nie zglasza naruszenia `color-contrast`; negatywne: pole zamkniete
   dalej ma tlo szare i tekst przekreslony (charakter zostaje).
+
+- [ ] **F7-06** `ui` `.napis` zjada szerokosc zadana przez widok, `.brama__napis` jest martwy.
+  Znalezisko z F7-02, zlapane pomiarem `getBoundingClientRect` na zywej bramie.
+  `app/style/scena.css` ma `.napis { width: 100% }`, a `app/style/brama.css` ma
+  `.brama__napis { width: min(90vw, 720px) }`. Obie reguly maja te sama
+  specyficznosc (0,1,0), a `scena.css` jest importowany w `globals.css` PO
+  `brama.css`, wiec wygrywa `100%`. Efekt: napis `J-WORD PASS` na bramie ma
+  1256 px zamiast 720 px (zmierzone na 1280x800) i jest niemal dwa razy wiekszy,
+  niz chcial widok. `.egzamin__etap` i `.quiz__napis` maja `width: 100%` wprost,
+  wiec tam roznicy nie widac - szerokosc niesie tam rodzic (`__naglowek`).
+  CZYTAJ: 04→D; 05→B1.
+  AC: na `/`, na 1280x800, szerokosc `[data-napis]` w `h1` <= 720 px i <= 90vw
+  (pomiar `getBoundingClientRect().width` na zywej stronie); na 390x844
+  szerokosc <= 0,9 * 390; zrzut OBEJRZANY, napis `J-WORD PASS` w calosci
+  widoczny i wyrazniej mniejszy niz dzis; `tests/f7-02.spec.ts` dalej zielony;
+  negatywne: zero zmian w wygladzie napisow na `/egzamin`, `/quiz`
+  i `/proba-ognia` (szerokosc `[data-napis]` na tych widokach bez zmian,
+  pomiar przed i po w dowodzie); zero `!important`.
 
 - [ ] **F7-05** `ui` Wariant `odbijany` pasa-gonca liczy droge od szerokosci OKNA, nie kontenera.
   Znalezisko z F2-05, zlapane na zrzucie z preview. `app/style/scena.css` ma
