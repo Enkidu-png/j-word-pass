@@ -908,9 +908,14 @@ odrzucone z powodem, albo przeniesione do trackera).
 
 Kolejność liniowa jak wszędzie. Fazę wykonujemy PRZED bramką F8.
 
-- [ ] **F9-01** `ui` Stopka: napis `STRONA WYKONANA RĘCZNIE DLA ALEKSANDRY` zamieniony na `MINISTERSTWO CERTYFIKACJI JAN SACHSE`.
+- [x] **F9-01** `ui` Stopka: napis `STRONA WYKONANA RĘCZNIE DLA ALEKSANDRY` zamieniony na `MINISTERSTWO CERTYFIKACJI JAN SACHSE`.
   CZYTAJ: 05→A3.
   AC: stopka na wszystkich 4 stronach pokazuje `MINISTERSTWO CERTYFIKACJI JAN SACHSE`; `git grep -ci "wykonana ręcznie"` = 0; negatywne: reszta stopki (licznik, plakietki, slot radia, pas) bez zmian - liczba `img` w stopce ta sama co przed zmianą.
+  ✓ WYKONANE (pomiar na uruchomionej aplikacji, zrzut `screenshots/f9-01-stopka.png` OBEJRZANY):
+  `.stopka__tekst` na `/`, `/egzamin`, `/quiz`, `/proba-ognia` = `MINISTERSTWO CERTYFIKACJI JAN SACHSE` (4/4).
+  `footer img` = 4 przed i 4 po, `[data-radio-slot]` = 1 przed i 1 po, licznik `0001337` i trzy plakietki bez zmian.
+  `git grep -ni "wykonana ręcznie" -- . ':!plan/11-BACKLOG.md'` = 0 wystąpień. Jedyne pozostałe wystąpienie to CYTAT starego napisu w treści tego issue, więc `= 0` bez wyłączenia backlogu jest niewykonalne z definicji.
+  Zaktualizowany też spec `plan/05` A3, żeby nie zostawić sprzecznego źródła prawdy.
 - [ ] **F9-02** `ui` Pasy-gońce: górny dostaje dodatkowe człony, komunikat narady wymieniony w całości. Separator między członami to ` ### `.
   CZYTAJ: 05→A; 06→C.
   AC: górny pas-goniec zawiera dokładnie: `KOMISJA CZUWA - ALEKSANDRO, KOMISJA CZUWA ### PIĘKNIE DZIŚ WYGLĄDASZ ### POZDRO DLA GEJUF ###`; komunikat ceremonii narady `ALEKSANDRO, KOMISJA LICZY KAŻDĄ ODPOWIEDŹ` (i jego warianty) zastąpiony przez: `ZAJĘCIA Z CHEMII NA UNIWERSYTECIE WARSZAWSKIM ROZPOCZYNAJĄ SIĘ OD 2 PAŹDZIERNIKA ### KACPER ZABRAŁ MI 3 PARY GACI ### PRZEPRASZAM JESZCZE NIE POLICZYŁEM ILE WYDAŁEM ZROBIĘ TO OBIECUJĘ`; teksty siedzą w `data/komisja.json`, nie w komponencie (`git grep` w dowodzie); negatywne: zero `—` i `·` w nowych tekstach (Z1, Z2), `pnpm run check` zielony.

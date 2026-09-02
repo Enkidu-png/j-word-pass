@@ -48,8 +48,8 @@ Ten sam wzorzec dla `/proba-ognia` bez quizu.
 ### A3. Stopka-webring
 
 Zawiera, w tej kolejności: pas cienki (`Pas id="pas-cienki"`), licznik odwiedzin
-(patrz niżej), trzy plakietki 88x31 z `03` B5, tekst `STRONA WYKONANA RĘCZNIE DLA
-ALEKSANDRY`, oraz `Ozdoba id="stwor-koperta"`.
+(patrz niżej), trzy plakietki 88x31 z `03` B5, tekst `MINISTERSTWO CERTYFIKACJI JAN SACHSE`
+(zmiana zamowiona przez Aleksandre 2026-09-02, issue F9-01), oraz `Ozdoba id="stwor-koperta"`.
 
 **Miejsce na radio:** między plakietkami a tekstem stopki stoi pusty
 `<div data-radio-slot>`. Wypełnia go `RadioTinyDesk` dopiero w F5-03 - shell powstaje

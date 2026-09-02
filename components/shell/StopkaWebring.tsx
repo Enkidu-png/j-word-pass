@@ -62,7 +62,7 @@ export default function StopkaWebring() {
       <div data-radio-slot>
         <RadioTinyDesk />
       </div>
-      <p className="stopka__tekst">STRONA WYKONANA RĘCZNIE DLA ALEKSANDRY</p>
+      <p className="stopka__tekst">MINISTERSTWO CERTYFIKACJI JAN SACHSE</p>
       <Ozdoba id="stwor-koperta" klasa="stopka__koperta" />
     </footer>
   );
