@@ -635,7 +635,27 @@ odrzucone z powodem, albo przeniesione do trackera).
   `clientWidth` rodzica) mieści się w viewporcie, `x >= 0`; zrzut OBEJRZANY -
   pierwsza litera naglowka widoczna w calosci; negatywne: poprawka nie dodaje
   `overflow: hidden` na `body` (zaslonilaby przyszle stwory rogowe).
-- [ ] **F7-03** `ui` Plakietki webringu nie respektuja Z11 (reduced motion).
+- [x] **F7-03** `ui` Plakietki webringu nie respektuja Z11 (reduced motion).
+  ✓ ZROBIONE. Trzy plakietki dostaly `klatka-statyczna` w `data/assety.json`
+  (pierwsza klatka wyciagnieta `sips -s format png`, bo na tej maszynie nie ma
+  `gifsicle` ani `magick`), a `scripts/lint-tokens.mjs` wymaga tego pola takze
+  od roli `plakietka`. Komponent `Ozdoba` i hook `uzyjKlatki` nie wymagaly
+  zmiany - podmiana dziala dla kazdej pozycji z klatka.
+  DOWOD: ✓ `npx playwright test tests/f7-03.spec.ts` = 4 passed: przy
+  `reducedMotion: reduce` wszystkie trzy `footer img[data-ozdoba^=plakietka]`
+  maja `src` z `/assets/statyczne/` i koncowka `.png`, przy normalnym ruchu
+  dokladnie `/assets/plakietka-{html,css,przegladarka}.gif` i obrys 88x31
+  (negatywne AC: zero zmian w wygladzie); ✓ walidator realnie broni - po
+  wycieciu `klatka-statyczna` z `plakietka-css` `pnpm run check` wywala
+  `rola "plakietka" wymaga pola "klatka-statyczna" (Z11)`, po przywroceniu
+  czysto; ✓ `tests/f1-01.spec.ts` wrocil ze skanu `main.tresc` na CALY dokument
+  i jest zielony (6 passed) - zasieg testu Z11 znowu obejmuje stopke;
+  ✓ `sips`: trzy nowe PNG maja 88x31, wagi 2,0-2,9 KB; ✓ screenshots/F7/
+  f7-03-stopka-normalny.png i -reduced.png OBEJRZANE - plakietki `I HTML`,
+  `W3C CSS` i `NETSCAPE Now` stoja w tym samym miejscu i w tej samej skali
+  w obu trybach, a rozny wyglad koperty obok potwierdza, ze tryb reduced
+  faktycznie byl wlaczony. Commit: `F7-03`.
+  <!-- oryginalny opis znaleziska -->
   Znalezisko z F2-01: `plan/03 D` wymaga `klatka-statyczna` tylko od rol `ozdoba`
   i `pas`, wiec trzy pozycje roli `plakietka` (`plakietka-html`, `plakietka-css`,
   `plakietka-przegladarka`) zostaja animowanymi GIF-ami takze przy

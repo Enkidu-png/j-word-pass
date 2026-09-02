@@ -360,7 +360,8 @@
       "szerokosc": 88,
       "wysokosc": 31,
       "opis": "Plakietka 88x31 z napisem I HTML",
-      "rola": "plakietka"
+      "rola": "plakietka",
+      "klatka-statyczna": "/assets/statyczne/plakietka-html.png"
     },
     {
       "id": "plakietka-css",
@@ -368,7 +369,8 @@
       "szerokosc": 88,
       "wysokosc": 31,
       "opis": "Plakietka 88x31 W3C CSS z ptaszkiem",
-      "rola": "plakietka"
+      "rola": "plakietka",
+      "klatka-statyczna": "/assets/statyczne/plakietka-css.png"
     },
     {
       "id": "plakietka-przegladarka",
@@ -376,7 +378,8 @@
       "szerokosc": 88,
       "wysokosc": 31,
       "opis": "Plakietka 88x31 NETSCAPE Now",
-      "rola": "plakietka"
+      "rola": "plakietka",
+      "klatka-statyczna": "/assets/statyczne/plakietka-przegladarka.png"
     }
   ]
 }

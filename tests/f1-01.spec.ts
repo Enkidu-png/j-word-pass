@@ -21,13 +21,14 @@ test("reduced motion podmienia KAZDA ozdobe na klatke statyczna (Z11)", async ({
   // .first() nie nadaje sie: pierwsza ozdoba w DOM to plomien z warstwy, ktora
   // reduced motion chowa przez display:none. Czekamy na widoczna z siatki.
   await expect(page.locator(".playground-siatka img[data-ozdoba]").first()).toBeVisible();
-  // Skan zawezony do tresci strony: stopka shellu (F2-01) dokłada plakietki
-  // webringu, ktore maja role "plakietka", a Z11 wymaga klatki statycznej
-  // wylacznie od rol "ozdoba" i "pas" (plan/03 D). Skan po calym dokumencie
-  // przewracal ten test na plakietce, nie na regresji silnika.
+  // F7-03: skan wrocil na CALY dokument. Wczesniej byl zawezony do
+  // `main.tresc`, bo plakietki webringu w stopce nie mialy klatki statycznej
+  // i przewracaly ten test na luce w `plan/03 D`, a nie na regresji silnika.
+  // Plakietki maja juz `klatka-statyczna`, a walidator jej pilnuje, wiec
+  // zawezenie tylko zmniejszalo zasieg.
   const czytajZrodla = () =>
     page.evaluate(() =>
-      [...document.querySelectorAll("main.tresc img[data-ozdoba]")].map((e) => (e as HTMLImageElement).getAttribute("src") ?? ""),
+      [...document.querySelectorAll("img[data-ozdoba]")].map((e) => (e as HTMLImageElement).getAttribute("src") ?? ""),
     );
   // SSR oddaje wersje ANIMOWANA (plan/04 G: strona bez JS ma sie ruszac), a na
   // klatke statyczna podmienia dopiero hydracja. Bez tej bariery test czytal

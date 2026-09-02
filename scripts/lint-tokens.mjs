@@ -295,8 +295,11 @@ function sprawdzAssety() {
       }
     }
 
-    // Z11: ozdoby i pasy musza miec klatke statyczna, kursor jest z niej zwolniony.
-    if (poz.rola === "ozdoba" || poz.rola === "pas") {
+    // Z11: ozdoby, pasy i plakietki musza miec klatke statyczna, kursor jest
+    // z niej zwolniony (przegladarka i tak renderuje pierwsza klatke, plan/03 D2).
+    // Plakietki dolozone w F7-03: `plan/03 D2` ich nie wymienialo, a Z11 nie ma
+    // wyjatkow, wiec trzy GIF-y w stopce animowaly sie mimo reduced motion.
+    if (poz.rola === "ozdoba" || poz.rola === "pas" || poz.rola === "plakietka") {
       const klatka = poz["klatka-statyczna"];
       if (typeof klatka !== "string") {
         bledy.push(`${gdzie}: rola "${poz.rola}" wymaga pola "klatka-statyczna" (Z11)`);
