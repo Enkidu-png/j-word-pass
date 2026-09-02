@@ -457,6 +457,73 @@ i anty-spec z `plan/01 G`, wpis raportu fazy, zero znalezisk bez issue w F7-ZNAL
   CZYTAJ: 09 (cały).
   AC: przed kliknięciem `WŁĄCZ` zero żądań do `youtube.com` i `youtube-nocookie.com` (assercja `page.on('request')`); po kliknięciu pojawia się żądanie do `iframe_api` i `iframe` z `src` zawierającym `oCcks-fwq2c`; `localStorage.jwp.audio === "on"`; `WYŁĄCZ` cichnie w < 100 ms; radio NIE ma `position: fixed` i nie zasłania żadnego przycisku (`elementFromPoint` na 390 px); zrzut obudowy w `screenshots/F5/` OBEJRZANY; negatywne: zero plików audio w `public/`, `git grep -ciE "youtube-dl|ytdl|yt-dlp"` = 0.
 
+### RAPORT FAZY F5 (DoD punkt po punkcie)
+
+- `pnpm run check` ZIELONY: `samotest: czysto`, `lint-tokens: czysto`, `tsc --noEmit`
+  bez bledow. `pnpm build` ZIELONY: `/proba-ognia` 6,93 kB, first load 109 kB
+  (limit 160 kB z F6-02), shared 102 kB. `npx playwright test` BEZ FAILOW:
+  224 passed, 0 failed, 6 skipped na obu viewportach (bylo 10 skipped - dwa testy
+  odparkowane w F7-01).
+- Zrzuty stanu fazy, wszystkie OBEJRZANE, w `screenshots/F5/`:
+  `F5-01-druk-{desktop,mobile}.png`, `F5-01-stemple-{desktop,mobile}.png`,
+  `F5-02-krok1-zjazd.png`, `F5-02-krok2-ogien.png`, `F5-02-krok3-popiol.png`,
+  `F5-02-krok4-butelka.png`, `F5-02-pergamin-{desktop,mobile}.png`,
+  `F5-03-radio-{wylaczone,gra}-{desktop,mobile}.png`.
+  Zrzuty zlapaly trzy bledy, ktorych nie widziala zadna assercja: rzad ogniska
+  wychodzil poza 390 px, rzad ognia ceremonii stal POD plonacym drukiem zamiast
+  nad nim, a `iframe` radia na 390 px mial 260 px szerokosci w obudowie 220 px.
+  Wszystkie naprawione przed odhaczeniem issue.
+- Ocena wzgledem Z6-Z9, Z11, Z16 i anty-spec (pomiar `getComputedStyle` na zywej
+  stronie, viewporty 1280x800 i 390x844):
+  - Z6 (zakaz przekrzywiania): SPELNIONY. Skan wszystkich elementow `main.tresc`
+    z rozkladem macierzy = 0 elementow z niezerowym `b` albo `c` na obu viewportach.
+    Drganie odrzuconego druku to `translateX` - klatki `druk-drganie` czytane
+    z CSSOM zywej strony niosa wylacznie `translateX(...)`. Pergamin ma macierz
+    `[1,0,0,1]`. `git grep -nE "(rotate|skew)\(" -- app components` poza allowlista
+    `ladowanie` = 0 trafien.
+  - Z7 (assety to pliki): SPELNIONY. `git grep -n "/assets/" -- app components`
+    poza `app/style/scena.css` (kursory) = 0 trafien. Ognisko, kot, stwory rogowe,
+    but, ucho, butelka, oba pasy i kafel ida przez `data/assety.json`.
+  - Z8 (gestosc): SPELNIONY. `/proba-ognia` ma 10 animowanych GIF-ow plus 5 elementow
+    z wlasna animacja CSS w `main.tresc`, identycznie na 1280x800 i 390x844 (minimum
+    to 6). Piec ogni ogniska ma piec roznych `animation-delay` (0, 130, 260, 390,
+    520 ms). Minimum 2 w rogach: 2 delfiny (prawy z `--lustro`). Pasy na pelna
+    szerokosc: 2 plus goniec shellu.
+  - Z9 (kafel tla): SPELNIONY. `kafel-ogien.png` na `<html>`, `background-repeat:
+    repeat`, `background-size: auto`, kafel inny niz na pozostalych widokach.
+  - Z11 (reduced motion): SPELNIONY. Przy `prefers-reduced-motion: reduce` licznik
+    animowanych elementow spada z 15 na 0, wszystkie 10 `img` przechodzi na klatki
+    z `/assets/statyczne/`, `ognisko-zar`, `druk-drganie`, `popiol-opada`,
+    `pergamin-rozwija` i wskaznik strojenia radia maja `animation-name: none`,
+    a ceremonia spalenia skraca sie do dwoch krokow po 300 ms.
+  - Z14 (zaleznosci): SPELNIONY z jednym swiadomym wyjatkiem opisanym w DECISIONS #20
+    - `iframe_api` YouTube, ladowany DOPIERO po gescie Aleksandry. Przed gestem
+    zero zadan do `youtube.com` i `youtube-nocookie.com`, zero `iframe`, zero
+    `script[src*=youtube]`. Zero nowych paczek w `package.json`.
+  - Z15 (zero autoplay): SPELNIONY. Wejscie z `jwp.audio === "on"` nie startuje
+    dzwieku, tylko prosi `KLIKNIJ, ABY WZNOWIĆ`.
+  - Z16 (copy do Aleksandry): SPELNIONY. Kazde zdanie widoku mowi do niej po imieniu:
+    `OGN-3/TAJ - WNIOSEK KOŃCOWY - ALEKSANDRA`, `TWÓJ ADRES E-MAIL, ALEKSANDRO`,
+    `ALEKSANDRO, TO NIE JEST ADRES`, `ALEKSANDRO, POTWIERDZAM, ŻE ROZUMIEM POWAGĘ
+    SYTUACJI`, `ALEKSANDRO, TWÓJ DRUK PŁONIE.`, `KLIKNIJ BUTELKĘ, ALEKSANDRO`,
+    `PISMO KOŃCOWE - TAJNE - DO RĄK WŁASNYCH ALEKSANDRY`, `KLIKNIJ WŁĄCZ,
+    ALEKSANDRO`, `RADIO MILCZY. KOMISJA PRZEPRASZA, ALEKSANDRO.`.
+    Zero emoji, zero `—` i `·` w nowych plikach (`git grep` = 0 trafien).
+  - Anty-spec proby ognia `plan/08 F` 1-5: (1) zero steppera - skan `body.innerText`
+    nie znajduje wzorca `KROK n Z m`; (2) zero czerwonych obwodek bez stempla -
+    `borderTopColor` pola po odrzuceniu jest IDENTYCZNY jak przed submitem, blad
+    niesie wylacznie stempel; (3) zero przekrzywienia druku i pergaminu (Z6 wyzej);
+    (4) zero konfetti i fajerwerkow - skan klas calego dokumentu po wysylce = 0
+    trafien na `konfetti|confetti|fajerwerk|firework`; (5) zero maili z aplikacji -
+    `/api/zgloszenie` pisze do Bloba i nic wiecej.
+  - Anty-spec radia `plan/09 B, D`: radio NIE jest `fixed` ani `sticky` (skan
+    `body *` = 0), zaden przycisk strony nie ma radia na swoim srodku
+    (`elementFromPoint`), zero plikow audio w `public/`, zero `youtube-dl|ytdl|yt-dlp`
+    w kodzie i w `package.json`.
+- Znaleziska bez issue: BRAK. Trzy bledy zlapane na zrzutach naprawiono w obrebie
+  swoich issue. F7-01 zamkniete razem z F5-02. Otwarte zostaja F7-02, F7-03,
+  F7-04 (czeka na decyzje Aleksandry) i F7-05.
+
 ## F6 - POLISH
 
 - [ ] **F6-01** `a11y` Audyt dostępności: przejście przez 3 etapy samą klawiaturą, kontrasty tokenów, `aria-label` na ozdobach interaktywnych, `role="button"` na butelce.

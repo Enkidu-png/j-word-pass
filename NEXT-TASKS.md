@@ -7,108 +7,85 @@
 
 ## Gdzie jestesmy
 
-**Fazy F0, F1, F2, F3 i F4 ZAMKNIETE**, kazda z raportem DoD w `plan/11-BACKLOG.md`.
-W tym przebiegu doszly: F4-01, F4-02, F4-03. Jeden commit na issue plus commit
-z raportem fazy.
+**Fazy F0-F5 ZAMKNIETE**, kazda z raportem DoD w `plan/11-BACKLOG.md`.
+W tym przebiegu doszly: F5-01, F5-02, F5-03 oraz zamkniete znalezisko F7-01.
+Jeden commit na issue.
 
-Etap 2 dziala end to end: kafel `kafel-quiz`, pas balonow, neonowy `QUIZ`, licznik
-`PYTANIE NN / 15` na czarnym tle, karta pytania z ozdoba wg tabeli `plan/07 B`
-(15 roznych `id`), warianty A-D, pytanie 14 otwarte, nawigacja plus rzad 15 kwadratow,
-maszyna prawdy (werdykt co 500 ms, `Escape` odslania wszystko naraz), tryb rewizji
-i przejscie na `/proba-ognia`. Zmierzone na zywej stronie: pelna ceremonia 8415 ms
-(desktop) i 8376 ms (mobile), limit 9000 ms.
+Etap 3 dziala end to end: kafel `kafel-ogien`, dwa pasy cienkie, `PROBA OGNIA`,
+ognisko z pieciu ogni plus kot, druk OGN-3/TAJ z walidacja stemplami, ceremonia
+spalenia w czterech krokach (zjazd druku, osiem ogni, dwadziescia ziaren popiolu,
+butelka) i list w butelce z suma `N/25` oraz przyciskiem `OD NOWA`.
+W stopce gra `RADIO KOMISJI` (YouTube IFrame API po gescie).
 
 **Deploy: NIE ruszany w tej paczce.** Bramka F8 nadal nalezy do Aleksandry.
 
 ## Nastepne issue
 
-**F5-01** (pierwsze issue fazy F5, PROBA OGNIA). Sprawdz jego `CZYTAJ:` w backlogu.
-Uwaga: `tests/f5-02.spec.ts` ma DWA sparkowane testy (`test.skip`), ktore po F5-02
-trzeba odpiac - to issue **F7-01**.
+**F6-01** (pierwsze issue fazy F6, POLISH - audyt dostepnosci). Sprawdz jego
+`CZYTAJ:` w backlogu. F6 to OSTATNIA faza budowlana: po jej DoD paczka konczy
+sie niezaleznie od kontekstu, a dalej jest tylko bramka decyzyjna F8.
 
 ## Stan srodowiska
 
 - `pnpm dev` chodzi na `localhost:3000`. `pnpm run check` zielony, `pnpm build`
-  zielony (`/quiz` first load 115 kB, `/egzamin` 112 kB, limit 160 kB),
-  `npx playwright test` = 186 passed, 0 failed, 10 skipped, dwa pelne przebiegi z rzedu.
-- Nowe pliki fazy F4: `components/quiz/Arkusz.tsx`, `app/style/quiz.css`,
-  `tests/f4-01.spec.ts`, `tests/f4-02.spec.ts`, `tests/f4-03.spec.ts`.
-- **`addInitScript` SERIALIZUJE funkcje - domkniecia nie ma.** Fabryka
-  `wypelnij(dane)` zwracajaca funkcje ciagnela `dane` z zakresu testu i w
-  przegladarce leciala `ReferenceError`, przez co szesc testow po cichu pracowalo
-  na pustym arkuszu. Argument podaje sie DRUGIM parametrem: `addInitScript(f, dane)`.
-  Ten sam skrypt odpala sie takze przy `page.reload()`, wiec kazdy seed stanu musi
-  miec straznika `if (sessionStorage.getItem("jwp.v1")) return;`, inaczej reload
-  kasuje to, co wlasnie zapisala strona.
-- **Kolejnosc arkuszy w `globals.css` rozstrzyga remisy specyficznosci.**
-  `quiz.css` idzie PRZED `scena.css`, wiec `.ozdoba { display: block }` bilo
-  `.karta__gif--kopia { display: none }`. Lekarstwo: selektor z rodzicem, nie `!important`.
-- **`.ladowanie` jest teraz `position: fixed`** (bylo `absolute`). Kazda kolejna
-  ceremonia odpalana przyciskiem ponizej pierwszego ekranu dziala dzieki temu
-  poprawnie. Nie cofaj tego bez przeczytania testu regresji w `tests/f3-03.spec.ts`.
-- **`uzyjStanu` nasluchuje zdarzenia `jwp:stan`.** Kto zapisuje werdykt etapu
-  BEZ zmiany sciezki, ten musi po `zapiszTeraz` zrobic
-  `window.dispatchEvent(new Event("jwp:stan"))`, inaczej PassOMetr zostanie
-  z etapem zamknietym. Wzorzec: `components/egzamin/DrukOdpowiedzi.tsx`.
-- **Zero punktow NIE idzie do `sessionStorage`.** `etapUkonczony` patrzy na
-  `punkty != null`, wiec zapisane `0` otworzyloby quiz, a `plan/02 E1` mowi,
-  ze pusta odpowiedz ma zostawiac bramke zamknieta. `lib/stan.ts` nie wolno
-  zmieniac (`plan/02 B`), wiec pilnuje tego strona zapisujaca.
-- `KafelTla id="..."` to sposob na Z9 w kazdym kolejnym widoku.
-- `FokusNaNaglowku` fokusuje `main.tresc h1` po KAZDEJ zmianie sciezki.
-  Naglowki etapow musza miec `tabIndex={-1}`. Naglowek bramy CELOWO go nie ma.
-- `EkranLadowania` renderuje sie portalem do `<body>`. Nie wkladaj go w scene
-  widoku - wpadnie w pomiary tego widoku.
+  zielony (`/quiz` 115 kB, `/egzamin` 112 kB, `/proba-ognia` 109 kB, limit
+  160 kB), `npx playwright test` = 224 passed, 0 failed, 6 skipped.
+- Nowe pliki fazy F5: `components/ogien/DrukOgnia.tsx`,
+  `components/ogien/ListWButelce.tsx`, `components/RadioTinyDesk.tsx`,
+  `app/style/ogien.css`, `tests/f5-01.spec.ts`, `tests/f5-03.spec.ts`.
+  Nowe pole `pismoKoncowe` w `data/komisja.json`.
+- **`noValidate` na formularzu jest OBOWIAZKOWE, jesli walidacje robi aplikacja.**
+  Przy `type="email"` i `min`/`max` przegladarka BLOKUJE submit i `onSubmit`
+  nigdy nie dochodzi. Szesc assercji padalo na "brak stempla", a przyczyna byla
+  natywna walidacja, nie kod stempli.
+- **Nie odmontowuj `iframe` odtwarzacza przy pauzie.** Pierwsza wersja radia
+  renderowala gniazdo tylko gdy `gra === true`; `WYLACZ` kasowalo iframe razem
+  ze stanem, wiec `getPlayerState()` nigdy nie wracalo `2`, a ponowne `WLACZ`
+  startowaloby koncert od poczatku. Odtwarzacz montuje sie RAZ. DECISIONS #20.
+- **`YT.Player` na `youtube-nocookie.com` MUSI dostac jawny `host`**, inaczej
+  `onReady` nie przychodzi i radio zawsze wpada w tryb awaryjny (plan/09 A).
+- `window.jwpRadio` to uchwyt diagnostyczny do odtwarzacza (jak `jwpAwaria`).
+  Bez niego kryterium "pauza ponizej 100 ms" jest niemierzalne.
+- Test F2-01 sprawdzal, ze slot na radio jest PUSTY. Od F5-03 sprawdza, ze siedzi
+  w nim dokladnie jedno `[data-radio]`.
+- Wczesniejsze pulapki srodowiska (JEDEN `pnpm dev` naraz, `pnpm build` psuje
+  dzialajacy `dev`, `nextjs-portal` na zrzutach z dev, `addInitScript`
+  serializuje funkcje, kolejnosc arkuszy w `globals.css`) sa dalej aktualne -
+  opis w historii tego pliku i w `DECISIONS.md` #14, #19.
 
-## Pulapki zmierzone w tym przebiegu (nie tracic na nie czasu drugi raz)
+## Pulapki zmierzone w tym przebiegu
 
-1. **JEDEN `pnpm dev` naraz.** Drugi serwer na innym porcie dzieli katalog
-   `.next` i psuje hydracje pierwszego: strona przestaje reagowac na JS,
-   a formularz wysyla sie natywnie GET-em z trescia w query stringu. Wyglada
-   jak blad komponentu, jest bledem srodowiska. Lekarstwo: `rm -rf .next`
-   i jeden serwer. Dowod wymagajacy innego env zbieraj po kolei. DECISIONS #19.
-2. **`position: absolute` na pelnoekranowej nakladce to pulapka.** Element
-   siada na gorze DOKUMENTU, nie okna. Jesli odpala go przycisk ponizej
-   pierwszego ekranu, nakladka jest w DOM i przechodzi `toBeVisible()`,
-   a uzytkownik nie widzi jej wcale. Mierz `boundingBox().y` wzgledem OKNA.
-3. **Nie renderuj wyniku ceremonii rownolegle z nakladka.** Werdykt wstawiony
-   do drzewa juz w fazie narady konczyl etap po 300 ms zamiast po kontraktowych
-   3500 ms i przechodzil przez wszystkie assercje poza pomiarem czasu.
-4. **`locator.textContent()` bez `timeout` zjada caly limit testu.** W petli
-   probkujacej element, ktory za chwile zniknie, domyslne 30 s zawiesza test.
-   Zawsze `textContent({ timeout: 200 }).catch(() => null)`.
-5. **Assercja `expect(y).toBeLessThanOrEqual(0)` przechodzi takze dla `-1090`.**
-   Kontrola przez cofniecie poprawki jest obowiazkowa: test, ktory nie pada po
-   przywroceniu buga, niczego nie pilnuje. Wlasciwa forma: `Math.abs(y) <= 1`.
-6. **`:hover` bije `:disabled` na tej samej specyficznosci.** Przycisk po
-   oddaniu pracy dalej zapalal sie na `--jad` pod kursorem. Zawsze
-   `:hover:not(:disabled)`.
-7. **Zrzuty z `pnpm dev` maja czarne kolko z `N` przy lewej krawedzi** - to
-   `<nextjs-portal>`, znaczek dev-toolsow, `position: fixed`. W produkcji go
-   nie ma. Skrypt zrzutow chowa go `nextjs-portal{display:none!important}`.
-8. **`pnpm build` psuje dzialajacy `pnpm dev`.** Kolejnosc zawsze: testy, build,
-   restart dev. Potwierdzone trzeci raz.
-9. **`bash ~/.claude/agent-context.sh` oddaje `STALE-TRANSCRIPT`** przez caly
-   przebieg (raz na starcie oddal `44`, potem juz nigdy liczby). Warunek
-   sztafety „konczy przy 55%" jest tym narzedziem niemierzalny. DECISIONS #14.
-   Ta paczka zostala domknieta NA GRANICY FAZY, zgodnie z dyspozycja.
+1. **Natywna walidacja HTML kontra walidacja wlasna** - patrz `noValidate` wyzej.
+   Objaw wyglada jak martwy handler, przyczyna jest w przegladarce.
+2. **Nie mierz animacji probkujac `getComputedStyle` w petli.** Animacja 240 ms
+   konczy sie, zanim petla assercji do niej dojdzie. Pewniejsze jest przeczytanie
+   klatek kluczowych z `document.styleSheets` (`CSSKeyframesRule`) - to dalej
+   pomiar na zywej stronie, a nie na tekscie pliku.
+3. **`getPlayerState()` mierz dopiero, gdy odtwarzacz REALNIE gra (stan `1`).**
+   Pauza materialu, ktory sie nie zaczal, nie zwraca `2` i test klamie.
+4. **GIF ognia ma klatki prawie przezroczyste.** Na zrzucie fazy potrafi zniknac
+   caly rzad plomieni - to klatka, nie brak elementu. Sprawdzaj `boundingBox`,
+   zanim uznasz element za niewidoczny.
+5. `bash ~/.claude/agent-context.sh` przez caly przebieg oddawal `50` raz na
+   starcie i `STALE-TRANSCRIPT` pozniej. Paczka domknieta NA GRANICY FAZY,
+   zgodnie z dyspozycja (DECISIONS #14).
 
 ## Otwarte issues w F7-ZNALEZISKA
 
-- **F7-01** dwa testy w `tests/f5-02.spec.ts` sparkowane, odpiac po F5-02.
-- **F7-02** naglowek `h1` przyciety przy lewej krawedzi okna. Uwaga: NIE dotyczy
-  `/egzamin`, bo tam `h1` niesie `NapisObrazek`, a nie tekst Caveatem.
+- **F7-02** naglowek `h1` przyciety przy lewej krawedzi okna. NIE dotyczy
+  `/egzamin` ani `/proba-ognia` (tam `h1` niesie `NapisObrazek`).
 - **F7-03** plakietki webringu nie maja klatki statycznej, wiec animuja sie mimo
   reduced motion.
 - **F7-04** kontrast tekstu w zamknietym polu PassOMetr okolo 3,8:1. Konflikt
   spec kontra dostepnosc, czeka na decyzje.
 - **F7-05** wariant `odbijany` pasa-gonca liczy droge od szerokosci OKNA, nie
   kontenera, wiec na bramie ucina `ALEKSANDRO`.
+- **F7-01 ZAMKNIETE** razem z F5-02.
 
 ## Decyzje w toku
 
 - **D-kontekst (do Aleksandry):** `agent-context.sh` nie mierzy okna workera.
   Rekomendacja: konczyc paczke na granicy fazy. Opis: `DECISIONS.md` #14.
 - **F7-04 (do Aleksandry):** kontrast pola zamknietego PassOMetr.
-- Swiadome odstepstwa opisane i zamkniete: `DECISIONS.md` #15, #16, #17, #18,
-  **#19** (dwa serwery dev kontra katalog `.next`).
+- Swiadome odstepstwa opisane i zamkniete: `DECISIONS.md` #15-#19 oraz **#20**
+  (skrypt `iframe_api` jako jedyny wyjatek od Z14).
