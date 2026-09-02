@@ -1113,6 +1113,36 @@ puszczaj pojedyncze pliki, nie całą suitę.
   ✓ D6 `DECISIONS.md` #24: próg zwalniający, zamek zamknięty przy braku zmiennej,
     pięć zmierzonych pułapek.
 
+### RAPORT FAZY F10 (DoD punkt po punkcie)
+
+- `pnpm run check` zielony (`samotest: czysto`, `lint-tokens: czysto`, `tsc --noEmit`
+  bez wyjscia).
+- `pnpm build` zielony: `/quiz` 115 kB, `/egzamin` 113 kB, `/proba-ognia` 109 kB,
+  `/` 107 kB, wspolne 102 kB - bez zmian wzgledem F9, mimo nowej nakladki
+  (siedzi w layoucie i jest wspoldzielona).
+- `npx playwright test` = **424 passed / 6 skipped / 0 failed** (388 sprzed fazy
+  plus 26 z F10-02 plus 10 z F10-03). Migotania `f4-01` i `f6-01` pod pelnym
+  obciazeniem sa STARE i opisane w `DECISIONS.md` (pulapka 3 przy fazie F9) -
+  pojedynczo oba pliki przechodza zawsze.
+- Zrzut stanu fazy: `screenshots/F10/F10-DoD-stan-fazy.png`, OBEJRZANY. Nakladka
+  bramy wstepu nad `/proba-ognia`: kafel `kafel-brama` powtarzany bez
+  `background-size` (Z9), tekst czytany na `--papier` (Z10), trzy ozdoby
+  z manifestu plus dwa pasy i goniec (Z8), zero przekrzywien (Z6), zero emoji
+  i zero dlugiego myslnika w copy (Z1, Z4). Fokus na polu widoczny magentowa
+  linia przerywana. Pozostale zrzuty fazy: `f10-02-brama-*`, `f10-02-stempel-*`,
+  `f10-02-po-wpuszczeniu-*` (desktop 1280 i mobile 390).
+- Wpisy raportowe: dowody D1-D7 przy F10-01, D1-D10 przy F10-02, D1-D6 przy F10-03.
+- Weryfikacja na PRODUKCJI (`https://j-word-pass.vercel.app`, deployment
+  `j-word-pass-giec52l86`): brama pokazuje sie po wyczyszczeniu `jwp.wstep`,
+  bledna odpowiedz daje stempel `KOMISJA NIE ROZPOZNAJE PETENTA`, poprawna
+  zdejmuje nakladke; `/api/ocena` bez naglowka = 401, z naglowkiem z `localStorage`
+  = 200 z werdyktem 8/10; w store pojawil sie
+  `odpowiedzi/2026-09-02T10:56:05.310Z-czesc2-3gzada.json` (652 B), po sprawdzeniu
+  skasowany.
+- Znaleziska bez issue: brak. Piec pulapek tej fazy opisanych w `DECISIONS.md` #24,
+  w tym jedna spoza kodu (produkcja odbija `curl` z lokalnego IP strona
+  `Vercel Security Checkpoint`).
+
 ## F8 - BRAMKA DECYZYJNA
 
 - [x] **F8-01** `deploy` STOP-GATE przed wykonaniem: pokaż Aleksandrze URL preview plus `WERYFIKACJA.md`, zapytaj o zgodę na `vercel deploy --prod` (podmiana żywej produkcji z wersji 1).

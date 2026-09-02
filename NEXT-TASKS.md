@@ -5,92 +5,68 @@
 > checkboxy w `plan/11-BACKLOG.md`. Jesli ten plik kiedykolwiek zacznie mowic
 > co innego niz backlog, wierz backlogowi i skasuj ten plik.
 
-## Gdzie jestesmy (aktualizacja: paczka F7-08 plus cala faza F9)
+## Gdzie jestesmy (aktualizacja: cala faza F10)
 
-**Fazy F0-F7 ZAMKNIETE.** W tym przebiegu doszlo **F7-08** oraz **CALA FAZA F9**
-(F9-01 do F9-06) z raportem DoD w `plan/11-BACKLOG.md`. Jeden commit na issue
-plus dwa commity naprawcze.
+**Fazy F0-F7, F9 i F10 ZAMKNIETE.** W tym przebiegu doszla CALA FAZA F10
+(F10-01, F10-02, F10-03) z raportem DoD w `plan/11-BACKLOG.md`. Wszystko jest
+na PRODUKCJI i tam zweryfikowane.
 
-**Otwarte pozycje: `F7-09` (nowe znalezisko, ponizej) i `F8-01` - twardy
-STOP-GATE Aleksandry.** Nie dotykac F8-01, zero `vercel deploy --prod`.
+**Otwarta pozycja: `F7-09`** - to nie jest robota workera, tylko decyzja
+Aleksandry (integracja GitHub deployuje `main` prosto na produkcje).
 
 ## Co doszlo w tej paczce
 
-- **F7-08** - zadanie etapu 1 wyszlo spod dekoracji. Na 390x844 `TREŚĆ PYTANIA`
-  z 1040 na **268 px**, `<textarea>` z 1688 na **982 px**. Sposob: kolejnosc
-  w DOM (pytanie przed danymi, scena kosmiczna POD druk odpowiedzi),
-  `DANE DO ZADANIA` w `<details>` zwinietym domyslnie, zwezony blok napisow nad
-  zadaniem. Liczba `img[data-ozdoba]` bez zmian (35 i 42).
-- **F9-01** - stopka mowi `MINISTERSTWO CERTYFIKACJI JAN SACHSE` na czterech
-  widokach, reszta stopki nietknieta (4 obrazki przed i po).
-- **F9-02** - nowe teksty pasow-goncow, oba w `data/komisja.json` pod `gonce`.
-- **F9-03** - Z16 w nowej wersji: pytanie etapu 1 bezosobowo, dokladnie 3 z 15
-  pytan quizu z imieniem (nr 1 `Aleksandro`, nr 7 `Rutkowska`, nr 13
-  `Mario Magdaleno`), klauzula `Potwierdzam, że rozumiem powagę sytuacji.`
-- **F9-04 (HARD)** - etap 1 ma DWIE czesci. Nowy `data/egzamin.json -> czesc2`,
-  `lib/stan.ts` niesie `odpowiedz2/punkty2/komentarz2`, `etapUkonczony("egzamin")`
-  wymaga OBU werdyktow, PassOMetr pokazuje sume z 20, `/api/ocena` sklada prompt
-  z danych i dostaje pole `czesc`.
-- **F9-05** - radio przelacza trzy materialy strzalkami, wybor w `localStorage`
-  pod `jwp.kanal`, podpis `LECI: POST MALONE...` skasowany.
-- **F9-06 (HARD)** - ekran WYZWANIA miedzy ceremonia spalenia a butelka,
-  tresc w `data/komisja.json -> wyzwanie`.
-- Naprawcze: straznik `tests/f3-02` mierzy strzalke po rozwinieciu `<details>`;
-  pergamin i `/api/zgloszenie` licza etap 1 jako **sume dwoch czesci** (20 i 35).
+- **F10-01** - kazda udana ocena zapisuje `odpowiedzi/<ISO>-czesc<N>-<losowe6>.json`
+  do prywatnego store'a `jwp-zgloszenia` (pelna tresc odpowiedzi, punkty,
+  komentarz, model). `/api/zgloszenie` zapisuje komplet: obie odpowiedzi
+  z werdyktami plus wynik quizu. Wspolny zapis w `lib/zapis.ts`. Awaria Bloba
+  NIE zabiera werdyktu. Przepis na odczyt: `WERYFIKACJA.md` sekcja 11.
+- **F10-02** - brama wstepu: pelnoekranowa nakladka z pytaniem `Jak na drugie
+  imie ma Janek?` przed kazdym z czterech widokow. Tresc widoku chowa ARKUSZ
+  (`:root:not([data-wstep="1"])`), nie React - dzieki temu nic nie mignie przed
+  hydracja. Pytanie i odpowiedz w `data/komisja.json -> wstep`.
+- **F10-03** - `/api/ocena` i `/api/zgloszenie` wymagaja naglowka `x-jwp-klucz`,
+  porownanie ze zmienna `JWP_KLUCZ_WSTEPU`. 401 przed wywolaniem modelu.
 
 ## Nastepne issue
 
-**`F7-09`, ale to NIE jest robota workera - to decyzja Aleksandry.**
-
-Integracja GitHub na Vercelu deployuje `main` PROSTO NA PRODUKCJE. Po
-`git push origin main` z commitem `e5c80d2` powstal deployment
-`j-word-pass-3j46hxzhy` z `target: production`. Zaden worker nie uruchamial
-`vercel deploy --prod`. Starsze wpisy `Production` sprzed 3 h i 4 h maja te sama
-sygnature, wiec produkcja chodzi za `main` od poczatku buildu v2, a bramka F8-01
-byla martwa juz przed ta paczka. Pelne AC z dwiema drogami wyjscia: `F7-09`
-w `plan/11-BACKLOG.md`.
-
-Poza tym **BRAK ISSUE DO WZIECIA**. Nastepny worker albo dostaje NOWE
-znalezisko do dopisania w F7-ZNALEZISKA, albo nie ma czego robic.
+**BRAK ISSUE DO WZIECIA.** Otwarte zostaje tylko `F7-09` (decyzja Aleksandry).
+Nastepny worker albo dostaje NOWE znalezisko do dopisania w F7-ZNALEZISKA,
+albo nie ma czego robic.
 
 ## Stan srodowiska
 
-- `pnpm run check` zielony. `pnpm build` zielony: `/quiz` 115 kB, `/egzamin`
-  113 kB, `/proba-ognia` 109 kB, `/` 107 kB, `/dev/scena` 107 kB, wspolne 102 kB.
-- `npx playwright test` na `pnpm dev` = **388 passed / 0 failed / 6 skipped**.
-- Kryteria klawiatury sprawdzone na `pnpm build && pnpm start`: pelny przeplyw
-  brama-pergamin sama klawiatura, 20 krokow, przechodzi.
-- Uwaga: po tej paczce na porcie 3000 chodzi `pnpm start` (build produkcyjny).
-  Przed dalsza praca: `pkill -f next-server; rm -rf .next; pnpm dev`.
+- `pnpm run check` zielony. `pnpm build` zielony (rozmiary bez zmian wzgledem F9).
+- `npx playwright test` = **424 passed / 6 skipped / 0 failed**.
+- **UWAGA, NOWE:** serwer deweloperski do testow musi miec klucz wstepu:
+  `JWP_KLUCZ_WSTEPU=wstep-testowy pnpm dev`. Playwright wstrzykuje to sam przez
+  `webServer.env`, ale gdy `pnpm dev` odpalasz RECZNIE (a `reuseExistingServer`
+  go potem przejmuje), bez tej zmiennej `/api/*` oddaje 401 i pada 9 testow.
+- Cala suita wchodzi z gotowym `jwp.wstep` w `localStorage` przez `storageState`
+  w `playwright.config.ts`. Sama brama testuje sie w `tests/f10-02.spec.ts`,
+  ktory ten wpis kasuje.
 
-## Pulapki zmierzone w tym przebiegu (pelny opis: DECISIONS.md #23)
+## Pulapki zmierzone w tym przebiegu (pelny opis: DECISIONS.md #24)
 
-1. **Limiter zapala sie DOPIERO na produkcji.** `lib/limit.ts` wychodzi przy
-   `NODE_ENV !== "production"`. Cala suita przeciwko `pnpm start` wywraca 9
-   testow na 429 (jeden proces, jedna `Mapa` licznikow) i pociaga za soba
-   `tests/f6-01`. To nie regresja. Na buildzie puszczaj pojedyncze pliki
-   i odczekaj minute miedzy przebiegami.
-2. **`clientWidth` wewnatrz ZAMKNIETEGO `<details>` to zero.** Zwiniete
-   `<details>` nie ma ukladu. Pomiar wnetrza zawsze po klikniecie w `summary`.
-3. **`PlonacyNapis` liczy plomienie jako `ceil(szerokosc / 60)`.** Zwezenie
-   napisu ZABIERA ozdobe ze sceny i lamie kryterium „nic nie usuniete".
-   Ponizej 301 px na 390 px nie schodzic.
-4. **Nowy blok dokladany POD zamkniety druk powtarza blad F7-08.** Czesc 2
-   egzaminu ladowala pole odpowiedzi na 1804 px. Lekarstwo bez JS:
-   `.egzamin:has([data-czesc-2]) .druk--pytanie:not([data-czesc-2])` na
-   `display: none` plus `scrollIntoView` na przejsciu.
-5. **`tests/f4-01` „przechodne strzalka w prawo" migocze pod obciazeniem.**
-   Nasluch strzalek wchodzi po hydracji, `pnpm dev` przy 12 workerach kompiluje
-   `/quiz` wolniej niz test naciska klawisz. Pojedynczo przechodzi zawsze.
-6. Wczesniejsze pulapki srodowiska (JEDEN `pnpm dev` naraz, `pnpm build` psuje
-   dzialajacy `dev`, martwy `next-server` na porcie 3000, `nextjs-portal`
-   na zrzutach z dev, `page.addStyleTag` nie nadaje sie do testowania kaskady,
-   kolejnosc arkuszy w `globals.css`) sa dalej aktualne.
+1. **`JWP_KLUCZ_WSTEPU` jest w Vercelu WRAZLIWA** - `vercel env pull` oddaje
+   `"[REDACTED]"`, nie wartosc. Testy jada na wlasnej, jawnej i umyslnie innej.
+2. **`vercel blob get` wymaga `--access private`**, samo `--rw-token` nie starcza.
+3. **`extraHTTPHeaders` w `use` leci do KAZDEGO hosta**, takze youtube.com -
+   globalny `x-jwp-klucz` wywracal `tests/f5-03`. Klucz doklejaj per `request.post`.
+4. **Nakladki bramy nie ma w HTML-u z serwera** - w DOM-ie psula pomiary sceny
+   (`f1-02`, `f7-08`). Tresc chowa arkusz, nie React.
+5. **Sam `focusin` nie wystarcza na pulapke fokusu** - Shift+Tab z pierwszego pola
+   oddaje fokus przegladarce bez zadnego zdarzenia. Cykl domyka nasluch `keydown`.
+6. **Produkcja potrafi odbic `curl` z lokalnego IP** strona `Vercel Security
+   Checkpoint` (403), przy 200 dla tego samego adresu z zewnatrz. Weryfikuj
+   produkcje przez zwykla przegladarke (`fetch` z konsoli strony).
+7. Wczesniejsze pulapki srodowiska (limiter tylko na produkcji, JEDEN `pnpm dev`
+   naraz, `pnpm build` psuje dzialajacy `dev`, migotanie `f4-01` i `f6-01` pod
+   pelnym obciazeniem, `clientWidth` w zamknietym `<details>`) sa dalej aktualne.
 
 ## Decyzje w toku
 
-- **F8-01 nadal nalezy do Aleksandry.** Zero deployu produkcyjnego.
-- `agent-context.sh` przez caly ten przebieg oddawal `STALE-TRANSCRIPT`,
-  wiec paczka zostala domknieta na granicy fazy (DECISIONS #14).
-- Swiadome odstepstwa tej paczki: `DECISIONS.md` #23 (trzy odstepstwa,
-  trzy pulapki).
+- **`F7-09` nalezy do Aleksandry.**
+- Brama wstepu to **prog zwalniajacy, nie uwierzytelnienie** (DECISIONS #24).
+  Nie dokladac do niej niczego, co wymagaloby, zeby byla szczelna.
+- `agent-context.sh` przez caly ten przebieg oddawal `STALE-TRANSCRIPT`.
