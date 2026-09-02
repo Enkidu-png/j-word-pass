@@ -181,7 +181,10 @@ button,
      czyli dokladnie ta liczba, ktorej brakowalo. Zero JS, zero zaleznosci. */
   container-type: inline-size;
 }
-.pas-goniec--odbijany .pas-goniec__tresc {
+/* `:where` zeruje specyficznosc modyfikatora, zeby blok Z11 nizej (0,1,0) mial
+   czym wygrac. Bez tego (0,2,0) bilo reguly reduced motion i odbijany goniec
+   jechal dalej. Ta sama pulapka co w F7-07 z `.napis`. */
+:where(.pas-goniec--odbijany) .pas-goniec__tresc {
   padding-left: 0;
   animation-name: goniec-odbijany;
   animation-direction: alternate;

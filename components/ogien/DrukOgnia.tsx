@@ -240,7 +240,7 @@ export default function DrukOgnia() {
       <div className="druk__wiersz">
         <div className="druk__kolumna">
           <label className="druk__etykieta" htmlFor="ogien-but">
-            ROZMIAR BUTA
+            TWÓJ ROZMIAR BUTA
           </label>
           <input
             className="druk__pole"
@@ -265,7 +265,7 @@ export default function DrukOgnia() {
       <div className="druk__wiersz">
         <div className="druk__kolumna">
           <label className="druk__etykieta" htmlFor="ogien-ucho">
-            ŚREDNICA UCHA W MILIMETRACH
+            ŚREDNICA TWOJEGO UCHA W MILIMETRACH
           </label>
           <input
             className="druk__pole"

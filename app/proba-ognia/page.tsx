@@ -6,7 +6,7 @@ import Pas from "@/components/scena/Pas";
 import PasGoniec from "@/components/scena/PasGoniec";
 import StworRogowy from "@/components/scena/StworRogowy";
 
-// ETAP 3: PROBA OGNIA (plan/08 A). Ceremonia spalenia i list w butelce
+// ETAP 3: PRÓBA OGNIA (plan/08 A). Ceremonia spalenia i list w butelce
 // dochodza w F5-02, radio w F5-03.
 
 // Piec ogni w rzedzie, kazdy z innym opoznieniem (plan/08 A punkt 4).
@@ -18,7 +18,7 @@ export default function Strona() {
       <KafelTla id="kafel-ogien" />
       <Pas id="pas-cienki" pozycja="gora" wysokosc={15} />
       <h1 className="ogien__naglowek" tabIndex={-1}>
-        <NapisObrazek tekst="PROBA OGNIA" wariant="chrom" klasa="ogien__napis" />
+        <NapisObrazek tekst="PRÓBA OGNIA" wariant="chrom" klasa="ogien__napis" />
       </h1>
 
       {/* Dekoracja: `pointer-events: none` na calym bloku (plan/08 E: hover na

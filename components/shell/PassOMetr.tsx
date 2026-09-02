@@ -12,7 +12,7 @@ import { uzyjStanu } from "./uzyjStanu";
 const ETAPY: { etap: Etap; numer: string; nazwa: string; adres: string; zMaks: number }[] = [
   { etap: "egzamin", numer: "ETAP 1", nazwa: "EGZAMIN", adres: "/egzamin", zMaks: 10 },
   { etap: "quiz", numer: "ETAP 2", nazwa: "QUIZ", adres: "/quiz", zMaks: 15 },
-  { etap: "ogien", numer: "ETAP 3", nazwa: "PROBA OGNIA", adres: "/proba-ognia", zMaks: 0 },
+  { etap: "ogien", numer: "ETAP 3", nazwa: "PRÓBA OGNIA", adres: "/proba-ognia", zMaks: 0 },
 ];
 
 const AWARIA_CO_MS = 45000;

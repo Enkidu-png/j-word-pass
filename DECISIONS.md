@@ -409,3 +409,18 @@ Przed poprawka `760 -> 760`, po poprawce `760 -> 111`.
 - Kazda przyszla regula `width` na `[data-napis]` dziala juz normalnie i nie
   zalezy od kolejnosci `@import` w `app/globals.css`. Dotyczy to takze
   `.brak__napis`, ktory wczesniej wygrywal wylacznie przez ta kolejnosc.
+
+## #23 - punkty etapów w `/api/zgloszenie` przychodzą od klienta bez dowodu
+
+Reviewer końcowy: `app/api/zgloszenie/route.ts` przyjmuje `punktyEgzamin`
+i `punktyQuiz` z ciała żądania. Nikt nie sprawdza, czy Aleksandra faktycznie
+przeszła etapy - ręczny POST z 10/15 zapisze się do Bloba tak samo jak wynik
+prawdziwy. Walidacja pilnuje wyłącznie typu i zakresu.
+
+Decyzja: zostaje jak jest. Strona nie ma i nie będzie miała logowania (Z14, brak
+zależności, jeden użytkownik), a stan etapów żyje w `sessionStorage`, czyli po
+stronie klienta - serwer nie ma czego zweryfikować bez dokładania sesji, której
+pakiet nie przewiduje. Zapis do Bloba to pamiątka z żartu, nie rejestr wyników.
+
+Konsekwencja: gdyby kiedyś liczyła się wiarygodność wpisu, trzeba najpierw
+dołożyć sesję po stronie serwera - dopiero wtedy walidacja punktów ma sens.

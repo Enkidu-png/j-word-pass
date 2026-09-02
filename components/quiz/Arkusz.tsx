@@ -131,13 +131,22 @@ export default function Arkusz() {
   // ruszane - to natywna zmiana wariantu w grupie radio. W polu tekstowym
   // pytania 14 strzalki zostaja przy kursorze, inaczej nie dalo by sie
   // poprawic literowki w srodku wyrazu.
-  const naKlawisz = (z: React.KeyboardEvent) => {
-    if (z.key !== "ArrowLeft" && z.key !== "ArrowRight") return;
-    const cel = z.target as HTMLElement;
-    if (cel instanceof HTMLInputElement && cel.type === "text") return;
-    z.preventDefault();
-    skocz(nr + (z.key === "ArrowRight" ? 1 : -1));
-  };
+  // Nasluch siedzi na oknie, nie na sekcji. Na sekcji dzialal tylko wtedy, kiedy
+  // fokus przypadkiem wladowal sie do srodka: po wejsciu na /quiz activeElement
+  // to <body>, wiec pierwsza strzalka nigdzie nie docierala (w dev maskowal to
+  // podwojny efekt StrictMode, ktory fokusowal karte). Ta sama droga co naEscape.
+  useEffect(() => {
+    if (faza !== "pisanie") return;
+    const naKlawisz = (z: KeyboardEvent) => {
+      if (z.key !== "ArrowLeft" && z.key !== "ArrowRight") return;
+      const cel = z.target as HTMLElement;
+      if (cel instanceof HTMLInputElement && cel.type === "text") return;
+      z.preventDefault();
+      skocz(nr + (z.key === "ArrowRight" ? 1 : -1));
+    };
+    window.addEventListener("keydown", naKlawisz);
+    return () => window.removeEventListener("keydown", naKlawisz);
+  }, [faza, nr]);
 
   const pytanie = pytania[nr - 1];
   const wybrany = odpowiedzi[pytanie.id] ?? "";
@@ -157,7 +166,7 @@ export default function Arkusz() {
   };
 
   return (
-    <section className="arkusz" onKeyDown={naKlawisz}>
+    <section className="arkusz">
       <p className="arkusz__licznik" data-licznik-pytan>
         PYTANIE {String(nr).padStart(2, "0")} / {pytania.length}
         <Ozdoba id="nowe" klasa="arkusz__nowe" />

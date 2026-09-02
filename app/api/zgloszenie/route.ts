@@ -17,7 +17,10 @@ export const runtime = "nodejs";
 const LIMIT_BAJTOW = 2 * 1024;
 
 function liczbaWZakresie(wartosc: unknown, min: number, max: number): number | null {
-  const n = typeof wartosc === "number" ? wartosc : Number(wartosc);
+  // Bez tego strażnika `null`, `true` i `[]` przechodzily przez `Number()` jako
+  // 0 albo 1, czyli granica zaufania obiecywala wiecej, niz sprawdzala.
+  if (typeof wartosc !== "number") return null;
+  const n = wartosc;
   if (!Number.isFinite(n) || n < min || n > max) return null;
   return n;
 }

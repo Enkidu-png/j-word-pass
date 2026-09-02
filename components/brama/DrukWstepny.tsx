@@ -25,7 +25,7 @@ export default function DrukWstepny() {
       }}
     >
       <label className="druk-wstepny__etykieta" htmlFor="imie-kandydatki">
-        IMIĘ KANDYDATKI
+        TWOJE IMIĘ, ALEKSANDRO
       </label>
       <input
         className="druk-wstepny__pole"

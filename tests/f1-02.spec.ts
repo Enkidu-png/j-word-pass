@@ -33,11 +33,14 @@ test("PRÓBA OGNIA miesci sie w viewBox, zero obciecia", async ({ page }) => {
   expect(wynik.dol, "dolna krawedz napisu poza viewBox").toBeLessThanOrEqual(wynik.vbH);
 });
 
-test("PasGoniec przy reduced motion stoi i jest wysrodkowany", async ({ page }) => {
+// Oba warianty, nie tylko `zwykly`: modyfikator `--odbijany` ma wlasna regule
+// animation-name, wiec przez sam test wariantu zwyklego przeszlo raz zlamane Z11.
+for (const wariant of ["zwykly", "odbijany"] as const) {
+test(`PasGoniec ${wariant} przy reduced motion stoi i jest wysrodkowany`, async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/dev/scena");
   const styl = await page
-    .locator('[data-goniec="zwykly"] .pas-goniec__tresc')
+    .locator(`[data-goniec="${wariant}"] .pas-goniec__tresc`)
     .first()
     .evaluate((e) => {
       const s = getComputedStyle(e);
@@ -47,6 +50,7 @@ test("PasGoniec przy reduced motion stoi i jest wysrodkowany", async ({ page }) 
   expect(styl.wyrownanie).toBe("center");
   expect(styl.wypelnienie).toBe("0px");
 });
+}
 
 test("PasGoniec bez reduced motion realnie sie przewija", async ({ page }) => {
   await page.goto("/dev/scena");

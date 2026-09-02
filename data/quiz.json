@@ -4,7 +4,7 @@
     "kategoria": "Biologia",
     "emojiZrodlowe": "🐙",
     "typ": "abcd",
-    "pytanie": "Które z poniższych zdań jest prawdziwe?",
+    "pytanie": "Aleksandro, które z poniższych zdań jest prawdziwe?",
     "warianty": {
       "A": "Ośmiornice mają trzy serca, ale wszystkie trzy pracują bez przerwy podczas pływania.",
       "B": "Ośmiornice mają trzy serca, z czego jedno przestaje bić podczas pływania.",
@@ -20,7 +20,7 @@
     "kategoria": "Astronomia",
     "emojiZrodlowe": "🌌",
     "typ": "abcd",
-    "pytanie": "Co jest prawdą?",
+    "pytanie": "Aleksandro, co jest prawdą?",
     "warianty": {
       "A": "Na Wenus dzień trwa krócej niż rok, ale tylko dlatego, że planeta obraca się w przeciwnym kierunku niż większość planet.",
       "B": "Na Wenus dzień trwa dokładnie 225 dni ziemskich, czyli tyle samo co jej rok.",
@@ -52,7 +52,7 @@
     "kategoria": "Fizyka",
     "emojiZrodlowe": "🧲",
     "typ": "abcd",
-    "pytanie": "Który fakt jest prawdziwy?",
+    "pytanie": "Aleksandro, który fakt jest prawdziwy?",
     "warianty": {
       "A": "W próżni cięższy przedmiot spada szybciej, jeśli oba przedmioty mają taki sam kształt.",
       "B": "W próżni piórko i młotek spadają z takim samym przyspieszeniem.",
@@ -68,7 +68,7 @@
     "kategoria": "Zoologia",
     "emojiZrodlowe": "🐌",
     "typ": "abcd",
-    "pytanie": "Które zdanie jest prawdziwe?",
+    "pytanie": "Aleksandro, które zdanie jest prawdziwe?",
     "warianty": {
       "A": "Niektóre ślimaki mogą pozostawać w stanie uśpienia przez kilka lat, szczególnie w niesprzyjających warunkach.",
       "B": "Niektóre gatunki ślimaków potrafią spać przez wiele miesięcy, ale kilkuletni sen jest u nich niemożliwy.",
@@ -100,7 +100,7 @@
     "kategoria": "Chemia",
     "emojiZrodlowe": "🧪",
     "typ": "abcd",
-    "pytanie": "Co jest prawdą?",
+    "pytanie": "Aleksandro, co jest prawdą?",
     "warianty": {
       "A": "Gal zaczyna się topić w temperaturze niewiele wyższej od temperatury pokojowej, około 29,8°C.",
       "B": "Gal topi się w dłoni, ponieważ temperatura ludzkiego ciała jest zawsze wyższa niż 30°C.",
@@ -148,7 +148,7 @@
     "kategoria": "Technologia",
     "emojiZrodlowe": "💾",
     "typ": "abcd",
-    "pytanie": "Co jest prawdą?",
+    "pytanie": "Aleksandro, co jest prawdą?",
     "warianty": {
       "A": "Pierwsza mysz komputerowa Douglasa Engelbarta miała drewnianą obudowę i powstała w 1964 roku.",
       "B": "Pierwsza mysz komputerowa miała drewnianą obudowę, ale została zaprojektowana dopiero w latach 70.",
@@ -180,7 +180,7 @@
     "kategoria": "Muzyka",
     "emojiZrodlowe": "🎼",
     "typ": "abcd",
-    "pytanie": "Który fakt jest prawdziwy?",
+    "pytanie": "Aleksandro, który fakt jest prawdziwy?",
     "warianty": {
       "A": "Mozart skomponował kilka utworów o humorystycznych lub obscenicznych tytułach, w tym kanon „Leck mich im Arsch\".",
       "B": "Mozart napisał „Leck mich im Arsch\", ale utwór przez długi czas przypisywano innemu kompozytorowi.",
@@ -196,7 +196,7 @@
     "kategoria": "Entomologia",
     "emojiZrodlowe": "🪲",
     "typ": "abcd",
-    "pytanie": "Co jest prawdą?",
+    "pytanie": "Aleksandro, co jest prawdą?",
     "warianty": {
       "A": "Niektóre gatunki mrówek hodują mszyce i pobierają od nich spadź, zapewniając im w zamian ochronę.",
       "B": "Mrówki mogą wykorzystywać mszyce jako źródło pożywienia, ale nie utrzymują ich przy życiu ani nie chronią przed drapieżnikami.",

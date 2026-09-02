@@ -41,9 +41,14 @@ const SCHEMA = {
   },
 };
 
-// Z1 + Z2: myślniki na dywiz, kropka środkowa w kosz. Dotyczy takze tekstu z AI.
+// Z1 + Z2 + Z4: myślniki na dywiz, kropka środkowa i emoji w kosz. Dotyczy takze
+// tekstu z AI - prompt to prosba, nie walidator, wiec granica zaufania czysci sama.
 function sanitizeDash(tekst: string): string {
-  const czysty = tekst.replace(/[—–]/g, "-").replace(/·/g, "").trim();
+  const czysty = tekst
+    .replace(/[—–]/g, "-")
+    .replace(/·/g, "")
+    .replace(/\p{Extended_Pictographic}/gu, "")
+    .trim();
   if (czysty.length <= 600) return czysty;
   const uciety = czysty.slice(0, 600);
   const koniec = Math.max(uciety.lastIndexOf("."), uciety.lastIndexOf("!"), uciety.lastIndexOf("?"));
