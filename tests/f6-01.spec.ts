@@ -104,11 +104,8 @@ const ZMIERZ_KONTRAST = () => {
   return wynik;
 };
 
-// F7-04: kontrast tekstu w zamknietym polu PassOMetr czeka na decyzje
-// Aleksandry (konflikt spec kontra dostepnosc). Wylaczony z asercji, ale
-// DALEJ raportowany w tabeli dowodowej.
-const WYJATKI_F7_04 = ["pass-o-metr__pole"];
-
+// F7-04 ZAMKNIETE (DECISIONS 21): zamkniete pole PassOMetr ma juz tlo
+// `--chrom-b-jasny` i miesci sie w progu, wiec nie ma tu zadnych wyjatkow.
 for (const sciezka of WIDOKI) {
   test(`kontrast: ${sciezka} kazdy tekst >= 4,5:1`, async ({ page }) => {
     await page.addInitScript(WPUSC);
@@ -119,7 +116,7 @@ for (const sciezka of WIDOKI) {
       console.log(`${String(w.ratio).padStart(6)}:1${w.wylaczony ? " [nieaktywny]" : ""}  ${w.sel}  ${w.kolor} na ${w.tlo}  "${w.tekst}"`);
     }
     const zle = tabela.filter(
-      (w) => w.ratio < 4.5 && !w.wylaczony && !WYJATKI_F7_04.some((k) => w.sel.includes(k)),
+      (w) => w.ratio < 4.5 && !w.wylaczony,
     );
     expect(zle).toEqual([]);
   });

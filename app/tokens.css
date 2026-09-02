@@ -32,6 +32,10 @@
   /* chrom i ramki */
   --chrom-a: #dcdcdc;
   --chrom-b: #6e6e6e;
+  /* F7-04 (DECISIONS 21): jasniejszy chrom TYLKO pod tekst zamknietego pola
+     PassOMetr. --chrom-b (#6e6e6e) daje z --tusz 3,75:1, ponizej progu 4,5:1.
+     Ten odcien daje 5,2:1 i dalej czyta sie jako szare, wygaszone pole. */
+  --chrom-b-jasny: #858585;
   --ramka-jasna: #ffffff;
   --ramka-ciemna: #404040;
   --fokus: #ff00c8;

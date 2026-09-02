@@ -53,7 +53,10 @@ body {
 }
 
 .pass-o-metr__pole--zamkniety {
-  background: var(--chrom-b);
+  /* F7-04: spec plan/05 A1 mowi `--chrom-b`, ale to 3,75:1 pod --tusz.
+     Z10 wygrywa ze spec (DECISIONS 21) - zmiana lokalna, token --chrom-b
+     zostaje bez zmian dla ramek i tel, ktore go uzywaja. */
+  background: var(--chrom-b-jasny);
 }
 
 .pass-o-metr__pole--zamkniety .pass-o-metr__tresc {

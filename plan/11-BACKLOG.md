@@ -668,7 +668,7 @@ odrzucone z powodem, albo przeniesione do trackera).
   `plakietka` (usuniecie pola wywala `pnpm run check`); test z `f1-01` wraca do
   skanu po calym dokumencie i jest zielony; negatywne: zero zmian w wygladzie
   plakietek przy normalnym ruchu.
-- [ ] **F7-04** `a11y` Kontrast tekstu w zamknietym polu PassOMetr.
+- [x] **F7-04** `a11y` Kontrast tekstu w zamknietym polu PassOMetr.
   Znalezisko z F2-01: `plan/05 A1` narzuca zamknietemu polu tlo `--chrom-b`
   (`#6e6e6e`), a tekst dziedziczy `--tusz` (`#101010`). Zmierzony kontrast to
   okolo 3,8:1, ponizej progu 4,5:1 dla malego tekstu. To konflikt SPEC kontra
@@ -679,6 +679,24 @@ odrzucone z powodem, albo przeniesione do trackera).
   zapisana w `DECISIONS.md`, ze pole zostaje jak jest; `@axe-core/playwright`
   na `/` nie zglasza naruszenia `color-contrast`; negatywne: pole zamkniete
   dalej ma tlo szare i tekst przekreslony (charakter zostaje).
+  DOWOD: ✓ decyzja podjeta przez orkiestratora (Aleksandra niedostepna) i
+  zapisana w `DECISIONS.md` jako wpis 21: Z10 wygrywa ze spec `plan/05 A1`,
+  precedens DECISIONS #10. Zmiana LOKALNA: nowy token `--chrom-b-jasny`
+  (`#858585`) uzyty tylko w regule `.pass-o-metr__pole--zamkniety`, sam
+  `--chrom-b` nietkniety, wiec siedem innych miejsc z ramkami `ridge`/`outset`
+  ma kontrast bez zmian; ✓ pomiar na ZYWEJ bramie (`tests/f7-04.spec.ts`,
+  `getComputedStyle` plus wzor WCAG): `rgb(16,16,16)` na `rgb(133,133,133)` =
+  **5,16:1** dla obu zamknietych pol (`data-etap="quiz"` i `="ogien"`), przed
+  zmiana bylo 3,75:1; ✓ `@axe-core/playwright` na `/`: `color-contrast = 0`
+  naruszen (jedyne pozostale to `region/moderate x1`, znane z F6-01);
+  ✓ negatywne zmierzone, nie zalozone: tlo dalej szare (`r = g = b`, wartosc
+  < 200), `text-decoration-line` dalej `line-through`, `aria-disabled="true"`
+  i klodka `stwor-klodka` na miejscu; ✓ `tests/f6-01.spec.ts` stracil wyjatek
+  `WYJATKI_F7_04` i dalej jest zielony (34 passed); ✓ `pnpm run check` czysto;
+  ✓ screenshots/F7/f7-04-pass-o-metr-desktop.png i -mobile.png OBEJRZANE: pola
+  2 i 3 sa szare, napisy `ETAP 2 QUIZ ZAMKNIĘTY` czytelne, przekreslenie
+  widoczne, klodka na swoim miejscu, pole otwarte dalej odcina sie jasnym
+  papierem i zielona ramka. Commit: `F7-04`.
 
 - [ ] **F7-06** `ui` `.napis` zjada szerokosc zadana przez widok, `.brama__napis` jest martwy.
   Znalezisko z F7-02, zlapane pomiarem `getBoundingClientRect` na zywej bramie.

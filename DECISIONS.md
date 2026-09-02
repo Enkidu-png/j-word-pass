@@ -354,3 +354,27 @@ zadania do YouTube przed gestem Aleksandry (dowod: `tests/f5-03.spec.ts`).
   startowaloby koncert od poczatku.
 - `window.jwpRadio` to uchwyt diagnostyczny do odtwarzacza (wzorzec `jwpAwaria`
   z F2-01). Bez niego kryterium "pauza ponizej 100 ms" jest niemierzalne.
+
+## 21. Z10 wygrywa ze spec `plan/05 A1` w zamknietym polu PassOMetr (F7-04)
+
+**Kontekst.** `plan/05 A1` narzuca zamknietemu polu PassOMetr tlo `--chrom-b`
+(`#6e6e6e`), a tekst pola dziedziczy `--tusz` (`#101010`). Zmierzony na zywej
+bramie kontrast tej pary to 3,75:1, czyli ponizej progu 4,5:1 dla malego tekstu.
+Pole NIE jest kontrolka wylaczona w rozumieniu WCAG 1.4.3 (to informacja o stanie
+etapu, nie disabled input), wiec wyjatek dla kontrolek go nie obejmuje. To konflikt
+spec kontra zasada twarda, a nie blad wykonania.
+
+**Decyzja.** Wygrywa Z10 (dostepnosc). Precedens: DECISIONS #10, gdzie Z7 wygral
+z tabela z `plan/07 B`. Uzytkownik byl niedostepny, decyzje podjal orkiestrator.
+Tlo zamknietego pola dostaje nowy token `--chrom-b-jasny` (`#858585`, 5,2:1 pod
+`--tusz`). Zmiana jest LOKALNA dla reguly `.pass-o-metr__pole--zamkniety`; token
+`--chrom-b` zostaje nietkniety, bo niesie ramki `ridge`/`outset` w siedmiu innych
+miejscach i jego podmiana zmienilaby kontrast tam, gdzie problemu nie ma.
+
+**Konsekwencje.**
+- Charakter zostaje: pole dalej jest szare i wygaszone, tekst dalej przekreslony,
+  klodka na miejscu. Zmienia sie jeden odcien szarosci, nie jezyk wizualny.
+- Spec `plan/05 A1` jest w tym punkcie NIEAKTUALNA. Kto bedzie ja czytal, ma
+  w kodzie komentarz odsylajacy tutaj.
+- `tests/f7-04.spec.ts` mierzy kontrast na zywej stronie i pilnuje charakteru
+  (tlo dalej szare, dalej `line-through`), zeby "naprawa" nie zjadla zartu.
