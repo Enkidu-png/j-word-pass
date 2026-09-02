@@ -1023,11 +1023,37 @@ puszczaj pojedyncze pliki, nie całą suitę.
 
 ## F10 - ZBIERANIE PRAC I BRAMA WSTĘPU (zamówione 2026-09-02, po wdrożeniu na produkcję)
 
-- [ ] **F10-01** `infra` ⚠ HARD Zapis ocenionych odpowiedzi, żeby Jan mógł osobiście sprawdzić test.
+- [x] **F10-01** `infra` ⚠ HARD Zapis ocenionych odpowiedzi, żeby Jan mógł osobiście sprawdzić test.
   CZYTAJ: 02→B,D; 08→B; 09 nie dotyczy.
   Kontrakt: po każdej udanej ocenie `/api/ocena` zapisuje do prywatnego store'a `jwp-zgloszenia` plik `odpowiedzi/<ISO-timestamp>-czesc<N>-<losowe6>.json` z polami `{ czesc, odpowiedz, punkty, komentarz, model, ts }`. Odpowiedź zapisujemy w CAŁOŚCI, nieprzyciętą. Dodatkowo `/api/zgloszenie` przyjmuje i zapisuje komplet: obie odpowiedzi z obydwoma werdyktami plus wynik quizu, żeby jeden plik dawał pełny obraz podejścia.
   AC: POST do `/api/ocena` na produkcji tworzy plik w `odpowiedzi/` (potwierdzić listingiem `vercel blob list --rw-token`, wynik w dowodzie); plik zawiera pełną treść odpowiedzi, punkty i komentarz modelu; `/api/zgloszenie` zapisuje obiekt z polami obu części i wynikiem quizu; **poza produkcją zapis NIE następuje** (`NODE_ENV !== "production"` schodzi na `console.log`, tak jak dotychczasowy `dev-log` - inaczej każdy przebieg testów zaśmieci płatny store, błąd F7-16 z v1); awaria zapisu do Bloba NIE psuje oceny (kandydatka dostaje werdykt, błąd tylko w logu); negatywne: zero nowych zależności, zero endpointu odczytu (panelu nie budujemy, odczyt przez dashboard i CLI).
   Po wykonaniu: dopisz do `WERYFIKACJA.md` sekcję `JAK PRZECZYTAĆ PRACE` z gotowym przepisem CLI (`vercel env pull` do pliku tymczasowego, `vercel blob list --rw-token`, `vercel blob get`), bo `VERCEL_OIDC_TOKEN` sam nie wystarcza.
+
+  ✓ D1 POST `/api/ocena` na PRODUKCJI (`https://j-word-pass.vercel.app`, commit `5c205e9`)
+    zwrócił `{"punkty":10,"komentarz":"Aleksandro, zgodnie z protokołem z dnia X..."}`,
+    a `vercel blob list --prefix odpowiedzi/ --rw-token` pokazał
+    `odpowiedzi/2026-09-02T10:04:58.069Z-czesc1-4tivwh.json` (604 B, wiek 3 s).
+  ✓ D2 `vercel blob get ... --access private` oddał plik z KOMPLETEM pól:
+    `{"czesc":1,"odpowiedz":"PROD F10-01: uszczelniam kadlub serem plesniowym, a dziure
+    zaklejam pieczatka Komisji.","punkty":10,"komentarz":"...","model":
+    "google/gemini-2.5-flash-lite","ts":"2026-09-02T10:04:58.069Z"}` - odpowiedź w całości,
+    nieprzycięta.
+  ✓ D3 POST `/api/zgloszenie` na produkcji oddał `{"tryb":"blob","sciezka":
+    "zgloszenia/2026-09-02T10:05:17.346Z-0lza58.json"}`, a pobrany plik ma
+    `czesc1:{odpowiedz,punkty:10,komentarz}`, `czesc2:{odpowiedz,punkty:7,komentarz}`
+    oraz `punktyQuiz:12`. Oba pliki testowe skasowane, `list --prefix odpowiedzi/`
+    kończy się na `No blobs in this store`.
+  ✓ D4 Poza produkcją zapisu NIE MA: lokalny `pnpm dev` wypisał do konsoli
+    `[blob dev-log] odpowiedzi/2026-09-02T09:50:34.782Z-czesc2-0a75gi.json {...}`
+    i `[blob dev-log] zgloszenia/...`, a listing store'a przed deployem nie miał
+    ani jednego wpisu w `odpowiedzi/`.
+  ✓ D5 Awaria Bloba nie psuje oceny: zapis w `/api/ocena` siedzi we WŁASNYM
+    `try/catch`, który loguje `[ocena zapis-nieudany]` i oddaje werdykt (`app/api/ocena/route.ts`).
+  ✓ D6 Negatywne: `package.json` bez nowej zależności (dalej next/react/react-dom/@vercel/blob),
+    zero endpointu odczytu. `pnpm run check` zielony, `pnpm build` zielony,
+    `npx playwright test` = 388 passed / 6 skipped, czyli tyle samo co przed zmianą.
+  ✓ D7 `WERYFIKACJA.md` sekcja 11 `JAK PRZECZYTAC PRACE` z przepisem CLI.
+    PUŁAPKA: `vercel blob get` wymaga JESZCZE `--access private`, samo `--rw-token` nie starcza.
 - [ ] **F10-02** `ui` ⚠ HARD Brama wstępu: pytanie kontrolne przed wejściem na stronę.
   CZYTAJ: 05→A,B; 04→B,D,F; 01→E (Z10, Z11, Z16).
   Kontrakt: pełnoekranowa nakładka przy pierwszym wejściu, PRZED ekranem ładowania. Pytanie brzmi dokładnie: `Jak na drugie imię ma Janek?`. Poprawna odpowiedź: `Franciszek`. Porównanie po normalizacji (`trim`, małe litery, usunięcie znaków diakrytycznych), więc `franciszek`, `Franciszek` i `FRANCISZEK` przechodzą.

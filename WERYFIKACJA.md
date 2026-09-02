@@ -268,8 +268,10 @@ vercel blob list --rw-token "$TOK"
 vercel blob list --prefix odpowiedzi/ --rw-token "$TOK"
 vercel blob list --prefix zgloszenia/ --rw-token "$TOK"
 
-# 3. pobranie jednego pliku po sciezce z listingu
-vercel blob get "odpowiedzi/2026-09-02T09:50:34.782Z-czesc2-0a75gi.json" --rw-token "$TOK"
+# 3. pobranie jednego pliku po sciezce z listingu.
+#    Flaga --access private jest OBOWIAZKOWA, bez niej CLI odmawia.
+vercel blob get "odpowiedzi/2026-09-02T10:04:58.069Z-czesc1-4tivwh.json" \
+  --access private --rw-token "$TOK"
 
 # 4. posprzataj token
 rm /tmp/jwp.env
