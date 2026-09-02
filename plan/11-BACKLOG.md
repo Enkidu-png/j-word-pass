@@ -972,6 +972,15 @@ Kolejność liniowa jak wszędzie. Fazę wykonujemy PRZED bramką F8.
   Negatywne: treść w `data/komisja.json` pod kluczem `wyzwanie` (`git grep "skarpetkami"` = `data/komisja.json` i backlog), `input[type=file]` count 0.
   Straże: nowy test `F9-06 ekran wyzwania` w `tests/f5-02.spec.ts`, zaktualizowane cztery kroki ceremonii, Escape i przepływ klawiaturowy w `tests/f6-01.spec.ts` (20 kroków). Zaktualizowany spec `plan/08` C.
 
+- [ ] **F7-09** `deploy` ⚠ Integracja GitHub na Vercelu deployuje `main` PROSTO NA PRODUKCJE, wiec `git push origin main` omija stop-gate F8-01. Zaden worker nie uruchamial `vercel deploy --prod`.
+  ZNALEZIONE W: paczka F9 (2026-09-02), po `git push origin main` z commitem `e5c80d2`.
+  DOWOD: `vercel ls --json` pokazuje `j-word-pass-3j46hxzhy` z `target: "production"`, `githubCommitRef: main`, `githubCommitSha: e5c80d25`, wiek 1 minuta. Starsze wpisy `Production` sprzed 3 h i 4 h maja te sama sygnature, wiec produkcja chodzi za `main` **od poczatku buildu v2**, a bramka F8 byla martwa juz wczesniej.
+  DLACZEGO TO WAZNE: F8-01 zaklada, ze Aleksandra ZATWIERDZA podmiane zywej produkcji. Przy obecnej konfiguracji kazdy push workera podmienia ja bez pytania.
+  AC: rozstrzygniecie nalezy do Aleksandry, do wyboru jedna z dwoch drog i ZAPIS decyzji w `DECISIONS.md`:
+  (a) produkcja ma chodzic za `main` - wtedy `F8-01` traci sens jako stop-gate i zostaje przepisany na liste kontrolna po deployu (produkcyjny URL 200, `/api/ocena` odpowiada, szoste zadanie 429, `og:image` na domenie produkcyjnej);
+  (b) produkcja ma byc reczna - wtedy w ustawieniach projektu Vercel `Git -> Production Branch` zmienia sie na galaz, ktorej nikt nie pusha (albo wlacza sie ochrone deployu), a dowodem jest `vercel ls` po nastepnym pushu BEZ nowego wpisu `Production`.
+  Kryterium negatywne dla obu drog: zaden worker dalej nie uruchamia `vercel deploy --prod` recznie.
+
 ### RAPORT FAZY F9 (DoD punkt po punkcie)
 
 Sześć issues zamkniętych jednym commitem każde, plus dwa commity naprawcze
