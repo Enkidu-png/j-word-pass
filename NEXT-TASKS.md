@@ -11,8 +11,8 @@
 (F9-01 do F9-06) z raportem DoD w `plan/11-BACKLOG.md`. Jeden commit na issue
 plus dwa commity naprawcze.
 
-**Jedyna otwarta pozycja w backlogu to `F8-01` - twardy STOP-GATE Aleksandry.**
-Nie dotykac, zero `vercel deploy --prod`.
+**Otwarte pozycje: `F7-09` (nowe znalezisko, ponizej) i `F8-01` - twardy
+STOP-GATE Aleksandry.** Nie dotykac F8-01, zero `vercel deploy --prod`.
 
 ## Co doszlo w tej paczce
 
@@ -40,9 +40,18 @@ Nie dotykac, zero `vercel deploy --prod`.
 
 ## Nastepne issue
 
-**BRAK ISSUE DO WZIECIA poza `F8-01`**, ktory jest stop-gatem Aleksandry.
-Nastepny worker albo dostaje NOWE znalezisko do dopisania w F7-ZNALEZISKA,
-albo nie ma czego robic.
+**`F7-09`, ale to NIE jest robota workera - to decyzja Aleksandry.**
+
+Integracja GitHub na Vercelu deployuje `main` PROSTO NA PRODUKCJE. Po
+`git push origin main` z commitem `e5c80d2` powstal deployment
+`j-word-pass-3j46hxzhy` z `target: production`. Zaden worker nie uruchamial
+`vercel deploy --prod`. Starsze wpisy `Production` sprzed 3 h i 4 h maja te sama
+sygnature, wiec produkcja chodzi za `main` od poczatku buildu v2, a bramka F8-01
+byla martwa juz przed ta paczka. Pelne AC z dwiema drogami wyjscia: `F7-09`
+w `plan/11-BACKLOG.md`.
+
+Poza tym **BRAK ISSUE DO WZIECIA**. Nastepny worker albo dostaje NOWE
+znalezisko do dopisania w F7-ZNALEZISKA, albo nie ma czego robic.
 
 ## Stan srodowiska
 
