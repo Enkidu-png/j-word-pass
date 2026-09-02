@@ -1,10 +1,11 @@
 import { test, expect } from "@playwright/test";
+import { wejdz } from "./pomoc";
 
 // AC wspolne dla F2-02a i F2-02b (patrz DECISIONS.md #18): gestosc Z8, rozne
 // opoznienia ozdob tablicy, pole `ALEKSANDRA` z `readonly`, drozne przyciski.
 
 test("gestosc bramy: minimum 12 animowanych elementow (Z8)", async ({ page }) => {
-  await page.goto("/");
+  await wejdz(page);
   const policz = async (selektor: string) => page.locator(selektor).count();
   const ozdoby = await policz(".brama img[data-ozdoba]");
   const pasy = await policz(".brama [data-pas]");
@@ -18,7 +19,7 @@ test("gestosc bramy: minimum 12 animowanych elementow (Z8)", async ({ page }) =>
 });
 
 test("ozdoby tablicy maja co najmniej 6 roznych animation-delay", async ({ page }) => {
-  await page.goto("/");
+  await wejdz(page);
   const opoznienia = await page
     .locator(".tablica__ozdoba")
     .evaluateAll((l) => l.map((e) => getComputedStyle(e).animationDelay));
@@ -33,14 +34,14 @@ test("ozdoby tablicy maja co najmniej 6 roznych animation-delay", async ({ page 
 });
 
 test("pole imienia ma wartosc ALEKSANDRA i atrybut readonly", async ({ page }) => {
-  await page.goto("/");
+  await wejdz(page);
   const pole = page.locator('[data-pole="imie"]');
   await expect(pole).toHaveValue("ALEKSANDRA");
   await expect(pole).toHaveAttribute("readonly", /.*/);
 });
 
 test("nic nie zaslania przyciskow bramy (elementFromPoint)", async ({ page }) => {
-  await page.goto("/");
+  await wejdz(page);
   const przyciski = page.locator(".brama button, .brama a, .brama input");
   const ile = await przyciski.count();
   expect(ile).toBeGreaterThan(0);
@@ -56,7 +57,7 @@ test("nic nie zaslania przyciskow bramy (elementFromPoint)", async ({ page }) =>
 });
 
 test("negatywne: brama nie jest hero z dwoma przyciskami w pustce", async ({ page }) => {
-  await page.goto("/");
+  await wejdz(page);
   // przycisk stoi WEWNATRZ tablicy ogloszen, nie w pustej przestrzeni
   await expect(page.locator('.tablica [data-cta="przystepuje"]')).toHaveCount(1);
 });

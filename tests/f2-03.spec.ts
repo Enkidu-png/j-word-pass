@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { wejdz } from "./pomoc";
 
 // AC F2-03: przycisk-uciekinier (plan/05 B2).
 
@@ -15,7 +16,7 @@ async function najedz(page: import("@playwright/test").Page) {
 }
 
 test("ucieka dokladnie 3 razy, przy czwartym kapituluje", async ({ page }) => {
-  await page.goto("/");
+  await wejdz(page);
   const przycisk = page.locator('[data-cta="wole-nie"]');
   await expect(przycisk).toHaveText("WOLĘ NIE");
 
@@ -35,7 +36,7 @@ test("ucieka dokladnie 3 razy, przy czwartym kapituluje", async ({ page }) => {
 });
 
 test("klik po kapitulacji prowadzi na /egzamin", async ({ page }) => {
-  await page.goto("/");
+  await wejdz(page);
   for (let i = 0; i < 4; i += 1) await najedz(page);
   await page.locator('[data-cta="wole-nie"]').click();
   await page.waitForURL("**/egzamin");
@@ -43,7 +44,7 @@ test("klik po kapitulacji prowadzi na /egzamin", async ({ page }) => {
 });
 
 test("Enter na sfokusowanym przycisku NIE powoduje ucieczki", async ({ page }) => {
-  await page.goto("/");
+  await wejdz(page);
   const przycisk = page.locator('[data-cta="wole-nie"]');
   // pozycja mierzona wzgledem KONTENERA, nie viewportu: `focus()` dowija strone,
   // wiec wspolrzedne ekranowe zmienilyby sie takze bez zadnego skoku
@@ -65,7 +66,7 @@ test("Enter na sfokusowanym przycisku NIE powoduje ucieczki", async ({ page }) =
 test("przy pointer: coarse ucieczka jest wylaczona", async ({ browser, baseURL }) => {
   const kontekst = await browser.newContext({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } });
   const page = await kontekst.newPage();
-  await page.goto(`${baseURL}/`);
+  await wejdz(page, `${baseURL}/`);
   expect(await page.evaluate(() => matchMedia("(pointer: coarse)").matches)).toBe(true);
   const przycisk = page.locator('[data-cta="wole-nie"]');
   const gdzie = () => przycisk.evaluate((e: HTMLElement) => `${e.offsetLeft},${e.offsetTop}`);
@@ -79,7 +80,7 @@ test("przy pointer: coarse ucieczka jest wylaczona", async ({ browser, baseURL }
 });
 
 test("negatywne: zero rotate i pozycja zawsze w obrebie tablicy ogloszen", async ({ page }) => {
-  await page.goto("/");
+  await wejdz(page);
   const przycisk = page.locator('[data-cta="wole-nie"]');
   for (let i = 0; i < 4; i += 1) {
     await najedz(page);
@@ -95,7 +96,7 @@ test("negatywne: zero rotate i pozycja zawsze w obrebie tablicy ogloszen", async
 });
 
 test("uciekinier NIGDY nie zaslania przycisku PRZYSTĘPUJĘ (10 losowan)", async ({ page }) => {
-  await page.goto("/");
+  await wejdz(page);
   const uciekinier = page.locator('[data-cta="wole-nie"]');
   const glowny = page.locator('[data-cta="przystepuje"]');
   for (let i = 0; i < 10; i += 1) {

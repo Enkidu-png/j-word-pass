@@ -1,11 +1,12 @@
 import { test, expect } from "@playwright/test";
+import { wejdz } from "./pomoc";
 
 // AC F2-02a: szkielet bramy. Kryteria dotyczace tablicy ogloszen, druku
 // wstepnego i przyciskow sa w tym samym AC, ale nalezą do zakresu F2-02b
 // (punkty 7-8 z plan/05 B1) - sprawdza je tests/f2-02b.spec.ts.
 
 test("kafel tla siedzi na html, powtarza sie i nie jest skalowany (Z9)", async ({ page }) => {
-  await page.goto("/");
+  await wejdz(page);
   const tlo = await page.evaluate(() => {
     const s = getComputedStyle(document.documentElement);
     return { obraz: s.backgroundImage, powtorz: s.backgroundRepeat, rozmiar: s.backgroundSize };
@@ -16,7 +17,7 @@ test("kafel tla siedzi na html, powtarza sie i nie jest skalowany (Z9)", async (
 });
 
 test("szkielet bramy: statek, napis-obrazek, podtytul, goniec ze strzalka, pas dolny, dwa stwory", async ({ page }) => {
-  await page.goto("/");
+  await wejdz(page);
   await expect(page.locator('.brama [data-ozdoba="statek"]')).toHaveCount(1);
   await expect(page.locator('.brama [data-napis="chrom"]')).toHaveAttribute("aria-label", "J-WORD PASS");
   await expect(page.locator(".brama__podtytul")).toHaveText("MIĘDZYGALAKTYCZNA KOMISJA KWALIFIKACYJNA");
@@ -36,7 +37,7 @@ test("szkielet bramy: statek, napis-obrazek, podtytul, goniec ze strzalka, pas d
 });
 
 test("negatywne: zero rotate i skew w DOM bramy (Z6)", async ({ page }) => {
-  await page.goto("/");
+  await wejdz(page);
   const zle = await page.evaluate(() =>
     [...document.querySelectorAll(".brama, .brama *")]
       .map((e) => ({ k: e.className?.toString?.() ?? "", t: getComputedStyle(e).transform }))

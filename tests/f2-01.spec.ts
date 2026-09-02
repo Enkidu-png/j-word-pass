@@ -1,17 +1,18 @@
 import { test, expect } from "@playwright/test";
+import { wejdz } from "./pomoc";
 
 // AC F2-01 (plan/11-BACKLOG.md). Shell: PasGoniec gorny, PassOMetr, StrazEtapu,
 // stopka-webring.
 
 test("stopka ma pusty slot na radio (kontrakt z F5-03)", async ({ page }) => {
-  await page.goto("/");
+  await wejdz(page);
   const slot = page.locator("footer [data-radio-slot]");
   await expect(slot).toHaveCount(1);
   expect((await slot.innerHTML()).trim()).toBe("");
 });
 
 test("PassOMetr ma trzy pola, etapy 2 i 3 sa aria-disabled przed zdaniem", async ({ page }) => {
-  await page.goto("/");
+  await wejdz(page);
   const pola = page.locator(".pass-o-metr__pole");
   await expect(pola).toHaveCount(3);
   await expect(page.locator('.pass-o-metr [aria-disabled="true"]')).toHaveCount(2);
@@ -30,7 +31,7 @@ test("wejscie na /quiz bez egzaminu pokazuje druk BEZ przekierowania", async ({ 
 test("licznik odwiedzin ma 7 cyfr i rosnie o 1 po nowej sesji", async ({ browser }) => {
   const kontekst = await browser.newContext();
   const a = await kontekst.newPage();
-  await a.goto("/");
+  await wejdz(a);
   const licznik = a.locator("[data-licznik]");
   // Licznik liczy w useEffect, wiec pierwsza klatka po goto ma jeszcze wartosc
   // wyjsciowa. Czekamy na zapis do localStorage, nie na sam render - inaczej
@@ -42,7 +43,7 @@ test("licznik odwiedzin ma 7 cyfr i rosnie o 1 po nowej sesji", async ({ browser
 
   // Nowa sesja = nowa karta z czystym sessionStorage, ale tym samym localStorage.
   const b = await kontekst.newPage();
-  await b.goto("/");
+  await wejdz(b);
   const oczekiwany = String(Number(pierwszy) + 1).padStart(7, "0");
   await expect(b.locator("[data-licznik]")).toHaveText(oczekiwany);
   expect(oczekiwany).toMatch(/^\d{7}$/);
@@ -51,7 +52,7 @@ test("licznik odwiedzin ma 7 cyfr i rosnie o 1 po nowej sesji", async ({ browser
 
 test("na 390 px PassOMetr jest NAD stopka", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
+  await wejdz(page);
   const gora = (s: string) => page.locator(s).evaluate((el) => el.getBoundingClientRect().top);
   const metr = await gora(".pass-o-metr");
   const stopka = await gora("footer.stopka");
@@ -62,7 +63,7 @@ test("na 390 px PassOMetr jest NAD stopka", async ({ page }) => {
 });
 
 test("negatywne: zero position fixed, zero sticky, zero hamburgera", async ({ page }) => {
-  await page.goto("/");
+  await wejdz(page);
   const zle = await page.evaluate(() =>
     [...document.querySelectorAll("body *")]
       .map((el) => ({ znacznik: el.tagName, klasa: el.className?.toString?.() ?? "", poz: getComputedStyle(el).position }))
@@ -73,6 +74,6 @@ test("negatywne: zero position fixed, zero sticky, zero hamburgera", async ({ pa
 });
 
 test("gorny pas-goniec niesie tekst komisji", async ({ page }) => {
-  await page.goto("/");
+  await wejdz(page);
   await expect(page.locator("body > .pas-goniec").first()).toContainText("KOMISJA CZUWA");
 });

@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { wejdz } from "./pomoc";
 
 // Etapy 2 i 3 sa za StrazaEtapu (plan/05 A2), wiec bez werdyktu poprzedniego
 // etapu ich naglowek NIE moze sie pokazac. Smoke pilnuje obu wariantow.
@@ -10,7 +11,7 @@ const ZASTRZEZONE = [
 
 for (const sciezka of OTWARTE) {
   test(`${sciezka} odpowiada 200 i ma nagłówek`, async ({ page }) => {
-    const odpowiedz = await page.goto(sciezka);
+    const odpowiedz = await wejdz(page, sciezka);
     expect(odpowiedz?.status()).toBe(200);
     await expect(page.locator("main.tresc h1")).toHaveCount(1);
     await expect(page.locator("main.tresc h1")).not.toBeEmpty();
@@ -19,7 +20,7 @@ for (const sciezka of OTWARTE) {
 
 for (const { sciezka, numer } of ZASTRZEZONE) {
   test(`${sciezka} odpowiada 200 i bez werdyktu pokazuje druk odmowny`, async ({ page }) => {
-    const odpowiedz = await page.goto(sciezka);
+    const odpowiedz = await wejdz(page, sciezka);
     expect(odpowiedz?.status()).toBe(200);
     await expect(page.locator(".straz__tresc")).toHaveText(
       `ALEKSANDRO, KOMISJA ZABRANIA. NAJPIERW ETAP ${numer}.`,

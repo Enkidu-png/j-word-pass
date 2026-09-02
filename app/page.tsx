@@ -1,4 +1,5 @@
 import DrukWstepny from "@/components/brama/DrukWstepny";
+import PierwszeWejscie from "@/components/brama/PierwszeWejscie";
 import KafelTla from "@/components/scena/KafelTla";
 import NapisObrazek from "@/components/scena/NapisObrazek";
 import Ozdoba from "@/components/scena/Ozdoba";
@@ -23,8 +24,9 @@ export default function Strona() {
   return (
     <div className="brama">
       <KafelTla id="kafel-brama" />
+      <PierwszeWejscie />
       <Ozdoba id="statek" klasa="brama__statek" pierwszyEkran />
-      <h1 className="brama__naglowek">
+      <h1 className="brama__naglowek" tabIndex={-1}>
         <NapisObrazek tekst="J-WORD PASS" wariant="chrom" klasa="brama__napis" />
       </h1>
       <p className="brama__podtytul">MIĘDZYGALAKTYCZNA KOMISJA KWALIFIKACYJNA</p>

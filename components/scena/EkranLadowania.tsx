@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Ozdoba from "./Ozdoba";
 import PasGoniec from "./PasGoniec";
 
@@ -103,7 +104,15 @@ export default function EkranLadowania({
     };
   }, [wariant, gotowe, min, maks, zamknij]);
 
-  return (
+  // Nakladka idzie PORTALEM do <body>, a nie tam, gdzie stoi jej wywolanie.
+  // Pelnoekranowy ekran ladowania nie jest czescia sceny widoku: siedzac
+  // w `.brama` wpadal w kazdy pomiar tego widoku (liczenie animowanych elementow
+  // Z8, skan transformow Z6, `elementFromPoint` na przyciskach) i dawal
+  // migotliwe faile zalezne od tego, czy test zdazyl przed jego zdjeciem.
+  // Portal montuje sie dopiero na kliencie, bo serwer nie ma `document`.
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
     <div data-ladowanie={wariant} className="ladowanie" role="status" aria-live="polite">
       <div className="ladowanie-scena">
         <div className="ladowanie-szescian">
@@ -124,6 +133,7 @@ export default function EkranLadowania({
       <div className="ladowanie__goniec">
         <PasGoniec tekst="KOMISJA PRZYGOTOWUJE AKTA DLA ALEKSANDRY" />
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

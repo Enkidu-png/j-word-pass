@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useLayoutEffect, useRef, useState } from "react";
 
 // Przycisk-uciekinier (plan/05 B2). Skacze DOKLADNIE trzy razy, przy czwartym
@@ -13,8 +12,7 @@ const TEKST_KAPITULACJI = "DOBRZE, ALEKSANDRO, NIECH BĘDZIE";
 
 type Punkt = { left: number; top: number };
 
-export default function PrzyciskUciekinier() {
-  const router = useRouter();
+export default function PrzyciskUciekinier({ naWejscie }: { naWejscie: () => void }) {
   const przyciskRef = useRef<HTMLButtonElement>(null);
   // Kursor MUSI opuscic przycisk, zeby kolejne najechanie sie liczylo. Bez tego
   // przycisk, ktory doskoczy z powrotem pod kursor, zjada dwa skoki naraz.
@@ -89,7 +87,7 @@ export default function PrzyciskUciekinier() {
       onMouseLeave={() => {
         gotowy.current = true;
       }}
-      onClick={() => router.push("/egzamin")}
+      onClick={naWejscie}
     >
       <span className="uciekinier__napis">{kapitulacja ? TEKST_KAPITULACJI : TEKST_UCIEKA}</span>
     </button>
