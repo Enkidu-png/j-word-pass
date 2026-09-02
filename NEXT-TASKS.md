@@ -5,7 +5,7 @@
 > checkboxy w `plan/11-BACKLOG.md`. Jesli ten plik kiedykolwiek zacznie mowic
 > co innego niz backlog, wierz backlogowi i skasuj ten plik.
 
-## Gdzie jestesmy (aktualizacja: paczka F7-04, F7-06)
+## Gdzie jestesmy (aktualizacja: paczka F7-07)
 
 **Fazy F0-F6 ZAMKNIETE**, kazda z raportem DoD w `plan/11-BACKLOG.md`.
 W tym przebiegu doszly: F6-01, F6-02, F6-03, F6-04 plus raport fazy F6.
@@ -27,7 +27,27 @@ Co realnie doszlo:
 
 **Deploy: NIE ruszany w tej paczce.** Bramka F8 nadal nalezy do Aleksandry.
 
-## Co doszlo w tej paczce
+## Co doszlo w paczce F7-07
+
+- **F7-07 ZROBIONE, ROOT CAUSE calej kaskady napisow.** `.napis { width: 100% }`
+  w `app/style/scena.css` to teraz `:where(.napis) { width: 100% }`.
+  Specyficznosc spada z (0,1,0) na (0,0,0), wiec regula bazowa jest wartoscia
+  DOMYSLNA, a nie zawodnikiem bijacym klasy widokow z arkuszy importowanych
+  wczesniej. Odzyskane dwie martwe reguly: `.werdykt__napis` (760 -> 420 px)
+  i `.maszyna__napis` (663,7 -> 320 px). Osiem pozostalych napisow na `/`,
+  `/egzamin`, `/quiz`, `/proba-ognia`, `/nie-ma`, `/dev/scena` co do piksela
+  bez zmian - tabela przed/po siedzi w `plan/11-BACKLOG.md`.
+  Straznik: `tests/f7-07.spec.ts` (20 testow). `tests/f7-06.spec.ts` dostal
+  zaktualizowane dwie wartosci w tabeli „przed poprawki".
+- **`.brak__napis` przestal dzialac przez przypadek.** Wczesniej wygrywal
+  wylacznie dlatego, ze `nieznalezione.css` jest importowany PO `scena.css`.
+  Dzis wygrywa specyficznoscia, jak kazda inna klasa widoku.
+- Stan po paczce: `pnpm run check` czysto, `pnpm build` zielony (`/quiz` 115 kB,
+  `/egzamin` 112 kB, `/proba-ognia` 109 kB, `/` 107 kB, `/dev/scena` 107 kB),
+  `npx playwright test` = **366 passed / 0 failed / 6 skipped**.
+- **F8-01 NIE RUSZANY** - stop-gate Aleksandry. Zero deployu.
+
+## Co doszlo w paczce F7-02, F7-03, F7-05
 
 - **F7-02 ZAMKNIETE** jako nieaktualne. `h1` na `/`, `/egzamin` i `/quiz` niesie
   dzis `NapisObrazek`, a nie tekst Caveatem od `x = 0`. Pomiar na zywej stronie
@@ -42,12 +62,10 @@ Co realnie doszlo:
 
 ## Nastepne issue
 
-**F7-06** (nowe znalezisko z tej paczki: `.napis { width: 100% }` z `scena.css`
-przykrywa `.brama__napis { width: min(90vw, 720px) }`, wiec napis bramy ma
-1256 px zamiast 720 px). To pierwszy `[ ]` w `plan/11-BACKLOG.md` PO pominieciu
-F7-04, ktore czeka na decyzje.
-**F7-04 POMIJAC** - czeka na decyzje Aleksandry (konflikt spec kontra kontrast).
-**F8-01 to twardy STOP-GATE** - nie dotykac.
+**BRAK ISSUE DO WZIECIA.** Po F7-07 w `plan/11-BACKLOG.md` nie ma juz zadnego
+otwartego `[ ]` poza **F8-01**, a to twardy STOP-GATE Aleksandry - nie dotykac,
+zero deployu. Nastepny worker albo dostaje NOWE znalezisko do dopisania w
+F7-ZNALEZISKA, albo nie ma czego robic.
 
 ## Stan srodowiska
 
@@ -71,6 +89,14 @@ F7-04, ktore czeka na decyzje.
 
 ## Pulapki zmierzone w przebiegu F7
 
+0. **`page.addStyleTag()` NIE nadaje sie do testowania kaskady.** Dokleja arkusz
+   na KONIEC `<head>`, wiec przy rownej specyficznosci wygrywa kolejnoscia
+   niezaleznie od tego, czy poprawka weszla. Pierwsza wersja testu F7-07
+   przechodzila takze z cofnietym fixem. Regule-konkurenta wstawiaj przez
+   `document.head.prepend(<style>)`, czyli PRZED arkuszem badanym.
+   Drugi warunek: badz pewien, ze element NIE ma juz wlasnej reguly o tej samej
+   specyficznosci - `.egzamin__etap` ma `width: 100%` w `egzamin.css`, wiec na
+   nim dowod tez byl slepy. Uzyty zostal napis z samymi `napis napis--chrom`.
 1. **`Range.getClientRects()` na `<svg>` z `<text textLength>` klamie.** Oddaje
    szerokosc SUROWYCH glifow, PRZED skalowaniem viewBox - na bramie 1404 px
    przy elemencie szerokim na 1256 px. Napisy-obrazki mierz obrysem elementu.
@@ -115,14 +141,9 @@ F7-04, ktore czeka na decyzje.
 
 ## Otwarte issues w F7-ZNALEZISKA
 
-- **F7-07** (NOWE, z F7-06) `.werdykt__napis { width: min(70%, 420px) }`
-  w `egzamin.css` jest martwy dokladnie tak samo, jak byl `.brama__napis`:
-  `.napis { width: 100% }` ma te sama specyficznosc i lezy w arkuszu
-  importowanym pozniej. Napis werdyktu ma 760 px zamiast 420 px (desktop).
-  F7-06 nie mogl tego ruszyc, bo jego kryterium negatywne zakazywalo zmiany
-  szerokosci napisow na `/egzamin`. Pelne AC w `plan/11-BACKLOG.md`.
-- Wszystko inne w F7 ZAMKNIETE: **F7-01** (z F5-02), **F7-02**, **F7-03**,
-  **F7-05**, **F7-04** i **F7-06**, kazde z dowodem w `plan/11-BACKLOG.md`.
+**ZERO.** Cala faza F7-ZNALEZISKA zamknieta: **F7-01** (z F5-02), **F7-02**,
+**F7-03**, **F7-04**, **F7-05**, **F7-06**, **F7-07** - kazde z dowodem
+w `plan/11-BACKLOG.md`.
 
 ## Decyzje w toku
 
