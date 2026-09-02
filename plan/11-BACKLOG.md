@@ -552,6 +552,36 @@ i anty-spec z `plan/01 G`, wpis raportu fazy, zero znalezisk bez issue w F7-ZNAL
 
   kazdy widok ma >= 6 animowanych (najmniej `/quiz` z 19, prog Z8 przekroczony ponad trzykrotnie), >= 2 stwory rogowe i >= 1 pas; ✓ Z9: piec widokow, PIEC ROZNYCH kafli (`kafel-brama`, `kafel-egzamin`, `kafel-quiz`, `kafel-ogien`, `kafel-404`), sprawdzone `new Set(...).size === 5` na jednym przebiegu przez wszystkie sciezki; ✓ ANTY-SPEC `plan/01 G` PUNKT PO PUNKCIE, zrzuty screenshots/F6/f6-04-{brama,egzamin,quiz,ogien,404}-desktop.png OBEJRZANE: **1** (zero czystego minimalistycznego retro) -> SPELNIONY, kazdy widok to wysypisko GIF-ow na kaflu, nie plakat vintage; **2** (zero hero z naglowkiem i dwoma przyciskami) -> SPELNIONY, dwa przyciski bramy siedza w tablicy ogloszen z szescioma GIF-ami, a nie na pustym hero; **3** (zero kart 3 na wiersz z jednakowymi cieniami) -> SPELNIONY, siatki bramy i 404 nie maja ZADNEGO cienia, tylko ramki `inset`; **4** (zero `border-radius` > 4 px) -> SPELNIONY maszynowo, skan `getComputedStyle` po wszystkich widocznych elementach piatki widokow = zero trafien; **5** (zero cieni z rozmyciem) -> SPELNIONY maszynowo, kazdy `box-shadow` ma trzeci parametr 0 px; **6** (zero `ease-in-out` na ozdobnikach) -> SPELNIONY maszynowo, kazdy element z `animation-name` ma `steps(...)`; **7** (zero pustej przestrzeni) -> patrz nizej, TRZY NARUSZENIA znalezione i naprawione; **8** (zero przeciagania mysza) -> SPELNIONY, zero `draggable` i zero `pointermove` w mechanice; **9** (zero scroll-hijackingu) -> SPELNIONY, zero `scroll-behavior` i zero obserwatorow scrolla; **10** (zero tekstu na tle bez podkladu) -> SPELNIONY, potwierdzony pomiarem kontrastu z F6-01: kazdy blok tekstu ma nieprzezroczystego przodka, ZERO trafien `tekst na kaflu`; ✓ dolozony maszynowy strazik Z6 w tym samym tescie: obrot i skos siedza wylacznie w `b` i `c` macierzy `matrix(a,b,c,d,e,f)`, wiec test przepuszcza przesuniecie gonca i lustro `scaleX(-1)`, a nie przepusci `rotate` ani `skew` - zero trafien na piatce widokow; ✓ negatywne, TRZY REALNE DZIURY ZNALEZIONE I NAPRAWIONE (pomiar: suma pionowych przedzialow elementow niosacych tresc, obrazkow i pasow, szukanie przerw > 120 px): `/proba-ognia` 172 px miedzy drukiem a delfinami -> dolozony pas-goniec `ALEKSANDRO, KOMISJA NIE ZWRACA DRUKÓW ANI NADZIEI` plus `padding-bottom` scieniony z 260 na 200 px; `/quiz` 128 px pod arkuszem -> dolozony pas-goniec `ALEKSANDRO, KOMISJA LICZY KAŻDĄ ODPOWIEDŹ`; `/egzamin` na 390 px 160 px miedzy CTA a stworami -> `padding-bottom` z 200 na 150 px (stwory maja tam tylko 72 px wysokosci); po poprawkach ZERO dziur na obu viewportach; ✓ DWIE REGRESJE ZLAPANE I NAPRAWIONE po dolozeniu goncow: `tests/f4-03.spec.ts` (strazik Z6 odrzucal KAZDY transform inny niz identycznosc i lustro, wiec przesuwajacy sie goniec go wywracal - przepisany na warunek `b === 0 && c === 0`, ktory dalej nie przepusci obrotu) i `tests/f5-02.spec.ts` (`[data-goniec]").last()` lapal nowego gonca zamiast tego przy butelce - selektor zawezony do `.butelka-blok`); ✓ test dziur ustabilizowany przez `document.fonts.status === "loaded"` plus dwie klatki - przy rownoleglej suicie `Caveat` doladowywal sie PO pomiarze i wysokosci blokow jeszcze rosly (jedno migniecie na 320 testow, zlapane i zamkniete); ✓ `pnpm run check` czysto. Commit: `F6-04`.
 
+### RAPORT FAZY F6 (DoD punkt po punkcie)
+
+- `pnpm run check` ZIELONY (`samotest: czysto`, `lint-tokens: czysto`, `tsc --noEmit`
+  bez bledu).
+- `pnpm build` ZIELONY: 10 route'ow, first load JS `/` 107 kB, `/egzamin` 112 kB,
+  `/quiz` 115 kB, `/proba-ognia` 109 kB, `/_not-found` 102 kB, `/opengraph-image`
+  102 kB, shared 102 kB. Limit 160 kB, najciezsza strona ma 45 kB zapasu.
+- `npx playwright test` BEZ FAILOW: **320 passed, 0 failed, 6 skipped** na obu
+  viewportach, TRZY PRZEBIEGI Z RZEDU (jedno migniecie w tescie dziur zlapane
+  i zamkniete oczekiwaniem na `document.fonts`).
+- Zrzut stanu fazy: `screenshots/F6/F6-DoD-stan-fazy.png`, OBEJRZANY. Nowy widok
+  404 stoi na wlasnym kaflu `kafel-404`, ma cztery stwory rogowe (ptaki u gory,
+  osmiornice u dolu), cztery pasy, jedenascie animowanych ozdob i dwa gonce.
+  Wzgledem Z7-Z9: assety to PLIKI z manifestu (Z7), gestosc ponad progiem
+  (Z8: 24 animowane przy wymaganych 6), wlasny kafel bez `background-size` (Z9).
+  Wzgledem anty-spec `plan/01 G`: zero pustej plachty, tekst na podkladzie,
+  ramki `inset` zamiast cieni, ruch skokowy.
+- Zrzuty wszystkich piatki widokow (`screenshots/F6/f6-04-*.png`) obejrzane
+  i skonfrontowane z anty-spec punkt po punkcie w dowodzie F6-04.
+- Wpis raportu fazy: ten akapit.
+- Zero znalezisk bez issue: w tej fazie NIE powstalo nowe znalezisko poza zakresem.
+  Wszystko, co wyszlo na pomiarach (kontrast radia, `solid` zamiast `dashed`
+  w obwodce fokusu, trzy puste plachty, dwie regresje testow), zostalo naprawione
+  W TYM SAMYM issue, ktore je znalazlo, bo miescilo sie w jego AC. Otwarte
+  znaleziska F7 bez zmian: **F7-02**, **F7-03**, **F7-04** (czeka na decyzje
+  Aleksandry), **F7-05**.
+
+**F6 to ostatnia faza budowlana.** Dalej zostaja tylko znaleziska F7 i bramka
+decyzyjna F8, ktora nalezy do Aleksandry.
+
 ## F7 - ZNALEZISKA (rośnie w trakcie, zakładana pusta)
 
 Każde znalezisko z zasady 7a ląduje tu jako osobne issue z pełnym AC.
