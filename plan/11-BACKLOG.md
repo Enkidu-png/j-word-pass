@@ -1143,6 +1143,11 @@ puszczaj pojedyncze pliki, nie całą suitę.
   w tym jedna spoza kodu (produkcja odbija `curl` z lokalnego IP strona
   `Vercel Security Checkpoint`).
 
+- [ ] **F7-10** `infra` Ocena części 2 z drugiego podejścia NIE dostała własnego pliku w `odpowiedzi/`, mimo że werdykt policzono. Odpowiedź da się odczytać tylko z druku końcowego, a gdyby kandydatka go nie wysłała, przepadłaby.
+  ZNALEZIONE W: odbiór realnych prac 2026-09-02. Dowód rozbieżności: w `odpowiedzi/` leży jeden plik `czesc2` z 11:55 na **9 punktów**, a druk końcowy `zgloszenia/2026-09-02T12:53:39.998Z` niesie `czesc2` na **6 punktów** i minimalnie inny tekst (`ze to, że` zamiast `za to, że`). Podejście na 6 punktów zostało ocenione, ale nie ma swojego pliku. Ten sam schemat NIE wystąpił dla części 1 - drugie podejście z 12:25 (7 pkt) ma własny plik i zgadza się z drukiem.
+  HIPOTEZY DO SPRAWDZENIA (po kolei, nie zgadywać): (a) zapis do Bloba padł, a `/api/ocena` z założenia połyka ten błąd, żeby nie psuć werdyktu - wtedy ślad jest w logach funkcji na Vercelu; (b) drugie podejście do części 2 poszło ścieżką, która nie woła zapisu; (c) werdykt w druku końcowym pochodzi z `sessionStorage` i rozjechał się z tym, co realnie oceniono.
+  AC: przyczyna nazwana i potwierdzona dowodem (log funkcji albo odtworzenie na produkcji), nie hipotezą; po naprawie KAŻDA oceniona odpowiedź ma własny plik w `odpowiedzi/` - odtworzone przez dwa podejścia z rzędu do tej samej części, dwa pliki w listingu; jeśli przyczyną jest cichy błąd zapisu, dochodzi widoczny ślad (wpis w logu z treścią odpowiedzi), żeby praca nie ginęła bez śladu; kryterium negatywne: awaria zapisu nadal NIE psuje werdyktu dla kandydatki.
+
 ## F8 - BRAMKA DECYZYJNA
 
 - [x] **F8-01** `deploy` STOP-GATE przed wykonaniem: pokaż Aleksandrze URL preview plus `WERYFIKACJA.md`, zapytaj o zgodę na `vercel deploy --prod` (podmiana żywej produkcji z wersji 1).
