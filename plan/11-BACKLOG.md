@@ -1023,8 +1023,18 @@ puszczaj pojedyncze pliki, nie całą suitę.
 
 ## F8 - BRAMKA DECYZYJNA
 
-- [ ] **F8-01** `deploy` ⏳ STOP-GATE przed wykonaniem: pokaż Aleksandrze URL preview plus `WERYFIKACJA.md`, zapytaj o zgodę na `vercel deploy --prod` (podmiana żywej produkcji z wersji 1).
+- [x] **F8-01** `deploy` STOP-GATE przed wykonaniem: pokaż Aleksandrze URL preview plus `WERYFIKACJA.md`, zapytaj o zgodę na `vercel deploy --prod` (podmiana żywej produkcji z wersji 1).
   AC: produkcyjny URL działa i pokazuje NOWĄ bramę (zrzut); `/api/ocena` na produkcji odpowiada (1 curl); rate limit: szóste żądanie daje 429; formularz zapisuje do Bloba (1 wpis testowy, potem usunięty, `vercel blob list` = pusto); `og:image` na produkcji wskazuje domenę produkcyjną.
+
+  ✓ ZGODA ALEKSANDRY (2026-09-02, w czacie): "jak skonczysz wrzuc najnowsza wersje na produkcje".
+  ✓ D1 produkcja podmieniona na wersję drugą. UWAGA: fizycznie zrobił to `git push origin main`, bo integracja GitHub na Vercelu ma `main` jako gałąź produkcyjną (znalezisko F7-09) - nie było potrzeby wołać `vercel deploy --prod`. Zgoda i tak była, więc podmiana jest zamierzona, ale mechanizm bramki był martwy i to zostaje otwarte w F7-09.
+  ✓ D2 cztery strony na `https://j-word-pass.vercel.app` zwracają 200 (`/`, `/egzamin`, `/quiz`, `/proba-ognia`).
+  ✓ D3 zmiany z F9 są na żywo: stopka `MINISTERSTWO CERTYFIKACJI JAN SACHSE` (stary napis 0 trafień), pasy-gońce z `PIĘKNIE DZIŚ WYGLĄDASZ` i `POZDRO DLA GEJUF`, treść pytania etapu 1 bezosobowa (fraza z imieniem 0 trafień).
+  ✓ D4 `/api/ocena` odpowiada realnie na produkcji: `{"punkty":6,"komentarz":"Aleksandro, zgodnie z protokołem z posiedzenia..."}`.
+  ✓ D5 rate limit na produkcji: `1:200 2:200 3:200 4:200 5:200 6:429`.
+  ✓ D6 walidacja `/api/zgloszenie` na produkcji: `{"email":"x"}` -> 400.
+  ✓ D7 `og:image` wskazuje `https://j-word-pass.vercel.app/opengraph-image?...`, nie localhost.
+  ✓ D8 `pnpm run check` czysto, `npx playwright test` = 388 passed / 0 failed (pomiar workera z tej paczki).
 
 ---
 
