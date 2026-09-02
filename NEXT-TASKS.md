@@ -7,32 +7,42 @@
 
 ## Gdzie jestesmy
 
-**Fazy F0, F1, F2 i F3 ZAMKNIETE**, kazda z raportem DoD w `plan/11-BACKLOG.md`.
-W tym przebiegu doszly: F3-01, F3-02, F3-03. Jeden commit na issue plus commit
+**Fazy F0, F1, F2, F3 i F4 ZAMKNIETE**, kazda z raportem DoD w `plan/11-BACKLOG.md`.
+W tym przebiegu doszly: F4-01, F4-02, F4-03. Jeden commit na issue plus commit
 z raportem fazy.
 
-Etap 1 dziala end to end: kafel kosmiczny, pas balonow, `ETAP 1` chromem,
-plonacy napis `EGZAMIN JASIU`, scena kosmiczna (planeta, ladownik, 12 gwiazdek,
-`pointer-events: none`), druki `DANE DO ZADANIA` i `TREŚĆ PYTANIA`, druk
-odpowiedzi z licznikiem, osmiornice rogowe, ceremonia narady z dymkami komisji
-i werdykt `ZDANE`/`NIEZDANE` z przejsciem na etap 2. Sprawdzone na ZYWYM modelu:
-werdykt `7/10` po 5465 ms, komentarz w wolaczu `Aleksandro`.
+Etap 2 dziala end to end: kafel `kafel-quiz`, pas balonow, neonowy `QUIZ`, licznik
+`PYTANIE NN / 15` na czarnym tle, karta pytania z ozdoba wg tabeli `plan/07 B`
+(15 roznych `id`), warianty A-D, pytanie 14 otwarte, nawigacja plus rzad 15 kwadratow,
+maszyna prawdy (werdykt co 500 ms, `Escape` odslania wszystko naraz), tryb rewizji
+i przejscie na `/proba-ognia`. Zmierzone na zywej stronie: pelna ceremonia 8415 ms
+(desktop) i 8376 ms (mobile), limit 9000 ms.
 
-**Deploy: NIE ruszany w tej paczce.** Ostatni preview jest sprzed F3, produkcja
-bez zmian. Bramka F8 nadal nalezy do Aleksandry.
+**Deploy: NIE ruszany w tej paczce.** Bramka F8 nadal nalezy do Aleksandry.
 
 ## Nastepne issue
 
-**F4-01** (pierwsze issue fazy F4, QUIZ, oznaczone `⚠ HARD`). Sprawdz jego
-`CZYTAJ:` w backlogu. Faza F4 nie zalezy od F3 - uzywa F1 i F2.
+**F5-01** (pierwsze issue fazy F5, PROBA OGNIA). Sprawdz jego `CZYTAJ:` w backlogu.
+Uwaga: `tests/f5-02.spec.ts` ma DWA sparkowane testy (`test.skip`), ktore po F5-02
+trzeba odpiac - to issue **F7-01**.
 
 ## Stan srodowiska
 
 - `pnpm dev` chodzi na `localhost:3000`. `pnpm run check` zielony, `pnpm build`
-  zielony (`/egzamin` first load 112 kB, limit 160 kB), `npx playwright test`
-  = 146 passed, 0 failed, 10 skipped, dwa pelne przebiegi z rzedu.
-- Nowe pliki tej fazy: `components/egzamin/DrukOdpowiedzi.tsx`,
-  `app/style/egzamin.css`, `tests/f3-02.spec.ts`, `tests/f3-03.spec.ts`.
+  zielony (`/quiz` first load 115 kB, `/egzamin` 112 kB, limit 160 kB),
+  `npx playwright test` = 186 passed, 0 failed, 10 skipped, dwa pelne przebiegi z rzedu.
+- Nowe pliki fazy F4: `components/quiz/Arkusz.tsx`, `app/style/quiz.css`,
+  `tests/f4-01.spec.ts`, `tests/f4-02.spec.ts`, `tests/f4-03.spec.ts`.
+- **`addInitScript` SERIALIZUJE funkcje - domkniecia nie ma.** Fabryka
+  `wypelnij(dane)` zwracajaca funkcje ciagnela `dane` z zakresu testu i w
+  przegladarce leciala `ReferenceError`, przez co szesc testow po cichu pracowalo
+  na pustym arkuszu. Argument podaje sie DRUGIM parametrem: `addInitScript(f, dane)`.
+  Ten sam skrypt odpala sie takze przy `page.reload()`, wiec kazdy seed stanu musi
+  miec straznika `if (sessionStorage.getItem("jwp.v1")) return;`, inaczej reload
+  kasuje to, co wlasnie zapisala strona.
+- **Kolejnosc arkuszy w `globals.css` rozstrzyga remisy specyficznosci.**
+  `quiz.css` idzie PRZED `scena.css`, wiec `.ozdoba { display: block }` bilo
+  `.karta__gif--kopia { display: none }`. Lekarstwo: selektor z rodzicem, nie `!important`.
 - **`.ladowanie` jest teraz `position: fixed`** (bylo `absolute`). Kazda kolejna
   ceremonia odpalana przyciskiem ponizej pierwszego ekranu dziala dzieki temu
   poprawnie. Nie cofaj tego bez przeczytania testu regresji w `tests/f3-03.spec.ts`.
