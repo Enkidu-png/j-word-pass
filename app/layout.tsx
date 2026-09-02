@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import komisja from "@/data/komisja.json";
 import PasGoniec from "@/components/scena/PasGoniec";
 import FokusNaNaglowku from "@/components/shell/FokusNaNaglowku";
 import PassOMetr from "@/components/shell/PassOMetr";
@@ -32,7 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="pl">
       <body>
-        <PasGoniec tekst="KOMISJA CZUWA - ALEKSANDRO, KOMISJA CZUWA" wariant="odbijany" czas={12000} />
+        <PasGoniec tekst={komisja.gonce.gora} wariant="odbijany" czas={12000} />
         <PassOMetr />
         <FokusNaNaglowku />
         <main className="tresc">

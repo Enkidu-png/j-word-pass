@@ -916,9 +916,15 @@ Kolejność liniowa jak wszędzie. Fazę wykonujemy PRZED bramką F8.
   `footer img` = 4 przed i 4 po, `[data-radio-slot]` = 1 przed i 1 po, licznik `0001337` i trzy plakietki bez zmian.
   `git grep -ni "wykonana ręcznie" -- . ':!plan/11-BACKLOG.md'` = 0 wystąpień. Jedyne pozostałe wystąpienie to CYTAT starego napisu w treści tego issue, więc `= 0` bez wyłączenia backlogu jest niewykonalne z definicji.
   Zaktualizowany też spec `plan/05` A3, żeby nie zostawić sprzecznego źródła prawdy.
-- [ ] **F9-02** `ui` Pasy-gońce: górny dostaje dodatkowe człony, komunikat narady wymieniony w całości. Separator między członami to ` ### `.
+- [x] **F9-02** `ui` Pasy-gońce: górny dostaje dodatkowe człony, komunikat narady wymieniony w całości. Separator między członami to ` ### `.
   CZYTAJ: 05→A; 06→C.
   AC: górny pas-goniec zawiera dokładnie: `KOMISJA CZUWA - ALEKSANDRO, KOMISJA CZUWA ### PIĘKNIE DZIŚ WYGLĄDASZ ### POZDRO DLA GEJUF ###`; komunikat ceremonii narady `ALEKSANDRO, KOMISJA LICZY KAŻDĄ ODPOWIEDŹ` (i jego warianty) zastąpiony przez: `ZAJĘCIA Z CHEMII NA UNIWERSYTECIE WARSZAWSKIM ROZPOCZYNAJĄ SIĘ OD 2 PAŹDZIERNIKA ### KACPER ZABRAŁ MI 3 PARY GACI ### PRZEPRASZAM JESZCZE NIE POLICZYŁEM ILE WYDAŁEM ZROBIĘ TO OBIECUJĘ`; teksty siedzą w `data/komisja.json`, nie w komponencie (`git grep` w dowodzie); negatywne: zero `—` i `·` w nowych tekstach (Z1, Z2), `pnpm run check` zielony.
+  ✓ WYKONANE (odczyt `textContent` z uruchomionej aplikacji, zrzuty `/tmp` obejrzane, oba pasy renderują pełny tekst):
+  górny pas (`body > .pas-goniec`, wszystkie widoki) = `KOMISJA CZUWA - ALEKSANDRO, KOMISJA CZUWA ### PIĘKNIE DZIŚ WYGLĄDASZ ### POZDRO DLA GEJUF ###`
+  pas na `/quiz` = `ZAJĘCIA Z CHEMII NA UNIWERSYTECIE WARSZAWSKIM ROZPOCZYNAJĄ SIĘ OD 2 PAŹDZIERNIKA ### KACPER ZABRAŁ MI 3 PARY GACI ### PRZEPRASZAM JESZCZE NIE POLICZYŁEM ILE WYDAŁEM ZROBIĘ TO OBIECUJĘ`
+  Teksty w `data/komisja.json` pod kluczem `gonce` (`gora`, `narada`); `git grep -n "PIĘKNIE DZIŚ"` i `git grep -n "KACPER ZABRAŁ"` wskazują wyłącznie `data/komisja.json` i `plan/11-BACKLOG.md`, zero trafień w komponentach.
+  Goniec ekranu ładowania (`KOMISJA PRZYGOTOWUJE AKTA DLA ALEKSANDRY`) NIE ruszany - to osobny, pinowany napis z `plan/04` F, nie komunikat pasa quizu.
+  `pnpm run check` zielony, `tests/kanon.spec.ts` (zero `—` i `·` na czterech widokach) i `tests/f2-01.spec.ts` przechodzą.
 - [ ] **F9-03** `dane` Zwroty: treść pytania etapu 1 bezosobowo (usunąć `Aleksandro`), quiz zostawia DOKŁADNIE 3 pytania z imieniem - jedno `Aleksandro`, jedno `Rutkowska`, jedno `Mario Magdaleno`, pozostałe 12 bezosobowo. Klauzula zgody w etapie 3: `Potwierdzam, że rozumiem powagę sytuacji.`
   CZYTAJ: 01→E (Z16), 02→E; 08→A pkt 6.
   AC: `jq -r '.pytanie' data/egzamin.json | grep -ci aleksandr` = 0; w `data/quiz.json` dokładnie 3 pytania zawierają imię, po jednym na `Aleksandro`, `Rutkowska`, `Mario Magdaleno` (wypisać numery w dowodzie), pozostałe 12 nie zawierają żadnego z tych słów; etykieta checkboxa w etapie 3 to dokładnie `Potwierdzam, że rozumiem powagę sytuacji.`; negatywne: nigdzie nie wróciła forma bezosobowo-urzędowa („kandydat proszony jest"), `pnpm run check` zielony.

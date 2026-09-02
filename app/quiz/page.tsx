@@ -1,3 +1,4 @@
+import komisja from "@/data/komisja.json";
 import Arkusz from "@/components/quiz/Arkusz";
 import KafelTla from "@/components/scena/KafelTla";
 import NapisObrazek from "@/components/scena/NapisObrazek";
@@ -21,7 +22,7 @@ export default function Strona() {
       <Arkusz />
 
       {/* F6-04: pod arkuszem zostawala pusta plachta 128 px samego kafla. */}
-      <PasGoniec tekst="ALEKSANDRO, KOMISJA LICZY KAŻDĄ ODPOWIEDŹ" czas={10000} />
+      <PasGoniec tekst={komisja.gonce.narada} czas={10000} />
 
       <StworRogowy id="stwor-kot" rog="lewy-dol" />
       <StworRogowy id="stwor-kot" rog="prawy-dol" lustro />
