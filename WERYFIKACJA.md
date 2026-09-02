@@ -113,10 +113,8 @@ padna i u Ciebie, to nie Twoja wina.
       przenosi do tego pytania. Kwadraty z odpowiedzia wygladaja inaczej niz puste.
 - [ ] **4.4 Kwadraty z klawiatury.** Tabem dojdz do kwadratu, wcisnij Enter.
       Ma przeskoczyc do tego pytania.
-- [ ] **4.5 Nawigacja strzalkami.** Kliknij najpierw w karte pytania, potem
-      strzalki lewo i prawo maja przewracac pytania. **ZNANY BLAD: bez tego
-      pierwszego klikniecia strzalki NIE dzialaja w wersji produkcyjnej**
-      (punkt 8.3). Na `pnpm dev` dzialaja i to myli.
+- [ ] **4.5 Nawigacja strzalkami.** Strzalki lewo i prawo przewracaja pytania
+      OD RAZU po wejsciu na `/quiz`, bez klikania w cokolwiek (patrz 8.3).
 - [ ] **4.6 Strzalki w polu tekstowym.** W pytaniu 14 wpisz slowo, wroc kursorem
       strzalka w srodek slowa. Kursor ma sie przesuwac w tekscie, a NIE zmieniac
       pytania.
@@ -190,34 +188,40 @@ padna i u Ciebie, to nie Twoja wina.
       `/proba-ognia`: `outline: dashed 3px rgb(255, 0, 200)` na wszystkich
       dziesieciu elementach w kolejce Taba.
 - [ ] **7.2 Cala sciezka klawiatura.** Przejdz od bramy do listu w butelce
-      SAMA KLAWIATURA, bez ani jednego klikniecia. Uwaga: na `/quiz` zablokuje
-      Cie punkt 4.5.
+      SAMA KLAWIATURA, bez ani jednego klikniecia. Automat przechodzi te droge
+      w tescie `tests/f6-01.spec.ts` w 15 krokach.
 - [ ] **7.3 Zatrzymanie ruchu.** Wlacz w systemie ograniczenie animacji
       (macOS: Ustawienia, Dostepnosc, Wyswietlacz, Ogranicz ruch) albo
       w DevTools: Rendering, `Emulate prefers-reduced-motion: reduce`.
       Odswiez strone. Wszystkie GIF-y maja zamienic sie w nieruchome obrazki,
       a animacje CSS maja stanac.
-- [ ] **7.4 ZNANY BLAD.** Przy wlaczonym ograniczeniu ruchu gorny pasek
-      `KOMISJA CZUWA - ALEKSANDRO, KOMISJA CZUWA` DALEJ sie przesuwa, na
-      wszystkich stronach, takze w wersji produkcyjnej. To lamie zasade Z11.
-      Sprawdz, czy juz naprawione: DevTools, zaznacz `.pas-goniec__tresc`,
-      Computed, `animation-name`. Ma byc `none`, a jest `goniec-odbijany`.
+- [ ] **7.4 Gorny pasek tez stoi.** Przy wlaczonym ograniczeniu ruchu pasek
+      `KOMISJA CZUWA - ALEKSANDRO, KOMISJA CZUWA` ma STAC. To byl blad znaleziony
+      przez recenzenta i naprawiony: DevTools, zaznacz `.pas-goniec__tresc`,
+      Computed, `animation-name` ma byc `none`. Zmierzone po naprawie na buildzie
+      produkcyjnym: `none` na wszystkich paskach na `/`, `/egzamin`, `/quiz`
+      i `/proba-ognia`.
 
-## 8. Znane bledy do potwierdzenia (nie odhaczaj, jesli dalej sa)
+## 8. Bledy z recenzji koncowej (napraw sprawdzona, potwierdz u siebie)
 
-- [ ] **8.1 Literowka w naglowku.** Trzeci etap nazywa sie `PROBA OGNIA` bez
-      kreski nad `O`, i w pasku PassOMetr, i w wielkim naglowku na
-      `/proba-ognia`. W tym samym projekcie `/quiz` mowi juz poprawnie
-      `PRZEJDŹ DO PRÓBY OGNIA`. Ma byc `PRÓBA OGNIA` w obu miejscach.
-- [ ] **8.2 Forma bezosobowa na bramie.** Etykieta pola na bramie brzmi
-      `IMIĘ KANDYDATKI`. To dokladnie ta forma, ktorej caly projekt zakazuje,
-      a Komisja zabrania jej nawet modelowi AI.
-- [ ] **8.3 Strzalki w quizie nie dzialaja w produkcji.** Na `localhost:3100`
-      (`pnpm build && npx next start -p 3100`) wejdz na `/quiz` i od razu wcisnij
-      strzalke w prawo, NIC nie klikajac. Licznik ma zostac na `PYTANIE 01 / 15`.
-      Na `pnpm dev` ten sam ruch dziala, bo tryb deweloperski przypadkiem ustawia
-      fokus na karcie. Test `tests/f4-01.spec.ts` przez to raz przechodzi,
-      a raz pada.
+Recenzent znalazl cztery rzeczy, wszystkie zostaly naprawione i zmierzone na
+buildzie PRODUKCYJNYM (`pnpm build && npx next start -p 3100`), nie na `pnpm dev`.
+Tu potwierdzasz, ze u Ciebie tez dzialaja.
+
+- [ ] **8.1 Nazwa trzeciego etapu ma polska litere.** Pasek PassOMetr i wielki
+      naglowek na `/proba-ognia` mowia `PRÓBA OGNIA`, nie `PROBA OGNIA`. Kreska
+      nad `Ó` ma byc widoczna w calosci, nie ucieta u gory.
+- [ ] **8.2 Brama mowi do Ciebie.** Etykieta pola na bramie brzmi
+      `TWOJE IMIĘ, ALEKSANDRO`, nie `IMIĘ KANDYDATKI`. To samo w druku etapu 3:
+      `TWÓJ ROZMIAR BUTA` i `ŚREDNICA TWOJEGO UCHA W MILIMETRACH`.
+- [ ] **8.3 Strzalki w quizie dzialaja od razu, takze w produkcji.** Na
+      `localhost:3100` wejdz na `/quiz` i wcisnij strzalke w prawo dwa razy,
+      NIC wczesniej nie klikajac. Licznik ma pokazac `PYTANIE 03 / 15`.
+      Wczesniej stal na `PYTANIE 01 / 15`, bo nasluch wisial na sekcji, do
+      ktorej fokus nigdy nie docieral.
+- [ ] **8.4 Pytania quizu tez mowia po imieniu.** Przejrzyj 15 pytan. Osiem
+      z nich zaczyna sie od `Aleksandro,` (reszta ma wlasna tresc, w ktorej
+      zwrot by nie pasowal).
 
 ## 9. Bezpieczenstwo (sprawdzenie jednorazowe)
 
@@ -232,7 +236,7 @@ padna i u Ciebie, to nie Twoja wina.
 ## 10. Bramka F8 (decyzja nalezy do Ciebie)
 
 - [ ] **10.1** Obejrzalas URL preview i te liste.
-- [ ] **10.2** Punkty 7.4, 8.1, 8.2 i 8.3 sa naprawione albo swiadomie przez
-      Ciebie odpuszczone.
+- [ ] **10.2** Punkty z sekcji 7.4 i 8 potwierdzone u Ciebie. Wszystkie zostaly
+      naprawione po recenzji, ale to Ty je odbierasz.
 - [ ] **10.3** Zgadzasz sie na `vercel deploy --prod`, czyli na podmiane zywej
       produkcji wersja druga. Bez tego checkboxa nikt nie wdraza.
