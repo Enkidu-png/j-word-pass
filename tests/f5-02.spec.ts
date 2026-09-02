@@ -162,7 +162,7 @@ test("Escape w kroku 1 skacze od razu do butelki", async ({ page }) => {
   await expect(page.locator("[data-butelka]")).toBeVisible({ timeout: 600 });
 });
 
-test("Enter na butelce rozwija pergamin z e-mailem i suma 20/25, pergamin bez przekrzywienia", async ({ page }) => {
+test("Enter na butelce rozwija pergamin z e-mailem i suma 27/35, pergamin bez przekrzywienia", async ({ page }) => {
   await page.addInitScript(WPUSC);
   await zloz(page);
   const butelka = page.locator("[data-butelka]");
@@ -174,9 +174,10 @@ test("Enter na butelce rozwija pergamin z e-mailem i suma 20/25, pergamin bez pr
   const pergamin = page.locator("[data-pergamin]");
   await expect(pergamin).toBeVisible();
   await expect(page.locator("[data-pergamin-email]")).toContainText("kandydatka@komisja.pl");
-  await expect(pergamin).toContainText("8/10");
+  // F9-04: etap 1 to suma dwoch czesci (8 plus 7) z 20
+  await expect(pergamin).toContainText("15/20");
   await expect(pergamin).toContainText("12/15");
-  await expect(page.locator("[data-suma]")).toContainText("20/25");
+  await expect(page.locator("[data-suma]")).toContainText("27/35");
 
   // Z6 i anty-spec plan/08 F punkt 3: zero obrotu i skosu na pergaminie
   const m = await pergamin.evaluate((e) => getComputedStyle(e).transform);

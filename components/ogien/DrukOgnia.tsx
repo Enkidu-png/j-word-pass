@@ -41,6 +41,11 @@ const pozaSkala = (wartosc: string, min: number, max: number) => {
   return wartosc.trim() === "" || Number.isNaN(liczba) || liczba < min || liczba > max;
 };
 
+// F9-04: etap 1 ma dwie czesci po 10 punktow, wiec do pergaminu i do zgloszenia
+// idzie ICH SUMA, nie sam werdykt czesci pierwszej.
+const sumaEtapu1 = (stan: ReturnType<typeof czytajStan>) =>
+  (stan?.egzamin?.punkty ?? 0) + (stan?.egzamin?.punkty2 ?? 0);
+
 export default function DrukOgnia() {
   const [email, ustawEmail] = useState("");
   const [but, ustawBut] = useState("");
@@ -59,7 +64,7 @@ export default function DrukOgnia() {
   // hydracji z HTML-em z serwera, ktory tego stanu nie zna.
   useEffect(() => {
     const stan = czytajStan();
-    ustawPunkty({ egzamin: stan?.egzamin?.punkty ?? 0, quiz: stan?.quiz?.punkty ?? 0 });
+    ustawPunkty({ egzamin: sumaEtapu1(stan), quiz: stan?.quiz?.punkty ?? 0 });
     if (stan?.ogien?.wyslano === true) {
       ustawEmail(stan.ogien.email ?? "");
       ustawFaze("butelka");
@@ -106,7 +111,7 @@ export default function DrukOgnia() {
     // Teatr rusza NATYCHMIAST i nie czeka na siec: Blob moze paść, a druk ma
     // spłonąć tak samo (plan/08 C krok 1 - POST leci rownolegle).
     const stan = czytajStan();
-    const punktyEgzamin = stan?.egzamin?.punkty ?? 0;
+    const punktyEgzamin = sumaEtapu1(stan);
     const punktyQuiz = stan?.quiz?.punkty ?? 0;
     ustawPunkty({ egzamin: punktyEgzamin, quiz: punktyQuiz });
     ustawFaze("skladanie");

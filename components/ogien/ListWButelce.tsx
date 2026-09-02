@@ -55,9 +55,9 @@ export default function ListWButelce({
             ADRES ZWROTNY: {email}
           </p>
           <ul className="pergamin__wynik">
-            <li>ETAP 1, EGZAMIN: {punktyEgzamin}/10</li>
+            <li>ETAP 1, EGZAMIN: {punktyEgzamin}/20</li>
             <li>ETAP 2, QUIZ: {punktyQuiz}/15</li>
-            <li data-suma>RAZEM: {punktyEgzamin + punktyQuiz}/25</li>
+            <li data-suma>RAZEM: {punktyEgzamin + punktyQuiz}/35</li>
           </ul>
           <p className="pergamin__zamkniecie">{komisja.pismoKoncowe}</p>
           <button

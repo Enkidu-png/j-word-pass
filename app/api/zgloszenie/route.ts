@@ -80,7 +80,8 @@ export async function POST(request: Request) {
 
   // Punkty tez sa granica zaufania: ciche zerowanie wartosci spoza skali
   // zapisywaloby do Bloba druk, ktorego Komisja nigdy nie wystawila.
-  const punktyEgzamin = liczbaWZakresie(cialo.punktyEgzamin, 0, 10);
+  // F9-04: etap 1 to dwie czesci po 10 punktow
+  const punktyEgzamin = liczbaWZakresie(cialo.punktyEgzamin, 0, 20);
   if (punktyEgzamin === null) {
     return Response.json(
       { blad: "Aleksandro, Twoje punkty z etapu 1 wypadają poza skalą Komisji (0-10)." },
