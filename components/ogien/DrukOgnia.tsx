@@ -306,7 +306,7 @@ export default function DrukOgnia() {
           checked={pokora}
           onChange={(z) => ustawPokore(z.target.checked)}
         />
-        <span>ALEKSANDRO, POTWIERDZAM, ŻE ROZUMIEM POWAGĘ SYTUACJI</span>
+        <span>Potwierdzam, że rozumiem powagę sytuacji.</span>
       </label>
 
       <button

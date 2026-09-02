@@ -19,7 +19,7 @@ w butelce z podsumowaniem.
    - `ŚREDNICA UCHA W MILIMETRACH` - `type="number"`, zakres 5-500, obok
      `Ozdoba id="stwor-ucho"` (jeśli brak motywu: dowolna inna z biblioteki)
 6. **Klauzula** na `--papier`, stopień `--stopien-drobny`, plus `<input type="checkbox">`
-   z etykietą `ALEKSANDRO, POTWIERDZAM, ŻE ROZUMIEM POWAGĘ SYTUACJI`.
+   z etykietą `Potwierdzam, że rozumiem powagę sytuacji.` (Z16 po zmianie z 2026-09-02).
 7. Przycisk `SKŁADAM WNIOSEK` - `disabled` dopóki checkbox niezaznaczony.
 8. `StworRogowy` x2 dolne z `--lustro`.
 

@@ -1,6 +1,6 @@
 {
   "tytul": "EGZAMIN PAŃSTWOWY Z FIZYKI STOSOWANEJ NR F-7/BIS",
-  "tresc": "Aleksandro, kto Twoim zdaniem wygrałby pojedynek: 2000 zebr z jetpackami, ale biało-żółtych, czy 1 słoń z karabinem maszynowym na trąbie?",
+  "tresc": "Kto Twoim zdaniem wygrałby pojedynek: 2000 zebr z jetpackami, ale biało-żółtych, czy 1 słoń z karabinem maszynowym na trąbie?",
   "zalozenia": [
     {
       "id": "kosmos",
@@ -27,7 +27,7 @@
       "tekst": "Przyjmujemy, że słoń przy każdym strzale przyspiesza o 1 km/h."
     }
   ],
-  "polecenie": "Aleksandro, zastosuj odpowiednie wzory i udowodnij swój wynik.",
+  "polecenie": "Zastosować odpowiednie wzory i udowodnić swój wynik.",
   "liczbaPodzadan": 1,
   "punktyMin": 6,
   "punktyMax": 10,
