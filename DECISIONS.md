@@ -465,3 +465,53 @@ w `summary`.
 Nasłuch strzałek wchodzi po hydracji, a `pnpm dev` przy 12 równoległych workerach
 kompiluje `/quiz` wolniej niż test naciska klawisz. Pojedynczo test przechodzi
 zawsze. Nie naprawiane w tej paczce - kandydat na barierę hydracji w teście.
+
+## 24. Faza F10: brama wstępu to PRÓG ZWALNIAJĄCY, nie uwierzytelnienie (2026-09-02)
+
+**Decyzja wymagana przez AC F10-03.** Pytanie kontrolne (`Jak na drugie imię ma
+Janek?`) i odpowiedź stoją w `data/komisja.json`, czyli w kodzie, który dostaje
+przeglądarka. Nagłówek `x-jwp-klucz` jedzie z `localStorage`. Ktoś zdeterminowany
+odczyta jedno i drugie w pięć sekund i to jest **zamierzone**: brama chroni przed
+przypadkowym ruchem, botami i linkiem wklejonym nie tam, gdzie trzeba. Przed
+uporczywym nadużyciem broni dopiero limit 5/min z `lib/limit.ts` oraz limit
+kwotowy klucza OpenRouter. Nie nazywać tego logowaniem i nie dokładać do niego
+niczego, co wymagałoby, żeby był szczelny.
+
+**Zamek jest zamknięty z braku klucza.** `lib/klucz.ts` odbija żądanie także
+wtedy, gdy `JWP_KLUCZ_WSTEPU` w ogóle nie ma w środowisku. Odwrotny wybór
+(brak zmiennej = przepuszczamy) zamieniłby literówkę w konfiguracji w cichy
+brak ochrony.
+
+**Pułapka 1: `JWP_KLUCZ_WSTEPU` jest w Vercelu oznaczona jako wrażliwa, więc
+`vercel env pull` oddaje `"[REDACTED]"`, nie wartość.** Testy nie mogą zależeć
+od sekretu, którego nie da się odczytać - `playwright.config.ts` wstrzykuje
+serwerowi własną, jawną wartość przez `webServer.env` - UMYŚLNIE inną niż
+odpowiedź z bramy, żeby prawdziwy klucz nie pojawił się w repozytorium (AC
+F10-03). Next nie nadpisuje zmiennych już obecnych w env procesu, więc ta
+wygrywa z `.env.local`.
+
+**Pułapka 2: `extraHTTPHeaders` w `use` leci do KAŻDEGO hosta, także na
+youtube.com.** Globalny `x-jwp-klucz` wywracał `tests/f5-03` (odtwarzacz radia).
+Klucz doklejany jest więc per wywołanie `request.post`, nie globalnie. Testy
+sterowane przeglądarką klucza nie potrzebują - biorą go z `localStorage`, który
+suita dostaje przez `storageState`.
+
+**Pułapka 3: nakładki bramy NIE MA w HTML-u z serwera.** Serwer nie wie, czy
+petent ma ważny wpis, więc nakładka w wydruku migałaby powracającym i - co
+gorsza - siedziała w DOM-ie każdego pomiaru sceny do końca hydracji (wywracało to
+`tests/f1-02` i `tests/f7-08` na policzonych ozdobach i na gońcu w `display:none`).
+Treść widoku chowa ARKUSZ regułą `:root:not([data-wstep="1"]) body > *:not(.wstep)`,
+a atrybut stawia skrypt z `<head>` przed pierwszym malowaniem.
+
+**Pułapka 4: sam `focusin` nie wystarcza na pułapkę fokusu.** Shift+Tab z
+pierwszego pola nakładki oddaje fokus paskowi przeglądarki, `activeElement`
+schodzi na `<body>` i żadne zdarzenie nie leci. Cykl trzeba domknąć osobnym
+nasłuchem `keydown` na krańcach.
+
+**Pułapka 5: produkcja potrafi odbić `curl` z lokalnego IP.** W trakcie tej
+paczki `https://j-word-pass.vercel.app` zaczął oddawać 403 i stronę
+`Vercel Security Checkpoint` dla `curl` ORAZ dla headless Chromium z tej samej
+maszyny, przy czym ten sam adres pobrany z zewnątrz zwracał 200. To automatyczna
+mitygacja ruchu, nie zmiana w projekcie (`get_project_deployment_protection`
+pokazuje wszystkie trzy ochrony wyłączone). Weryfikacja produkcji przechodzi
+wtedy przez zwykłą przeglądarkę (`fetch` z konsoli strony), nie przez `curl`.

@@ -6,6 +6,7 @@ import ListWButelce from "@/components/ogien/ListWButelce";
 import NapisObrazek from "@/components/scena/NapisObrazek";
 import Ozdoba from "@/components/scena/Ozdoba";
 import { czytajStan, zapiszTeraz } from "@/lib/stan";
+import { kluczWstepu } from "@/lib/wstep";
 
 // Druk OGN-3/TAJ plus walidacja stemplami (plan/08 A punkty 5-7, plan/08 B).
 //
@@ -156,7 +157,8 @@ export default function DrukOgnia() {
       try {
         const odp = await fetch("/api/zgloszenie", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          // F10-03: ten sam klucz co przy ocenie.
+          headers: { "Content-Type": "application/json", "x-jwp-klucz": kluczWstepu() },
           body: JSON.stringify(dane),
         });
         if (odp.ok) {

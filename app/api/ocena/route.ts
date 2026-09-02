@@ -2,6 +2,7 @@
 // Klucz zyje wylacznie tutaj, po stronie serwera (Z12).
 
 import egzamin from "@/data/egzamin.json";
+import { brakKlucza } from "@/lib/klucz";
 import { adresZadania, limitPrzekroczony } from "@/lib/limit";
 import { losowe6, zapiszJSON } from "@/lib/zapis";
 
@@ -98,6 +99,12 @@ async function zapytajModel(model: string, odpowiedz: string, klucz: string, cze
 }
 
 export async function POST(request: Request) {
+  // F10-03: brama wstepu chroni takze ten endpoint, a nie tylko widok.
+  // Sprawdzenie stoi PRZED czytaniem ciala i przed wywolaniem modelu - zadne
+  // zadanie bez klucza nie kosztuje ani grosza.
+  const zamek = brakKlucza(request);
+  if (zamek) return zamek;
+
   const surowy = await request.text();
   if (new TextEncoder().encode(surowy).length > LIMIT_BAJTOW) {
     return Response.json({ blad: "Aleksandro, Twój wniosek przekracza dopuszczalną objętość akt." }, { status: 413 });

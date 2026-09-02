@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import egzamin from "@/data/egzamin.json";
 import komisja from "@/data/komisja.json";
+import { kluczWstepu } from "@/lib/wstep";
 import EkranLadowania from "@/components/scena/EkranLadowania";
 import NapisObrazek from "@/components/scena/NapisObrazek";
 import { czytajStan, zapiszStan, zapiszTeraz } from "@/lib/stan";
@@ -121,7 +122,8 @@ export default function DrukOdpowiedzi() {
     ustawFaze("narada");
     fetch("/api/ocena", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      // F10-03: bez klucza z bramy wstepu endpoint oddaje 401 i nie wola modelu.
+      headers: { "Content-Type": "application/json", "x-jwp-klucz": kluczWstepu() },
       body: JSON.stringify({ odpowiedz: tresc, czesc }),
     })
       .then((r) =>

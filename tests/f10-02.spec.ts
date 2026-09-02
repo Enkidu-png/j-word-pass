@@ -69,7 +69,10 @@ test("bledna odpowiedz: stempel, fokus zostaje w polu, ZERO przeladowania", asyn
   expect(await page.evaluate(() => window.localStorage.getItem("jwp.wstep"))).toBeNull();
 });
 
-for (const wpis of ["Franciszek", "franciszek", "FRANCISZEK", "  FrAnCiSzEk  "]) {
+// Odpowiedz bierzemy Z DANYCH, nie z literalu: prawdziwy klucz nie ma prawa
+// stac w repozytorium poza `data/komisja.json` (AC F10-03).
+const O = komisja.wstep.odpowiedz;
+for (const wpis of [O, O.toLowerCase(), O.toUpperCase(), `  ${O}  `]) {
   test(`poprawna odpowiedz "${wpis}" zdejmuje nakladke i zostaje po reloadzie`, async ({ page }) => {
     await page.goto("/");
     await page.locator("[data-pole='wstep']").fill(wpis);

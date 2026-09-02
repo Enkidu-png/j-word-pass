@@ -1,6 +1,12 @@
 import { test, expect } from "@playwright/test";
 import komisja from "../data/komisja.json";
 
+// F10-03: `/api/ocena` i `/api/zgloszenie` oddaja 401 bez klucza z bramy wstepu.
+// Przegladarka bierze go z localStorage, wywolania z fixture `request` musza go
+// doklejac same. Naglowek NIE jest globalny w konfiguracji: leciałby wtedy takze
+// do youtube.com i wywracal testy radia.
+const KLUCZ = { "x-jwp-klucz": "wstep-testowy" };
+
 // AC F5-02: poprawny POST tworzy blob zgloszenia/...json; email "x" -> 400 z komunikatem
 // Komisji; payload 3 KB -> 400/413; brak tokena -> 200 tryb "dev-log" (mierzone osobno,
 // bo lokalny dev MA token - dowod w BACKLOGU); negatywne: drugi submit z flaga wyslano
@@ -37,7 +43,7 @@ const WPUSC = () => {
 };
 
 test("poprawny POST konczy sie zapisem pod zgloszenia/<ts>-<losowe6>.json", async ({ request }) => {
-  const res = await request.post("/api/zgloszenie", { data: POPRAWNE });
+  const res = await request.post("/api/zgloszenie", { data: POPRAWNE, headers: KLUCZ });
   expect(res.status()).toBe(200);
   const cialo = await res.json();
   expect(["blob", "dev-log"]).toContain(cialo.tryb);
@@ -45,17 +51,26 @@ test("poprawny POST konczy sie zapisem pod zgloszenia/<ts>-<losowe6>.json", asyn
 });
 
 test("email 'x' odsylany z 400 i komunikatem Komisji", async ({ request }) => {
-  const res = await request.post("/api/zgloszenie", { data: { ...POPRAWNE, email: "x" } });
+  const res = await request.post("/api/zgloszenie", {
+    data: { ...POPRAWNE, email: "x" },
+    headers: KLUCZ,
+  });
   expect(res.status()).toBe(400);
   expect((await res.json()).blad).toContain("ADRES NIE PRZYPOMINA ADRESU");
 });
 
 test("zakresy buta i ucha pilnowane po stronie serwera", async ({ request }) => {
-  const but = await request.post("/api/zgloszenie", { data: { ...POPRAWNE, rozmiarButa: 8 } });
+  const but = await request.post("/api/zgloszenie", {
+    data: { ...POPRAWNE, rozmiarButa: 8 },
+    headers: KLUCZ,
+  });
   expect(but.status()).toBe(400);
   expect((await but.json()).blad).toContain("10-70");
 
-  const ucho = await request.post("/api/zgloszenie", { data: { ...POPRAWNE, srednicaUchaMm: 900 } });
+  const ucho = await request.post("/api/zgloszenie", {
+    data: { ...POPRAWNE, srednicaUchaMm: 900 },
+    headers: KLUCZ,
+  });
   expect(ucho.status()).toBe(400);
   expect((await ucho.json()).blad).toContain("5-500");
 });
@@ -63,6 +78,7 @@ test("zakresy buta i ucha pilnowane po stronie serwera", async ({ request }) => 
 test("payload 3 KB odbity limitem objetosci", async ({ request }) => {
   const res = await request.post("/api/zgloszenie", {
     data: { ...POPRAWNE, email: `${"a".repeat(3000)}@komisja.pl` },
+    headers: KLUCZ,
   });
   expect([400, 413]).toContain(res.status());
   expect((await res.json()).blad).toContain("objętość");

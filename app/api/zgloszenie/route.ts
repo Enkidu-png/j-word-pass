@@ -1,3 +1,4 @@
+import { brakKlucza } from "@/lib/klucz";
 import { adresZadania, limitPrzekroczony } from "@/lib/limit";
 import { losowe6, zapiszJSON } from "@/lib/zapis";
 
@@ -34,6 +35,10 @@ const punktyLubNull = (wartosc: unknown): number | null =>
   liczbaWZakresie(wartosc, 0, 10);
 
 export async function POST(request: Request) {
+  // F10-03: ten sam prog co w `ocena` - bez klucza z bramy nic nie laduje w platnym store.
+  const zamek = brakKlucza(request);
+  if (zamek) return zamek;
+
   // Druk bez auth zapisuje pliki do platnego store'a - limit jest tu jedyna
   // zapora przed pompowaniem go skryptem. Prog nizszy niz w `ocena`, bo
   // Aleksandra sklada zgloszenie raz, nie piec razy na minute.

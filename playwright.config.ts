@@ -15,7 +15,7 @@ export default defineConfig({
       origins: [
         {
           origin: "http://localhost:3000",
-          localStorage: [{ name: "jwp.wstep", value: "franciszek" }],
+          localStorage: [{ name: "jwp.wstep", value: "wstep-testowy" }],
         },
       ],
     },
@@ -32,6 +32,13 @@ export default defineConfig({
   ],
   webServer: {
     command: "pnpm dev",
+    // Prawdziwa wartosc JWP_KLUCZ_WSTEPU zyje wylacznie w env Vercela i jest tam
+    // oznaczona jako wrazliwa, wiec `vercel env pull` jej NIE oddaje. Testy nie
+    // moga zalezec od sekretu, ktorego nie da sie odczytac: lokalnie serwer
+    // dostaje wartosc jawna i UMYSLNIE INNA niz odpowiedz z bramy - prawdziwy
+    // klucz nie ma prawa pojawic sie w repozytorium (AC F10-03). Next nie
+    // nadpisuje zmiennych juz obecnych w env procesu, wiec ta wygrywa z `.env.local`.
+    env: { JWP_KLUCZ_WSTEPU: "wstep-testowy" },
     url: "http://localhost:3000",
     reuseExistingServer: true,
     timeout: 120_000,

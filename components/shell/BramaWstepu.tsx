@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import komisja from "@/data/komisja.json";
 import { assetPo } from "@/lib/assety";
-import { KLUCZ_WSTEPU, wstepPasuje } from "@/lib/wstep";
+import { KLUCZ_WSTEPU, kluczDoNaglowka, wstepPasuje } from "@/lib/wstep";
 import NapisObrazek from "@/components/scena/NapisObrazek";
 import Ozdoba from "@/components/scena/Ozdoba";
 import Pas from "@/components/scena/Pas";
@@ -94,7 +94,7 @@ export default function BramaWstepu() {
   const przepusc = (zapisz: boolean) => {
     if (zapisz) {
       try {
-        window.localStorage.setItem(KLUCZ_WSTEPU, komisja.wstep.odpowiedz);
+        window.localStorage.setItem(KLUCZ_WSTEPU, kluczDoNaglowka(komisja.wstep.odpowiedz));
       } catch {
         // jw. - brak zapisu znaczy tylko tyle, ze przy kolejnym wejsciu spytamy jeszcze raz
       }

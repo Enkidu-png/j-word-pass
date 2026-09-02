@@ -14,6 +14,12 @@ export function wstepPasuje(wpis: string, odpowiedz: string): boolean {
   return w.length > 0 && w === normalizuj(odpowiedz);
 }
 
+// W localStorage siedzi wartosc ZNORMALIZOWANA, bo dokladnie ona jedzie potem
+// w naglowku `x-jwp-klucz` (F10-03).
+export function kluczDoNaglowka(odpowiedz: string): string {
+  return normalizuj(odpowiedz);
+}
+
 // Wartosc do naglowka `x-jwp-klucz` (F10-03). Poza przegladarka pusty string.
 export function kluczWstepu(): string {
   if (typeof window === "undefined") return "";
