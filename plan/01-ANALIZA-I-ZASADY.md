@@ -156,8 +156,21 @@ pilnuje allowlisty. Efekt 3D robimy CSS-owymi transformacjami, nie `three.js`.
 **Z15. Dźwięk startuje TYLKO po geście Aleksandry.** Zero autoplay z dźwiękiem.
 Stan włączenia zapamiętany w `localStorage` pod kluczem `jwp.audio`.
 
-**Z16. Copy mówi do Aleksandry po imieniu** (sekcja D). Złamanie: „Kandydat proszony
-jest o wypełnienie druku".
+**Z16. Copy mówi do Aleksandry, ale NIE wszędzie po imieniu** (sekcja D, wersja
+poprawiona po odbiorze 2026-09-02). Domyślny rejestr to drugia osoba liczby pojedynczej
+(„Twoja odpowiedź", „potwierdzam"), a wołacz `Aleksandro` jest **przyprawą, nie regułą**:
+za dużo imienia brzmi jak mail marketingowy, nie jak żart. Wiążący rozkład:
+
+| Miejsce | Zwrot |
+|---|---|
+| treść pytania etapu 1 (obie części) | BEZOSOBOWO, zero imienia |
+| pytania quizu | dokładnie 3 z 15 z imieniem: jedno `Aleksandro`, jedno `Rutkowska`, jedno `Mario Magdaleno`; pozostałe 12 bezosobowo |
+| klauzula zgody w etapie 3 | `Potwierdzam, że rozumiem powagę sytuacji.` bez imienia |
+| etykiety pól, przyciski, komunikaty błędów | drugą osobą, imię dozwolone oszczędnie |
+| pasy-gońce | wg treści z `05` A i `06` C, imię dozwolone |
+
+Złamanie: „Kandydat proszony jest o wypełnienie druku" (forma bezosobowa urzędowa
+zamiast drugiej osoby) ORAZ wstawienie `Aleksandro` do treści pytania egzaminacyjnego.
 
 **Z17. Zakaz `transition: all`.** Zawsze lista konkretnych właściwości.
 

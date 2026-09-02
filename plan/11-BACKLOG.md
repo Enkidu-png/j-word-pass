@@ -894,6 +894,32 @@ odrzucone z powodem, albo przeniesione do trackera).
   AC: na 390x844 górna krawędź `<textarea>` jest nie niżej niż **1000 px** od początku strony, a `TREŚĆ PYTANIA` nie niżej niż **600 px** (pomiar `getBoundingClientRect().top + scrollY`, obie liczby w dowodzie); gęstość Z8 nadal spełniona (>= 6 animowanych elementów, >= 2 stwory rogowe, >= 1 pas - policzyć po zmianie); płonący napis `EGZAMIN JASIU` nadal widoczny nad zadaniem; kryterium negatywne: nic nie zostało USUNIĘTE ze sceny - scena kosmiczna, założenia i ozdoby dalej są na stronie, tylko w innej kolejności albo w zwartszym układzie (porównanie liczby `img[data-ozdoba]` przed i po, wynik ten sam).
   PROPOZYCJA WYKONANIA (worker może wybrać inną, jeśli spełni AC): na 390 px scena kosmiczna schodzi z 200 px do 120 px i ląduje POD drukiem odpowiedzi, a `DANE DO ZADANIA` zwijają się w `<details>` otwarty domyślnie na desktopie i zamknięty na mobile. Dekoracja zostaje, kolejność się zmienia.
 
+## F9 - ZMIANY PO ODBIORZE (zamówione przez Aleksandrę 2026-09-02)
+
+Kolejność liniowa jak wszędzie. Fazę wykonujemy PRZED bramką F8.
+
+- [ ] **F9-01** `ui` Stopka: napis `STRONA WYKONANA RĘCZNIE DLA ALEKSANDRY` zamieniony na `MINISTERSTWO CERTYFIKACJI JAN SACHSE`.
+  CZYTAJ: 05→A3.
+  AC: stopka na wszystkich 4 stronach pokazuje `MINISTERSTWO CERTYFIKACJI JAN SACHSE`; `git grep -ci "wykonana ręcznie"` = 0; negatywne: reszta stopki (licznik, plakietki, slot radia, pas) bez zmian - liczba `img` w stopce ta sama co przed zmianą.
+- [ ] **F9-02** `ui` Pasy-gońce: górny dostaje dodatkowe człony, komunikat narady wymieniony w całości. Separator między członami to ` ### `.
+  CZYTAJ: 05→A; 06→C.
+  AC: górny pas-goniec zawiera dokładnie: `KOMISJA CZUWA - ALEKSANDRO, KOMISJA CZUWA ### PIĘKNIE DZIŚ WYGLĄDASZ ### POZDRO DLA GEJUF ###`; komunikat ceremonii narady `ALEKSANDRO, KOMISJA LICZY KAŻDĄ ODPOWIEDŹ` (i jego warianty) zastąpiony przez: `ZAJĘCIA Z CHEMII NA UNIWERSYTECIE WARSZAWSKIM ROZPOCZYNAJĄ SIĘ OD 2 PAŹDZIERNIKA ### KACPER ZABRAŁ MI 3 PARY GACI ### PRZEPRASZAM JESZCZE NIE POLICZYŁEM ILE WYDAŁEM ZROBIĘ TO OBIECUJĘ`; teksty siedzą w `data/komisja.json`, nie w komponencie (`git grep` w dowodzie); negatywne: zero `—` i `·` w nowych tekstach (Z1, Z2), `pnpm run check` zielony.
+- [ ] **F9-03** `dane` Zwroty: treść pytania etapu 1 bezosobowo (usunąć `Aleksandro`), quiz zostawia DOKŁADNIE 3 pytania z imieniem - jedno `Aleksandro`, jedno `Rutkowska`, jedno `Mario Magdaleno`, pozostałe 12 bezosobowo. Klauzula zgody w etapie 3: `Potwierdzam, że rozumiem powagę sytuacji.`
+  CZYTAJ: 01→E (Z16), 02→E; 08→A pkt 6.
+  AC: `jq -r '.pytanie' data/egzamin.json | grep -ci aleksandr` = 0; w `data/quiz.json` dokładnie 3 pytania zawierają imię, po jednym na `Aleksandro`, `Rutkowska`, `Mario Magdaleno` (wypisać numery w dowodzie), pozostałe 12 nie zawierają żadnego z tych słów; etykieta checkboxa w etapie 3 to dokładnie `Potwierdzam, że rozumiem powagę sytuacji.`; negatywne: nigdzie nie wróciła forma bezosobowo-urzędowa („kandydat proszony jest"), `pnpm run check` zielony.
+- [ ] **F9-04** `dane` ⚠ HARD Etap 1 dostaje DRUGĄ CZĘŚĆ, pokazywaną po zamknięciu części pierwszej.
+  CZYTAJ: 06→A,B,C; 02→B,E1.
+  Treść zadania (dosłownie, bezosobowo): `Zakładając, że siła wkurwienia myszy wynosi 12 megawatów, a przeciętny debil generuje 15 idiotycznych pytań na minutę oraz 5 cringowych tekstów co 10 minut: jaki jest potencjał wpierdolu oraz po jakim czasie najszybciej nastąpi wpierdol? Zastosować odpowiednie wzory i uzasadnić odpowiedź.`
+  AC: po werdykcie części 1 pojawia się przycisk `PRZEJDŹ DO CZĘŚCI 2`, a nie od razu przejście do etapu 2; część 2 ma własny druk z treścią wyżej, własną `<textarea>` z licznikiem 8000 znaków i własny przycisk oddania; ocena idzie tym samym `/api/ocena` (payload z polem rozróżniającym część, prompt dostaje treść zadania z `data/egzamin.json`); wynik etapu 1 w `sessionStorage` trzyma OBA werdykty, a PassOMetr pokazuje sumę; `StrazEtapu` przepuszcza na `/quiz` dopiero po zamknięciu części 2; pusta odpowiedź w części 2 zachowuje się jak w części 1 (0/10 bez żądania do API); zrzuty desktop i 390 px OBEJRZANE; negatywne: treść zadania NIE jest zaszyta w komponencie (`git grep` na fragmencie zwraca tylko `data/egzamin.json`), zero `Aleksandro` w treści zadania (Z16).
+- [ ] **F9-05** `ui` Radio: usunięcie podpisu `LECI: POST MALONE, TINY DESK CONCERT`, dodanie przełączania między trzema materiałami strzałkami.
+  CZYTAJ: 09 (cały).
+  Lista materiałów (kolejność wiążąca): 1. `oCcks-fwq2c` (Post Malone, Tiny Desk Concert, NPR Music), 2. `RLmx3KMNuRM` (Top Gun Niesiołowice, czasem łowię ryby), 3. `wj2jITPprLw` (tak puszysty jak almette, ebr cypisz).
+  AC: obudowa ma dwie strzałki (`POPRZEDNI` i `NASTĘPNY`) jako przyciski z `aria-label`; klik przełącza materiał w pętli (z trzeciego na pierwszy) i odtwarzacz gra nowy `videoId` (assercja na `src` iframe albo `player.getVideoData().video_id`); wybrany materiał zapisany w `localStorage` pod `jwp.kanal` i wraca po reloadzie; strzałki działają też klawiaturą (Tab plus Enter); podpis `LECI: POST MALONE...` nie występuje (`git grep -ci "leci: post"` = 0), zamiast niego pokazywana jest nazwa bieżącego materiału z listy; negatywne: nadal ZERO żądań do YouTube przed pierwszym kliknięciem `WŁĄCZ`, zero plików audio w `public/`.
+- [ ] **F9-06** `ui` ⚠ HARD Etap 3: po zatwierdzeniu druku i ceremonii spalenia dochodzi ekran z ZADANIEM próby ognia, przedstawiony jako druk Komisji.
+  CZYTAJ: 08→C,D,E,F; 04→B,D.
+  Treść zadania (dosłownie): `PRÓBA OGNIA: stanąć na głowie, ze skarpetkami na dłoniach, nogami w śpiworze i w okularach przeciwsłonecznych. Punkty bonusowe za piankę marshmallow w buzi. Wykonanie udowodnić zdjęciem albo filmem.`
+  AC: ekran pojawia się po ceremonii spalenia a PRZED listem w butelce (kolejność sprawdzona w teście); zadanie stoi na druku z ramką `ridge`, ma `NapisObrazek` z nagłówkiem i minimum 3 ozdoby z manifestu, w tym `ogien`; przycisk `PRZYJMUJĘ WYZWANIE` prowadzi do butelki; zrzuty desktop i 390 px OBEJRZANE - cały tekst zadania czytelny bez przewijania w poziomie; negatywne: treść w `data/komisja.json`, nie w komponencie; nic nie jest przekrzywione (Z6); zero pola na wgranie pliku (dowód wysyła się poza stroną, nie budujemy uploadu).
+
 ## F8 - BRAMKA DECYZYJNA
 
 - [ ] **F8-01** `deploy` ⏳ STOP-GATE przed wykonaniem: pokaż Aleksandrze URL preview plus `WERYFIKACJA.md`, zapytaj o zgodę na `vercel deploy --prod` (podmiana żywej produkcji z wersji 1).
