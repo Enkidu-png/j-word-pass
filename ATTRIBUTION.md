@@ -60,3 +60,15 @@ stwor-zegar.gif | https://blob.gifcities.org/gifcities/5F7THBEHNDLP262BDD55U2AKO
 plakietka-html.gif | https://blob.gifcities.org/gifcities/YTQW3GVYDPVL2PCPDZYVSFWD255OBQJY.gif | GeoCities archive (Internet Archive), public domain-ish | 2026-09-02 | haslo: valid html
 plakietka-css.gif | https://blob.gifcities.org/gifcities/JSSRMAUVR7I3GABBLH2ZQUBPLQBL36LO.gif | GeoCities archive (Internet Archive), public domain-ish | 2026-09-02 | haslo: made with css
 plakietka-przegladarka.gif | https://blob.gifcities.org/gifcities/2RPJGXKVKDB7LXANJPZQJ4MOCCTLK2RC.gif | GeoCities archive (Internet Archive), public domain-ish | 2026-09-02 | haslo: netscape now
+
+## Materialy radia Komisji (F9-05)
+
+Nie sa kopiowane do repo. Odtwarzane WYLACZNIE przez oficjalny osadzony odtwarzacz
+YouTube (`youtube-nocookie.com`), prawa przy wlascicielach kanalow. Link do zrodla
+jest widoczny w obudowie radia.
+
+| Nr | ID filmu | Material | Zrodlo |
+|---|---|---|---|
+| 1 | oCcks-fwq2c | Post Malone, Tiny Desk Concert, NPR Music | https://youtu.be/oCcks-fwq2c |
+| 2 | RLmx3KMNuRM | Top Gun Niesiolowice, czasem lowie ryby | https://youtu.be/RLmx3KMNuRM |
+| 3 | wj2jITPprLw | tak puszysty jak almette, ebr cypisz | https://youtu.be/wj2jITPprLw |

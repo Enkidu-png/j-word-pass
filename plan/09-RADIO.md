@@ -57,7 +57,7 @@ Elementy obudowy, od góry:
 - suwak głośności `<input type="range" min="0" max="100">` sterujący `setVolume`
 - **strzałki `POPRZEDNI` i `NASTĘPNY`** (F9-05) w rzędzie pod `WŁĄCZ`, z `aria-label`,
   przełączające w pętli między trzema materiałami; wybór w `localStorage` pod `jwp.kanal`
-- podpis: nazwa BIEŻĄCEGO materiału (podpis `LECI: POST MALONE...` skasowany w F9-05)
+- podpis: nazwa BIEŻĄCEGO materiału (stały podpis z jednym koncertem skasowany w F9-05)
   plus link `youtu.be/<id bieżącego materiału>` otwierany w nowej karcie (atrybucja źródła)
 
 **Lista materiałów (F9-05, kolejność wiążąca):** 1. `oCcks-fwq2c` (Post Malone, Tiny Desk
